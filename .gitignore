@@ -1,0 +1,22 @@
+﻿# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Local tooling artefacts
+_cdp_*/
+_shot*/
+tools/_*/
+_dom.html
+screenshots/_probe*
+*.log
+
+# Editors
+.vscode/
+.idea/
+*.suo
+*.user

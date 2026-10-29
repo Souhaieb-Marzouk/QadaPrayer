@@ -1,0 +1,533 @@
+/**
+ * The Qada model.
+ *
+ * Design in one paragraph: every prayer of a lifetime is a *slot* identified by
+ * an absolute integer `dayNumber * 5 + prayerIndex`. The ledger stores one mark
+ * per slot (missed / done / exempt). Everything the user sees — the backlog
+ * count, today's per-prayer make-up lists, the projected finish date — is
+ * derived from that ledger plus the profile. Nothing is stored as "a plan", so
+ * changing the daily frequency, marking an old day retroactively, or deferring
+ * a make-up can never corrupt history: history is only the marks themselves.
+ */
+
+import {
+  PRAYERS,
+  PRAYER_INDEX,
+  SLOTS_PER_DAY,
+  addDays,
+  dayOfISO,
+  isISO,
+  toISO,
+  todayISO as computeTodayISO,
+} from './dates.js';
+import { decodeRuns, encodeRuns } from './rle.js';
+
+export const MARK_MISSED = 0;
+export const MARK_DONE = 1;
+export const MARK_EXEMPT = 2;
+
+export const STATE_VERSION = 1;
+
+export const DEFAULT_PROFILE = {
+  gender: 'male',
+  pubertyDate: null,
+  pubertySource: 'estimate',
+  revertDate: null,
+  regularSince: null,
+  location: {
+    name: 'Tunis',
+    country: 'Tunisia',
+    lat: 36.8065,
+    lon: 10.1815,
+    tz: 'Africa/Tunis',
+  },
+  method: 'tunisia',
+  asrShadow: 1,
+  offsets: { subh: 0, sunrise: 0, dhuhr: 0, asr: 0, maghreb: 0, isha: 0 },
+  quotaPrayers: 5,
+  language: 'en',
+  theme: 'dark',
+  textScale: 1,
+  askBeforeDone: true,
+  strictOrder: false,
+  notifications: { enabled: false, subh: true, dhuhr: true, asr: true, maghreb: true, isha: true, qada: true, quietFrom: 23, quietTo: 5 },
+  lock: { enabled: false, pinHash: null },
+};
+
+/** Number of make-ups the user aims for per day. */
+export function quotaPrayers(profile) {
+  const value = Number(profile?.quotaPrayers);
+  if (!Number.isFinite(value)) return 5;
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+/** Split the daily quota across the five prayers, earliest prayers first. */
+export function distributeQuota(quota) {
+  const base = Math.floor(quota / SLOTS_PER_DAY);
+  const remainder = quota % SLOTS_PER_DAY;
+  return Array.from({ length: SLOTS_PER_DAY }, (_, i) => base + (i < remainder ? 1 : 0));
+}
+
+/** First slot the user was ever obliged to pray (Dhuhr of the puberty day). */
+export function owedStartIndex(profile) {
+  if (!profile?.pubertyDate || !isISO(profile.pubertyDate)) return null;
+  let start = dayOfISO(profile.pubertyDate) * SLOTS_PER_DAY + PRAYER_INDEX.dhuhr;
+  if (profile.revertDate && isISO(profile.revertDate)) {
+    start = Math.max(start, dayOfISO(profile.revertDate) * SLOTS_PER_DAY);
+  }
+  return start;
+}
+
+export function slotIndex(dateISO, prayer) {
+  const day = dayOfISO(dateISO);
+  const index = PRAYER_INDEX[prayer];
+  if (index === undefined) throw new RangeError(`Unknown prayer: ${prayer}`);
+  return day * SLOTS_PER_DAY + index;
+}
+
+export function slotDate(index) {
+  const day = Math.floor(index / SLOTS_PER_DAY);
+  return { dateISO: toISO(fromDateNumber(day)), prayer: PRAYERS[index % SLOTS_PER_DAY] };
+}
+
+function fromDateNumber(dayNumberValue) {
+  const dt = new Date(dayNumberValue * 86400000);
+  return { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() };
+}
+
+function clampProfile(profile) {
+  const merged = {
+    ...DEFAULT_PROFILE,
+    ...profile,
+    location: { ...DEFAULT_PROFILE.location, ...(profile?.location || {}) },
+    offsets: { ...DEFAULT_PROFILE.offsets, ...(profile?.offsets || {}) },
+    notifications: { ...DEFAULT_PROFILE.notifications, ...(profile?.notifications || {}) },
+    lock: { ...DEFAULT_PROFILE.lock, ...(profile?.lock || {}) },
+  };
+  if (!isISO(merged.pubertyDate)) merged.pubertyDate = null;
+  if (merged.revertDate && !isISO(merged.revertDate)) merged.revertDate = null;
+  if (merged.regularSince && !isISO(merged.regularSince)) merged.regularSince = null;
+  merged.quotaPrayers = quotaPrayers(merged);
+  merged.asrShadow = merged.asrShadow === 2 ? 2 : 1;
+  merged.textScale = Math.min(1.5, Math.max(0.85, Number(merged.textScale) || 1));
+  if (!['en', 'fr', 'ar'].includes(merged.language)) merged.language = 'en';
+  if (!['dark', 'light', 'auto'].includes(merged.theme)) merged.theme = 'dark';
+  return merged;
+}
+
+export class Qada {
+  constructor(data, ledger, today) {
+    this.data = data;
+    this.ledger = ledger;
+    this.today = today;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Construction                                                      */
+  /* ---------------------------------------------------------------- */
+
+  static ledgerSize(today) {
+    return (dayOfISO(today) + 3) * SLOTS_PER_DAY;
+  }
+
+  static create(profile, today = computeTodayISO('UTC')) {
+    const data = {
+      v: STATE_VERSION,
+      profile: clampProfile(profile),
+      marks: null,
+      pauses: {},
+      log: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    const ledger = new Uint8Array(Qada.ledgerSize(today));
+    return new Qada(data, ledger, today);
+  }
+
+  static fromJSON(raw, today = computeTodayISO('UTC')) {
+    if (!raw || typeof raw !== 'object') throw new TypeError('Backup is not an object');
+    if (raw.v !== STATE_VERSION) {
+      if (typeof raw.v === 'number' && raw.v > STATE_VERSION) {
+        throw new Error('This backup was created by a newer version of the app.');
+      }
+    }
+    const data = {
+      v: STATE_VERSION,
+      profile: clampProfile(raw.profile),
+      marks: Array.isArray(raw.marks) ? raw.marks : [],
+      pauses: raw.pauses && typeof raw.pauses === 'object' ? raw.pauses : {},
+      log: Array.isArray(raw.log) ? raw.log.slice(-200) : [],
+      createdAt: raw.createdAt || new Date().toISOString(),
+      updatedAt: raw.updatedAt || new Date().toISOString(),
+    };
+    const runTotal = data.marks.reduce(
+      (sum, run) => sum + (Number(run?.[1]) || 0),
+      0,
+    );
+    const size = Math.max(Qada.ledgerSize(today), runTotal);
+    const ledger = decodeRuns(data.marks, size);
+    const model = new Qada(data, ledger, today);
+    model.ensureCapacity(dayOfISO(today) * SLOTS_PER_DAY + SLOTS_PER_DAY);
+    return model;
+  }
+
+  toJSON() {
+    this.ensureCapacity(Math.max(0, this.startIndex ?? 0));
+    return {
+      ...this.data,
+      marks: encodeRuns(this.ledger, this.ledger.length),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  clone() {
+    return Qada.fromJSON(this.toJSON(), this.today);
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Basics                                                            */
+  /* ---------------------------------------------------------------- */
+
+  get profile() {
+    return this.data.profile;
+  }
+
+  setToday(today) {
+    this.today = today;
+    this.ensureCapacity(dayOfISO(today) * SLOTS_PER_DAY + SLOTS_PER_DAY * 2);
+  }
+
+  get startIndex() {
+    return owedStartIndex(this.data.profile);
+  }
+
+  get endOfToday() {
+    return dayOfISO(this.today) * SLOTS_PER_DAY + SLOTS_PER_DAY - 1;
+  }
+
+  endOfDay(dateISO) {
+    return dayOfISO(dateISO) * SLOTS_PER_DAY + SLOTS_PER_DAY - 1;
+  }
+
+  backlogEnd(dateISO = this.today) {
+    return this.endOfDay(addDays(dateISO, -1));
+  }
+
+  ensureCapacity(index) {
+    if (index < this.ledger.length) return;
+    const next = new Uint8Array(Math.ceil((index + SLOTS_PER_DAY) / SLOTS_PER_DAY) * SLOTS_PER_DAY);
+    next.set(this.ledger);
+    this.ledger = next;
+  }
+
+  get(index) {
+    if (index < 0 || index >= this.ledger.length) return MARK_MISSED;
+    return this.ledger[index];
+  }
+
+  set(index, value) {
+    this.ensureCapacity(index);
+    this.ledger[index] = value;
+  }
+
+  isOwed(index) {
+    const start = this.startIndex;
+    if (start === null) return false;
+    return index >= start && index <= this.endOfToday;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Queries                                                           */
+  /* ---------------------------------------------------------------- */
+
+  /** Count of owed / done / exempt slots between two indices (inclusive). */
+  countRange(start, end) {
+    if (start === null || end < start) return { total: 0, done: 0, exempt: 0 };
+    let total = 0;
+    let done = 0;
+    let exempt = 0;
+    const last = Math.min(end, this.ledger.length - 1);
+    for (let i = start; i <= last; i += 1) {
+      const value = this.ledger[i];
+      if (value === MARK_EXEMPT) exempt += 1;
+      else {
+        total += 1;
+        if (value === MARK_DONE) done += 1;
+      }
+    }
+    return { total, done, exempt };
+  }
+
+  /** Backlog statistics: everything owed before today. */
+  stats(today = this.today) {
+    const start = this.startIndex;
+    if (start === null) {
+      return { total: 0, done: 0, exempt: 0, remaining: 0, progress: 1 };
+    }
+    const end = this.backlogEnd(today);
+    const { total, done, exempt } = this.countRange(start, end);
+    const remaining = Math.max(0, total - done);
+    return {
+      total,
+      done,
+      exempt,
+      remaining,
+      progress: total === 0 ? 1 : done / total,
+    };
+  }
+
+  /** First `limit` make-up slots that are still owed, oldest first. */
+  firstUndone(start, end, limit) {
+    const out = [];
+    if (start === null || limit <= 0) return out;
+    const last = Math.min(end, this.ledger.length - 1);
+    for (let i = start; i <= last && out.length < limit; i += 1) {
+      if (this.ledger[i] === MARK_MISSED) out.push(i);
+    }
+    return out;
+  }
+
+  /** Marks of the five slots of a day. */
+  dayMarks(dateISO) {
+    return PRAYERS.map((prayer) => this.get(slotIndex(dateISO, prayer)));
+  }
+
+  dayStatus(dateISO) {
+    if (this.data.profile.pubertyDate && dateISO < this.data.profile.pubertyDate) {
+      return 'before';
+    }
+    if (dateISO > this.today) return 'future';
+    let owed = 0;
+    let done = 0;
+    for (const prayer of PRAYERS) {
+      const index = slotIndex(dateISO, prayer);
+      if (!this.isOwed(index)) continue;
+      const mark = this.get(index);
+      if (mark === MARK_EXEMPT) continue;
+      owed += 1;
+      if (mark === MARK_DONE) done += 1;
+    }
+    if (owed === 0) return 'exempt';
+    if (done === 0) return 'missed';
+    if (done === owed) return 'done';
+    return 'partial';
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Today's plan                                                      */
+  /* ---------------------------------------------------------------- */
+
+  isPaused(dateISO, prayerIndex) {
+    const mask = this.data.pauses?.[dateISO];
+    return Number.isInteger(mask) ? ((mask >> prayerIndex) & 1) === 1 : false;
+  }
+
+  /** Bitmask of prayers whose make-up list is suppressed for a date. */
+  pausedMask(dateISO) {
+    const mask = this.data.pauses?.[dateISO];
+    return Number.isInteger(mask) ? mask : 0;
+  }
+
+  /**
+   * Assignment of make-ups to the five prayers of a date.
+   * Only meaningful for today and future dates: the past is read from marks.
+   */
+  plan(dateISO = this.today) {
+    const quota = quotaPrayers(this.data.profile);
+    const perPrayer = distributeQuota(quota);
+    // A prayer that is already completed for the day no longer carries any
+    // make-up: whatever the user confirmed when marking it was consumed then.
+    const capacities = perPrayer.map((value, index) => {
+      if (this.get(slotIndex(dateISO, PRAYERS[index])) === MARK_DONE) return 0;
+      return this.isPaused(dateISO, index) ? 0 : value;
+    });
+    const need = capacities.reduce((a, b) => a + b, 0);
+    const queue = this.firstUndone(this.startIndex, this.backlogEnd(dateISO), need);
+
+    let cursor = 0;
+    const items = PRAYERS.map((prayer, index) => {
+      const capacity = capacities[index];
+      const take = Math.min(capacity, queue.length - cursor);
+      const assigned = queue.slice(cursor, cursor + take);
+      cursor += take;
+      return {
+        prayer,
+        index: slotIndex(dateISO, prayer),
+        capacity,
+        mark: this.get(slotIndex(dateISO, prayer)),
+        qada: assigned,
+      };
+    });
+
+    const stats = this.stats(this.today);
+    return {
+      dateISO,
+      quota,
+      pausedMask: this.pausedMask(dateISO),
+      items,
+      assigned: cursor,
+      remainingBefore: stats.remaining,
+      remainingAfter: Math.max(0, stats.remaining - cursor),
+    };
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Mutations                                                         */
+  /* ---------------------------------------------------------------- */
+
+  touch() {
+    this.data.updatedAt = new Date().toISOString();
+  }
+
+  log(entry) {
+    this.data.log.push({ ...entry, at: new Date().toISOString() });
+    if (this.data.log.length > 200) this.data.log.splice(0, this.data.log.length - 200);
+  }
+
+  setMark(dateISO, prayer, value) {
+    const index = slotIndex(dateISO, prayer);
+    if (!this.isOwed(index)) return false;
+    this.set(index, value);
+    this.touch();
+    return true;
+  }
+
+  markMany(indices, value = MARK_DONE) {
+    let marked = 0;
+    for (const index of indices) {
+      if (!this.isOwed(index)) continue;
+      this.set(index, value);
+      marked += 1;
+    }
+    if (marked) this.touch();
+    return marked;
+  }
+
+  /**
+   * Mark every owed slot in an inclusive date range.
+   * Dates are clamped to the owed window; future dates are refused.
+   */
+  markRange(fromDate, toDate, value = MARK_DONE) {
+    const start = this.startIndex;
+    if (start === null) return 0;
+    const yesterday = addDays(this.today, -1);
+    const cappedTo = toDate < yesterday ? toDate : yesterday;
+    if (cappedTo < fromDate) return 0;
+    const from = Math.max(start, dayOfISO(fromDate) * SLOTS_PER_DAY);
+    const to = Math.min(this.endOfToday, this.endOfDay(cappedTo));
+    if (to < from) return 0;
+    let count = 0;
+    for (let i = from; i <= to; i += 1) {
+      this.ledger[i] = value;
+      count += 1;
+    }
+    this.touch();
+    this.log({ kind: 'range', from: fromDate, to: cappedTo, value, count });
+    return count;
+  }
+
+  /**
+   * Record the outcome of a prayer the user was shown.
+   * `defer` is 'none' | 'next' | 'tomorrow' and only matters when not prayed.
+   */
+  applyOutcome({ dateISO, prayer, prayed, qadaIndices = [], defer = 'none' }) {
+    const prayerIndex = PRAYER_INDEX[prayer];
+    const index = slotIndex(dateISO, prayer);
+    if (prayed) {
+      if (this.isOwed(index)) this.set(index, MARK_DONE);
+      this.markMany(qadaIndices, MARK_DONE);
+      this.log({ kind: 'prayed', dateISO, prayer, qada: qadaIndices.length });
+    } else {
+      const mask = this.pausedMask(dateISO);
+      const bits = defer === 'tomorrow'
+        ? ((1 << SLOTS_PER_DAY) - 1) ^ ((1 << prayerIndex) - 1)
+        : 1 << prayerIndex;
+      this.data.pauses[dateISO] = mask | bits;
+      this.log({ kind: 'defer', mode: defer, dateISO, prayer });
+    }
+    this.touch();
+  }
+
+  clearPause(dateISO) {
+    if (this.data.pauses?.[dateISO] !== undefined) {
+      delete this.data.pauses[dateISO];
+      this.touch();
+    }
+  }
+
+  setQuota(prayers) {
+    this.data.profile.quotaPrayers = quotaPrayers({ quotaPrayers: prayers });
+    this.touch();
+  }
+
+  updateProfile(patch) {
+    this.data.profile = clampProfile({ ...this.data.profile, ...patch });
+    this.touch();
+  }
+
+  /**
+   * Onboarding shortcut: "I have been praying regularly since <date>".
+   * Everything owed from that date until yesterday is marked done.
+   */
+  applyRegularSince(dateISO) {
+    if (!isISO(dateISO)) return 0;
+    const start = this.startIndex;
+    if (start === null) return 0;
+    const yesterday = addDays(this.today, -1);
+    if (dateISO > yesterday) return 0;
+    const from = Math.max(start, dayOfISO(dateISO) * SLOTS_PER_DAY);
+    const to = this.backlogEnd(this.today);
+    let count = 0;
+    for (let i = from; i <= to; i += 1) {
+      if (this.ledger[i] === MARK_MISSED) {
+        this.ledger[i] = MARK_DONE;
+        count += 1;
+      }
+    }
+    this.touch();
+    this.log({ kind: 'regular-since', dateISO, count });
+    return count;
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Projections                                                       */
+  /* ---------------------------------------------------------------- */
+
+  /** Days until the backlog is cleared at the current pace. */
+  projection(today = this.today) {
+    const stats = this.stats(today);
+    const quota = quotaPrayers(this.data.profile);
+    const net = quota - SLOTS_PER_DAY;
+    const atPace = quota > 0 ? Math.ceil(stats.remaining / quota) : Infinity;
+    const finishDate =
+      Number.isFinite(atPace) && atPace < 365 * 200 ? addDays(today, atPace) : null;
+    return {
+      ...stats,
+      quota,
+      net,
+      daysAtPace: Number.isFinite(atPace) ? atPace : null,
+      finishDate,
+      yearsAtPace: Number.isFinite(atPace) ? atPace / 365.25 : null,
+    };
+  }
+
+  /** Completion ratio of the five daily prayers over the last `days` days. */
+  recentActivity(today = this.today, days = 7) {
+    const out = [];
+    for (let offset = days - 1; offset >= 0; offset -= 1) {
+      const dateISO = addDays(today, -offset);
+      let owed = 0;
+      let done = 0;
+      for (const prayer of PRAYERS) {
+        const index = slotIndex(dateISO, prayer);
+        if (!this.isOwed(index)) continue;
+        const mark = this.get(index);
+        if (mark === MARK_EXEMPT) continue;
+        owed += 1;
+        if (mark === MARK_DONE) done += 1;
+      }
+      out.push({ dateISO, owed, done });
+    }
+    return out;
+  }
+}
