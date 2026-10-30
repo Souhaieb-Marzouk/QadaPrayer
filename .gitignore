@@ -1,4 +1,4 @@
-﻿# OS junk
+# OS junk
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -20,3 +20,6 @@ screenshots/_probe*
 .idea/
 *.suo
 *.user
+
+# Browser profile leftovers from screenshot tooling
+_ffprof/
