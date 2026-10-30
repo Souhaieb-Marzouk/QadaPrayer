@@ -1,5 +1,9 @@
 # Building the Android package in Visual Studio
 
+The MAUI project in this guide is called **QadaPrayer** — that is the name the
+`x:Class`, the namespace and the file names below assume. The signing file is
+**`qada.keystore`**.
+
 Two ways to get a signed `.apk` and `.aab`. Both produce the same thing; pick one.
 
 | | Visual Studio + .NET MAUI | PWABuilder |
@@ -8,7 +12,7 @@ Two ways to get a signed `.apk` and `.aab`. Both produce the same thing; pick on
 | Where | everything inside VS | website |
 | Result | a WebView shell around the live app | a Trusted Web Activity (Play-quality) |
 | Updates | **every web deploy updates the app** — no new APK needed | same |
-| Signing | VS creates the keystore for you | site generates one |
+| Signing | `keytool`, one command | the site generates one |
 | Best for | you already live in VS | first release, or a Play Store submission |
 
 > This guide covers the Visual Studio route. If you only want an APK once, the
@@ -36,9 +40,13 @@ platform. If it does, you are done with setup.
 
 1. **File → New → Project**.
 2. Search **.NET MAUI App** → choose the C# one → **Next**.
-3. **Project name:** `Qada` → **Create**.
-4. Close `MainPage.xaml` if it opened, and delete `MainPage.xaml` **and**
-   `MainPage.xaml.cs` from the project (right-click → Delete).
+3. **Project name:** `QadaPrayer` → **Create**.
+
+   The name matters: MAUI derives the namespace from it, and the two files in
+   `android/overrides/` expect `QadaPrayer`. Anything else means editing
+   `x:Class` and a `namespace` line (see section 3).
+
+4. Close `MainPage.xaml` if it opened.
 
 Do **not** change `TargetFrameworks` in the `.csproj` — the template picks the
 right one for your SDK.
@@ -50,12 +58,12 @@ right one for your SDK.
 In `android/overrides/` there are two files. **Overwrite** the template's copies
 with them (same names, same folder):
 
-| From | To (project root) |
+| From | To (project folder) |
 | --- | --- |
-| `MainPage.xaml` | `Qada/MainPage.xaml` |
-| `MainPage.xaml.cs` | `Qada/MainPage.xaml.cs` |
+| `MainPage.xaml` | `QadaPrayer/MainPage.xaml` |
+| `MainPage.xaml.cs` | `QadaPrayer/MainPage.xaml.cs` |
 
-Then open `Qada/App.xaml.cs` and replace the line that creates the Shell:
+Then open `QadaPrayer/App.xaml.cs` and replace the line that creates the Shell:
 
 ```csharp
 // before
@@ -76,23 +84,65 @@ What the files do: a full-screen WebView pointed at
 (the PWA needs it), external links opened in the system browser, and the Android
 back button navigating inside the app.
 
+> **If your project has a different name.** The two files declare `QadaPrayer`
+> as the namespace (`x:Class="QadaPrayer.MainPage"` and `namespace QadaPrayer;`).
+> A project named anything else must change **both** to match, or the build fails
+> with *"The name 'InitializeComponent' does not exist"*.
+
+---
+
+## 3b. Finding `keytool`
+
+Modern Visual Studio does not always install the JDK to
+`C:\Program Files\Microsoft\jdk-*`. From the **Developer PowerShell**, try in
+this order until one works:
+
+```powershell
+# 1. fastest — is it already on PATH?
+keytool -help
+
+# 2. where does the machine think Java is?
+where.exe keytool
+Get-Command java, keytool -ErrorAction SilentlyContinue | Select-Object Source
+
+# 3. search the usual install roots (takes a few seconds)
+Get-ChildItem "$env:JAVA_HOME\bin\keytool.exe",
+              "$env:ANDROID_HOME\jbr\bin\keytool.exe",
+              "$env:LOCALAPPDATA\Android\Sdk\jbr\bin\keytool.exe",
+              "$env:LOCALAPPDATA\Programs\Android Studio\jbr\bin\keytool.exe",
+              "C:\Program Files\Eclipse Adoptium",
+              "C:\Program Files\Java",
+              "C:\Program Files\Android",
+              "${env:ProgramFiles(x86)}\Android" `
+  -Recurse -Filter keytool.exe -ErrorAction SilentlyContinue |
+  Select-Object -First 5 FullName
+```
+
+`keytool` ships with any JDK — including the JetBrains runtime inside Android
+Studio (`...\jbr\bin\keytool.exe`), which works perfectly for signing.
+
+If none of that finds it, the JDK is missing and the Android build itself cannot
+work: re-run the Visual Studio Installer and tick **OpenJDK** under the MAUI
+workload, or install *Eclipse Temurin 17* and re-open the Developer PowerShell.
+
 ---
 
 ## 4. Set the app identity and version
 
-### Where is `Qada.csproj`?
+### Where is `QadaPrayer.csproj`?
 
 It is **not in this repository** — Visual Studio creates it with the project.
-You will find it inside the project folder you just created, usually:
+In this setup it lives here:
 
 ```
-C:\Users\<you>\source\repos\Qada\Qada\Qada.csproj
+C:\Users\Mercenary\Documents\QadaPrayer\QadaPrayer\QadaPrayer.csproj
 ```
 
-Three ways to reach it, the first one being the easiest:
+The outer `QadaPrayer` folder holds the solution; the inner one holds the
+project. Three ways to reach the file, the first one being the easiest:
 
-1. **Solution Explorer** → right-click the **Qada** project → **Edit Project
-   File**. The XML opens in the editor; no need to find it on disk.
+1. **Solution Explorer** → right-click the **QadaPrayer** project → **Edit
+   Project File**. The XML opens in the editor; no need to find it on disk.
 2. Right-click the project → **Open Folder in File Explorer** → the `.csproj` is
    the only file with that extension.
 3. In **Solution Explorer**, the project node itself *is* the `.csproj` —
@@ -107,22 +157,19 @@ development* workload is installed (section 1).
 Inside the first `<PropertyGroup>`, set these:
 
 ```xml
-<ApplicationTitle>Qada</ApplicationTitle>
-<ApplicationId>com.souhaieb.qada</ApplicationId>
+<ApplicationTitle>QadaPrayer</ApplicationTitle>
+<ApplicationId>com.souhaieb.qadaprayer</ApplicationId>
 <ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
 <ApplicationVersion>200</ApplicationVersion>
 ```
 
-If your file is missing or damaged, `android/Qada.csproj.example` contains a
-complete Android-only project file you can copy over it — but check the
+`ApplicationTitle` is the label under the icon on the home screen — write `Qada`
+there instead if you prefer the short brand. `ApplicationId` is permanent once
+published; pick it now and never change it.
+
+If your file is missing or damaged, `android/QadaPrayer.csproj.example` contains
+a complete Android-only project file you can copy over it — but check the
 `TargetFramework` line first (`net9.0-android` vs `net10.0-android`).
-
-```xml
-<ApplicationTitle>Qada</ApplicationTitle>
-<ApplicationId>com.souhaieb.qada</ApplicationId>
-<ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
-<ApplicationVersion>200</ApplicationVersion>
-```
 
 `ApplicationVersion` is the Android **versionCode**: it must be an integer that
 **increases with every release**, otherwise Android refuses the update. Use
@@ -134,15 +181,13 @@ complete Android-only project file you can copy over it — but check the
 | 0.2.1 | `0.2.1` | `201` |
 | 0.3.0 | `0.3.0` | `300` |
 
-> `ApplicationId` is permanent once published. If you ever plan to put this on
-> the Play Store, pick it now and never change it. `com.souhaieb.qada` is fine.
-
 ---
 
 ## 5. The icon and splash
 
-1. Copy `app/assets/icon-1024.png` to `Qada/Resources/AppIcon/appicon.png`.
-2. Replace this line in `Qada.csproj`:
+1. Copy `app/assets/icon-1024.png` to
+   `QadaPrayer/Resources/AppIcon/appicon.png`.
+2. Replace this line in `QadaPrayer.csproj`:
 
 ```xml
 <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -154,8 +199,9 @@ with:
 <MauiIcon Include="Resources\AppIcon\appicon.png" Color="#06100F" />
 ```
 
-3. Optional: copy `app/assets/favicon.svg` over `Qada/Resources/Splash/splash.svg`
-   and change the splash colour in the `<MauiSplashScreen>` line to `#06100F`.
+3. Optional: copy `app/assets/favicon.svg` over
+   `QadaPrayer/Resources/Splash/splash.svg` and change the splash colour in the
+   `<MauiSplashScreen>` line to `#06100F`.
 
 ---
 
@@ -172,81 +218,152 @@ by default) or no network on the phone.
 
 ---
 
-## 7. Create the signing keystore
+## 7. Why "Publish" is greyed out and "Build → Archive" is missing
 
-This is the part that matters for the rest of the app's life.
+That is expected, not a mistake on your side.
 
-1. In **Solution Explorer**, right-click the **Qada** project → **Publish…**
-   (or **Build → Archive…** in older layouts). The **Archive Manager** opens.
-2. Click **Distribute…** → **Ad Hoc**.
-3. Choose **Create new signing identity** (or "Create a new keystore"):
-   - **Alias:** `qada`
-   - **Password:** a long password you will keep
-   - **Validity:** `10000` days (Android ignores anything past 2033, but be generous)
-   - **Full name / Organisation:** anything, it is only metadata
-4. VS generates the keystore and signs the APK with it.
+**Publish → Ad Hoc** and **Build → Archive** belonged to **Xamarin.Android**. The
+Archive Manager was **not** carried over to **.NET MAUI**; Microsoft removed it,
+and Android publishing now happens through `dotnet publish`. The greyed-out
+**Publish…** entry is the Windows/MSIX publisher, which has nothing to do with
+Android.
 
-The keystore lands in:
+You stay inside Visual Studio: everything below runs in its terminal.
 
-```
-%USERPROFILE%\AppData\Local\Xamarin\Mono for Android\Keystore\qada\qada.keystore
-```
+**Tools → Command Line → Developer PowerShell** (this one has `dotnet`, the
+Android SDK and the JDK already on `PATH`).
 
-**Copy it somewhere safe — outside the repository.** Losing it means you can
-never update the app again under the same identity; anyone with the file and the
-password can sign as you. Never commit it.
-
-Suggested storage: a password manager entry plus an encrypted backup, and note
-the pair (alias `qada`, its password, the store password).
+> A plain `dotnet build` also produces an APK, but it is signed with a throwaway
+> debug key. Android refuses to update an installed app with a different key, so
+> never ship a debug build — use the publish command below with your own
+> keystore.
 
 ---
 
-## 8. Produce the APK
+## 8. Create the signing keystore (`qada.keystore`)
 
-In the Archive Manager, select the archive → **Open Folder**. Inside you get:
-
-```
-Qada.apk                     ← install this; this is what goes on the release
-com.souhaieb.qada-Signed.apk ← signed variant (same app)
-```
-
-Rename it `qada-<version>.apk` (e.g. `qada-0.2.0.apk`) so the download link in
-`index.html` and the README stay valid, and attach it to the GitHub release
-together with `dist/qada-<version>-web.zip` and its `.sha256`.
-
----
-
-## 9. Produce the AAB (only for the Play Store)
-
-Same archive → **Distribute…** → **Google Play** → choose the **same** signing
-identity → it produces `Qada.aab`, signed and ready to upload.
-
-You do not need an AAB for GitHub releases. People cannot install an `.aab`
-directly — it is a bundle that Google splits into APKs.
-
----
-
-## 10. Doing it from the command line instead
-
-Once the workload is installed, the whole thing is two commands:
+Visual Studio installs a JDK, which ships `keytool`. Find it as shown in
+section 3b, then create the key — **once, ever**. Run it from the folder that
+holds `QadaPrayer.csproj`, so the file lands next to the project:
 
 ```powershell
-# one keystore, generated once
-keytool -genkeypair -v -keystore qada.keystore -alias qada `
-        -keyalg RSA -keysize 2048 -validity 10000
+cd C:\Users\Mercenary\Documents\QadaPrayer\QadaPrayer
 
-# apk + aab, signed
-dotnet publish -f net10.0-android -c Release `
-  -p:AndroidPackageFormats="apk;aab" `
-  -p:AndroidKeyStore=true `
-  -p:AndroidSigningKeyStore=qada.keystore `
-  -p:AndroidSigningKeyAlias=qada `
-  -p:AndroidSigningKeyPass=YOUR_KEY_PASSWORD `
-  -p:AndroidSigningStorePass=YOUR_STORE_PASSWORD
+& "C:\path\to\keytool.exe" `
+  -genkeypair -v `
+  -keystore qada.keystore `
+  -alias qada `
+  -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-Change `net10.0-android` to whatever `TargetFrameworks` says in your `.csproj`.
-The output is in `bin\Release\net10.0-android\publish\`.
+It asks for:
+
+| Prompt | What to answer |
+| --- | --- |
+| Enter keystore password | a long password — this is the **store password** |
+| Re-enter new password | same again |
+| What is your first and last name? | anything, e.g. `QadaPrayer` |
+| Organizational unit / organization / city / state / country | anything, e.g. `TN` |
+| Enter key password for `<qada>` | press **Enter** to reuse the store password |
+
+You now have `qada.keystore`. **Move it outside the repository** (a folder you
+back up) and store its secrets in a password manager:
+
+- file: `qada.keystore`
+- store password
+- alias: `qada`
+- key password (= store password if you pressed Enter)
+
+Losing this file means you can never update the app again under the same
+identity. Anyone with the file *and* the password can sign as you. `.gitignore`
+already blocks `*.keystore`, but keep it out of the folder anyway.
+
+---
+
+## 9. Publish the APK and the AAB
+
+From the folder that contains `QadaPrayer.csproj`:
+
+```powershell
+cd C:\Users\Mercenary\Documents\QadaPrayer\QadaPrayer
+
+dotnet publish -f net9.0-android -c Release `
+  -p:AndroidPackageFormats="apk;aab" `
+  -p:AndroidKeyStore=true `
+  -p:AndroidSigningKeyStore="qada.keystore" `
+  -p:AndroidSigningKeyAlias=qada `
+  -p:AndroidSigningKeyPass="YOUR_KEY_PASSWORD" `
+  -p:AndroidSigningStorePass="YOUR_STORE_PASSWORD"
+```
+
+- `-f` must match `<TargetFramework>` in `QadaPrayer.csproj`
+  (`net9.0-android` or `net10.0-android`). Read it with:
+  ```powershell
+  Select-String -Path .\*.csproj -Pattern "TargetFramework"
+  ```
+- `AndroidPackageFormats="apk"` if you only want the APK.
+- Passwords containing `&`, `;` or `"` break the argument list. In that case set
+  them as environment variables and reference them:
+  ```powershell
+  $env:QADA_STORE_PASS = 'your store password'
+  $env:QADA_KEY_PASS   = 'your key password'
+  dotnet publish -f net9.0-android -c Release `
+    -p:AndroidPackageFormats="apk;aab" `
+    -p:AndroidKeyStore=true `
+    -p:AndroidSigningKeyStore="qada.keystore" `
+    -p:AndroidSigningKeyAlias=qada `
+    -p:AndroidSigningKeyPass=env:QADA_KEY_PASS `
+    -p:AndroidSigningStorePass=env:QADA_STORE_PASS
+  ```
+
+The output lands in:
+
+```
+bin\Release\net9.0-android\publish\
+```
+
+Look for `*-Signed.apk` and `*.aab`. Copy the APK out and rename it
+`qada-<version>.apk` (e.g. `qada-0.2.0.apk`) — that is the file to attach to the
+GitHub release, together with `dist/qada-<version>-web.zip` and its `.sha256`.
+
+The private key stays on your machine; only the signed APK travels.
+
+---
+
+## 10. Doing it again for the next release
+
+Two numbers change, one command runs:
+
+1. In `QadaPrayer.csproj`: `ApplicationDisplayVersion` → the new version, and
+   `ApplicationVersion` → the next versionCode (200 → 201 → 300 …).
+2. Re-run the `dotnet publish` command from section 9.
+
+Same keystore, same alias — that is what lets Android install the new APK over
+the old one and keep every logged prayer.
+
+**Speed-up:** put the signing arguments in a file that never gets committed,
+`qada.signing.props`:
+
+```xml
+<Project>
+  <PropertyGroup>
+    <AndroidKeyStore>true</AndroidKeyStore>
+    <AndroidSigningKeyStore>$(MSBuildThisFileDirectory)qada.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias>qada</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>YOUR_KEY_PASSWORD</AndroidSigningKeyPass>
+    <AndroidSigningStorePass>YOUR_STORE_PASSWORD</AndroidSigningStorePass>
+  </PropertyGroup>
+</Project>
+```
+
+and reference it from `QadaPrayer.csproj`:
+
+```xml
+<Import Project="qada.signing.props" Condition="Exists('qada.signing.props')" />
+```
+
+Then `dotnet publish -f net9.0-android -c Release -p:AndroidPackageFormats="apk;aab"`
+is enough. Add `qada.signing.props` to `.gitignore` — it contains the passwords.
 
 ---
 
@@ -295,6 +412,10 @@ does not need).
 
 | Symptom | Fix |
 | --- | --- |
+| **Publish… is greyed out / no Build → Archive** | Expected for .NET MAUI — the Archive Manager was a Xamarin feature. Use `dotnet publish` (section 9) |
+| `dotnet` is not recognised in the terminal | Use **Tools → Command Line → Developer PowerShell**, not a plain PowerShell window |
+| `keytool.exe` not found | Section 3b — it may live in Android Studio's `jbr`, not under `Program Files\Microsoft` |
+| "The name 'InitializeComponent' does not exist" | Your project name differs from the namespace in the override files — see section 3 |
 | "The project needs a workload" | Visual Studio Installer → Modify → tick **.NET Multi-platform App UI development** |
 | Build fails on `MauiIcon` | The `Include` path must match the file name exactly; PNG and SVG both work |
 | App installs but data is lost on restart | `DomStorageEnabled` — the override file already sets it; make sure you copied `MainPage.xaml.cs` |

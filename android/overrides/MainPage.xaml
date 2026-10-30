@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!--
+  x:Class must be <YourProjectNamespace>.MainPage.
+  This file assumes the MAUI project is called "QadaPrayer"; if yours is named
+  differently, change "QadaPrayer.MainPage" here and the namespace in
+  MainPage.xaml.cs to match.
+-->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Qada.MainPage"
+             x:Class="QadaPrayer.MainPage"
              BackgroundColor="#06100F"
              Shell.NavBarIsVisible="False"
-             Title="Qada">
+             Title="QadaPrayer">
 
     <!-- The installed app is a shell around the live PWA: every web deploy
          updates it, without shipping a new APK. -->

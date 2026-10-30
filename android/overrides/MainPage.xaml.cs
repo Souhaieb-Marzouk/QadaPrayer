@@ -1,6 +1,11 @@
 using Microsoft.Maui.ApplicationModel;
 
-namespace Qada;
+// Must match x:Class in MainPage.xaml. The MAUI template names the namespace
+// after the project, so this file assumes the project is called "QadaPrayer".
+// If yours differs, rename the namespace here and in the XAML file too (two
+// places), otherwise the build fails with
+// "The name 'InitializeComponent' does not exist".
+namespace QadaPrayer;
 
 /// <summary>
 /// Full-screen host for the Qada web app.

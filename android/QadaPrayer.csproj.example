@@ -1,12 +1,13 @@
 <!--
-  Reference copy of the Android-only project file.
+  Reference copy of the Android-only project file for the app QadaPrayer.
 
   You normally do NOT create this by hand: Visual Studio generates it when you
-  create a ".NET MAUI App" project, and you only edit a few lines. Keep this file
-  as a reference — or copy it over Qada.csproj if yours is broken.
+  create a ".NET MAUI App" project named QadaPrayer, and you only edit a few
+  lines. Keep this file as a reference — or copy it over QadaPrayer.csproj if
+  yours is broken.
 
   ⚠ If your SDK is .NET 10, change net9.0-android to net10.0-android below.
-    The quickest way to know: open the generated Qada.csproj and read
+    The quickest way to know: open the generated QadaPrayer.csproj and read
     <TargetFramework> / <TargetFrameworks>.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
@@ -14,17 +15,17 @@
   <PropertyGroup>
     <TargetFramework>net9.0-android</TargetFramework>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Qada</RootNamespace>
+    <RootNamespace>QadaPrayer</RootNamespace>
     <UseMaui>true</UseMaui>
     <SingleProject>true</SingleProject>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
     <!-- Shown under the icon on the home screen -->
-    <ApplicationTitle>Qada</ApplicationTitle>
+    <ApplicationTitle>QadaPrayer</ApplicationTitle>
 
     <!-- Permanent. Never change it after publishing. -->
-    <ApplicationId>com.souhaieb.qada</ApplicationId>
+    <ApplicationId>com.souhaieb.qadaprayer</ApplicationId>
 
     <!-- The version users see -->
     <ApplicationDisplayVersion>0.2.0</ApplicationDisplayVersion>
