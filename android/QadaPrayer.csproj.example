@@ -6,14 +6,14 @@
   lines. Keep this file as a reference — or copy it over QadaPrayer.csproj if
   yours is broken.
 
-  ⚠ If your SDK is .NET 10, change net9.0-android to net10.0-android below.
-    The quickest way to know: open the generated QadaPrayer.csproj and read
-    <TargetFramework> / <TargetFrameworks>.
+  ⚠ This file targets the .NET 10 SDK (net10.0-android). On .NET 9, change it
+    to net9.0-android. The quickest way to know: open the generated
+    QadaPrayer.csproj and read <TargetFramework> / <TargetFrameworks>.
 -->
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0-android</TargetFramework>
+    <TargetFramework>net10.0-android</TargetFramework>
     <OutputType>Exe</OutputType>
     <RootNamespace>QadaPrayer</RootNamespace>
     <UseMaui>true</UseMaui>

@@ -168,8 +168,9 @@ there instead if you prefer the short brand. `ApplicationId` is permanent once
 published; pick it now and never change it.
 
 If your file is missing or damaged, `android/QadaPrayer.csproj.example` contains
-a complete Android-only project file you can copy over it — but check the
-`TargetFramework` line first (`net9.0-android` vs `net10.0-android`).
+a complete Android-only project file you can copy over it — the
+`TargetFramework` line must match your SDK (`net10.0-android` for .NET 10,
+`net9.0-android` for .NET 9).
 
 `ApplicationVersion` is the Android **versionCode**: it must be an integer that
 **increases with every release**, otherwise Android refuses the update. Use
@@ -287,8 +288,8 @@ From the folder that contains `QadaPrayer.csproj`:
 ```powershell
 cd C:\Users\Mercenary\Documents\QadaPrayer\QadaPrayer
 
-dotnet publish -f net9.0-android -c Release `
-  -p:AndroidPackageFormats="apk;aab" `
+dotnet publish -f net10.0-android -c Release `
+  -p:AndroidPackageFormats="apk%3Baab" `
   -p:AndroidKeyStore=true `
   -p:AndroidSigningKeyStore="qada.keystore" `
   -p:AndroidSigningKeyAlias=qada `
@@ -296,19 +297,24 @@ dotnet publish -f net9.0-android -c Release `
   -p:AndroidSigningStorePass="YOUR_STORE_PASSWORD"
 ```
 
-- `-f` must match `<TargetFramework>` in `QadaPrayer.csproj`
-  (`net9.0-android` or `net10.0-android`). Read it with:
+> **The semicolon trap.** Writing `-p:AndroidPackageFormats="apk;aab"` fails with
+> `MSB1006: Property is not valid. Switch: aab` — MSBuild splits `-p:` on `;` into
+> two properties. Use `%3B` (the MSBuild escape for a semicolon) as above, or
+> publish twice, once with `=apk` and once with `=aab`.
+
+- `-f` must match `<TargetFramework>` in `QadaPrayer.csproj` — `net10.0-android`
+  on the .NET 10 SDK, `net9.0-android` on .NET 9. Read it with:
   ```powershell
   Select-String -Path .\*.csproj -Pattern "TargetFramework"
   ```
-- `AndroidPackageFormats="apk"` if you only want the APK.
+- `AndroidPackageFormats=apk` if you only want the APK.
 - Passwords containing `&`, `;` or `"` break the argument list. In that case set
   them as environment variables and reference them:
   ```powershell
   $env:QADA_STORE_PASS = 'your store password'
   $env:QADA_KEY_PASS   = 'your key password'
-  dotnet publish -f net9.0-android -c Release `
-    -p:AndroidPackageFormats="apk;aab" `
+  dotnet publish -f net10.0-android -c Release `
+    -p:AndroidPackageFormats="apk%3Baab" `
     -p:AndroidKeyStore=true `
     -p:AndroidSigningKeyStore="qada.keystore" `
     -p:AndroidSigningKeyAlias=qada `
@@ -319,7 +325,7 @@ dotnet publish -f net9.0-android -c Release `
 The output lands in:
 
 ```
-bin\Release\net9.0-android\publish\
+bin\Release\net10.0-android\publish\
 ```
 
 Look for `*-Signed.apk` and `*.aab`. Copy the APK out and rename it
@@ -362,8 +368,9 @@ and reference it from `QadaPrayer.csproj`:
 <Import Project="qada.signing.props" Condition="Exists('qada.signing.props')" />
 ```
 
-Then `dotnet publish -f net9.0-android -c Release -p:AndroidPackageFormats="apk;aab"`
-is enough. Add `qada.signing.props` to `.gitignore` — it contains the passwords.
+Then `dotnet publish -f net10.0-android -c Release -p:AndroidPackageFormats=apk`
+is enough (use `apk%3Baab` for both). Add `qada.signing.props` to `.gitignore` —
+it contains the passwords.
 
 ---
 
@@ -413,6 +420,8 @@ does not need).
 | Symptom | Fix |
 | --- | --- |
 | **Publish… is greyed out / no Build → Archive** | Expected for .NET MAUI — the Archive Manager was a Xamarin feature. Use `dotnet publish` (section 9) |
+| `MSB1006: Property is not valid. Switch: aab` | The `;` in `-p:AndroidPackageFormats="apk;aab"` split the property. Use `apk%3Baab` (section 9) |
+| `NETSDK1045` / "does not target" on publish | `-f` does not match the project's `<TargetFramework>`. .NET 10 SDK → `net10.0-android` |
 | `dotnet` is not recognised in the terminal | Use **Tools → Command Line → Developer PowerShell**, not a plain PowerShell window |
 | `keytool.exe` not found | Section 3b — it may live in Android Studio's `jbr`, not under `Program Files\Microsoft` |
 | "The name 'InitializeComponent' does not exist" | Your project name differs from the namespace in the override files — see section 3 |
