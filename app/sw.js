@@ -1,6 +1,6 @@
 /* Qada service worker — offline shell, no network dependency at runtime. */
 
-const VERSION = 'qada-v1';
+const VERSION = 'qada-v2';
 const SHELL = [
   './',
   './index.html',
@@ -10,10 +10,12 @@ const SHELL = [
   './js/config.js',
   './js/i18n.js',
   './js/store.js',
+  './js/notify.js',
   './js/core/dates.js',
   './js/core/astro.js',
   './js/core/prayerTimes.js',
   './js/core/engine.js',
+  './js/core/reminders.js',
   './js/core/rle.js',
   './js/ui/icons.js',
   './js/ui/dom.js',
@@ -86,6 +88,28 @@ self.addEventListener('fetch', (event) => {
         return fresh;
       } catch {
         return cached || Response.error();
+      }
+    })(),
+  );
+});
+
+/* Focus an open Qada window when a reminder is tapped, or open the app. */
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(
+    (async () => {
+      const clientList = await self.clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true,
+      });
+      for (const client of clientList) {
+        if (client.url.includes('/app/') && 'focus' in client) {
+          await client.focus();
+          return;
+        }
+      }
+      if (self.clients.openWindow) {
+        await self.clients.openWindow('./#/today');
       }
     })(),
   );

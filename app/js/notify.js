@@ -1,0 +1,224 @@
+/**
+ * Reminder delivery — the thin browser layer around the pure scheduler.
+ *
+ * Everything here is best effort by nature: a web app can only fire while it is
+ * alive, and browsers throttle background timers. The UI says so plainly. What
+ * this module guarantees is that when the app *is* running, a due reminder is
+ * shown once, with sound and vibration, and the queue re-arms itself.
+ */
+
+import { t } from './i18n.js';
+import { addDays, fromISO, toISO } from './core/dates.js';
+import { computeDay } from './core/prayerTimes.js';
+import { buildSchedule, normalizeReminders } from './core/reminders.js';
+
+let timer = null;
+let audio = null;
+const shown = new Set();
+const dayCache = new Map();
+
+/* ------------------------------------------------------------------ */
+/* Capability                                                          */
+/* ------------------------------------------------------------------ */
+
+export function supported() {
+  return typeof window !== 'undefined' && 'Notification' in window;
+}
+
+export function permission() {
+  if (!supported()) return 'unsupported';
+  return Notification.permission;
+}
+
+export async function requestPermission() {
+  if (!supported()) return 'unsupported';
+  if (Notification.permission === 'granted') return 'granted';
+  try {
+    return await Notification.requestPermission();
+  } catch {
+    return 'denied';
+  }
+}
+
+/** Must be called from a user gesture, otherwise browsers keep audio blocked. */
+export function primeAudio() {
+  try {
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return;
+    if (!audio) audio = new Ctor();
+    if (audio.state === 'suspended') audio.resume();
+  } catch {
+    audio = null;
+  }
+}
+
+function chime() {
+  if (!audio) return;
+  try {
+    const start = audio.currentTime;
+    [880, 1174.66].forEach((frequency, index) => {
+      const oscillator = audio.createOscillator();
+      const gain = audio.createGain();
+      const at = start + index * 0.22;
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, at);
+      gain.gain.exponentialRampToValueAtTime(0.22, at + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, at + 0.65);
+      oscillator.connect(gain);
+      gain.connect(audio.destination);
+      oscillator.start(at);
+      oscillator.stop(at + 0.7);
+    });
+  } catch {
+    /* audio is a nicety, never a failure */
+  }
+}
+
+function vibrate(pattern) {
+  try {
+    navigator.vibrate?.(pattern);
+  } catch {
+    /* not supported */
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Display                                                             */
+/* ------------------------------------------------------------------ */
+
+export async function show({ title, body, tag, data }) {
+  const options = {
+    body,
+    tag,
+    data,
+    icon: './assets/icon-192.png',
+    badge: './assets/icon-192.png',
+    silent: true, // we play our own chime so it also works on desktop
+  };
+  try {
+    const registration = await navigator.serviceWorker?.getRegistration();
+    if (registration?.showNotification) {
+      await registration.showNotification(title, options);
+      return true;
+    }
+  } catch {
+    /* fall through to the constructor */
+  }
+  try {
+    new Notification(title, options);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Queue                                                               */
+/* ------------------------------------------------------------------ */
+
+export function cancelReminders() {
+  if (timer) clearTimeout(timer);
+  timer = null;
+}
+
+function dayFor(app, dateISO) {
+  if (dayCache.has(dateISO)) return dayCache.get(dateISO);
+  const p = app.model.profile;
+  const day = computeDay({
+    dateISO,
+    lat: p.location.lat,
+    lon: p.location.lon,
+    tz: p.location.tz,
+    method: p.method,
+    asrShadow: p.asrShadow,
+    offsets: p.offsets,
+  });
+  if (dayCache.size > 8) dayCache.clear();
+  dayCache.set(dateISO, day);
+  return day;
+}
+
+export function nextEvents(app, limit = 24) {
+  if (!app?.model || !app.day) return [];
+  const settings = normalizeReminders(app.model.profile.notifications);
+  if (!settings.enabled || permission() !== 'granted') return [];
+
+  const tomorrowISO = addDays(app.today, 1);
+  const events = buildSchedule({
+    days: [
+      { dateISO: app.today, windows: app.day.windows },
+      { dateISO: tomorrowISO, windows: dayFor(app, tomorrowISO).windows },
+    ],
+    nowMinutes: app.now,
+    settings,
+    remaining: app.model.stats(app.today).remaining,
+    limit,
+  });
+
+  return events.filter((event) => !shown.has(event.key));
+}
+
+function formatClock(minutes) {
+  const m = ((Math.round(minutes) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+}
+
+function fire(app, event) {
+  const settings = normalizeReminders(app.model.profile.notifications);
+  if (shown.has(event.key)) return;
+  shown.add(event.key);
+  if (shown.size > 120) shown.clear();
+
+  let title;
+  let body;
+  if (event.kind === 'qada') {
+    title = t('notify.qadaTitle');
+    body = t('notify.qadaBody', { count: event.remaining });
+  } else {
+    title = t('notify.prayerTitle', {
+      prayer: t(`prayer.${event.prayer}`),
+      time: formatClock(event.time),
+    });
+    body = t('notify.prayerBody', { prayer: t(`prayer.${event.prayer}`) });
+  }
+
+  show({ title, body, tag: event.key, data: { kind: event.kind, prayer: event.prayer } });
+  if (settings.sound) chime();
+  if (settings.vibrate) vibrate([180, 90, 180]);
+
+  scheduleReminders(app);
+}
+
+/** Re-arm the timer for the next due reminder. Safe to call as often as needed. */
+export function scheduleReminders(app) {
+  cancelReminders();
+  const events = nextEvents(app);
+  if (!events.length) return null;
+
+  const next = events[0];
+  const delay = Math.max(400, next.delayMinutes * 60000);
+  timer = setTimeout(() => fire(app, next), delay);
+  return next;
+}
+
+/** Fire a sample notification right now, from a user gesture. */
+export async function sendTest(app) {
+  const settings = normalizeReminders(app?.model?.profile?.notifications);
+  if (settings.sound) chime();
+  if (settings.vibrate) vibrate([120, 60, 120]);
+  return show({
+    title: t('notify.testTitle'),
+    body: t('notify.testBody'),
+    tag: 'qada:test',
+    data: { kind: 'test' },
+  });
+}
+
+/** Reset the "already shown" memory — used when the day changes. */
+export function resetShown() {
+  shown.clear();
+}
+
+/** Exported for tests: date helpers used by the notifier. */
+export const _internal = { fromISO, toISO, dayCache };

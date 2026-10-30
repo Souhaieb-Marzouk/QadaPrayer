@@ -21,6 +21,7 @@ import * as settingsScreen from './ui/settings.js';
 import * as sheets from './ui/sheets.js';
 import * as lock from './ui/lock.js';
 import { renderLock } from './ui/lock.js';
+import { resetShown, scheduleReminders } from './notify.js';
 
 export const app = {
   store: new Store(),
@@ -118,6 +119,8 @@ export function boot() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && app.model) {
       const changed = refreshClock();
+      if (changed) resetShown();
+      scheduleReminders(app);
       if (changed || app.route === 'today') render({ preserveScroll: true });
     }
   });
@@ -125,10 +128,15 @@ export function boot() {
   setInterval(() => {
     if (!app.model) return;
     const changed = refreshClock();
+    if (changed) {
+      resetShown();
+      scheduleReminders(app);
+    }
     if (changed || app.route === 'today') render({ preserveScroll: true });
   }, 30000);
 
   render();
+  scheduleReminders(app);
 }
 
 /** Deep-link helpers used by the screenshot tooling: ?lang=ar&theme=light&sheet=prayer:asr */
@@ -262,6 +270,7 @@ export function commit(mutator, { message, silent = false } = {}) {
   // day is always rebuilt after a mutation — it costs well under a millisecond.
   app.day = computeDayFor(app.today);
   render({ preserveScroll: true });
+  scheduleReminders(app);
   if (message && !silent) showToast(message, i18n.t('common.undo'), 'undo');
 }
 

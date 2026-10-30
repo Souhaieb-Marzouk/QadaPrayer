@@ -23,6 +23,8 @@ today. It is built on the Maliki position that missed prayers must be made up.
 - **Prayer times computed on the device** — any city, nine calculation methods,
   adjustable Asr shadow and per-prayer minute offsets.
 - **Exemptions** — days that were not due are excluded from what you owe.
+- **Reminders** — a notification at each prayer and one evening nudge with the
+  make-ups still waiting, with a lead time, quiet hours, chime and vibration.
 - **Progress you can feel** — remaining count, completion, projected finish
   date, seven-day activity and milestones.
 - **Private by construction** — no account, no server, no analytics. Backups are
@@ -63,8 +65,8 @@ leave a tip:
 
 ## Roadmap
 
-- Prayer reminders with per-prayer notification actions.
 - Home-screen widget with today's prayers and remaining make-ups.
+- Tap-to-mark actions directly inside a reminder notification.
 - Encrypted cloud sync between devices (end-to-end, no server-side plaintext).
 - Printable make-up plan for review with a scholar.
 

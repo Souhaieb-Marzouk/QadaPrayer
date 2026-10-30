@@ -77,8 +77,8 @@ for icon in manifest.get("icons", []):
 sw = open(os.path.join(ROOT, "app", "sw.js"), encoding="utf-8").read()
 for match in re.finditer(r"'\./([^']+)'", sw):
     asset = match.group(1)
-    if not asset:
-        continue
+    if not asset or "#" in asset:
+        continue  # URL fragments are not files
     target = os.path.normpath(os.path.join(ROOT, "app", asset))
     if not os.path.exists(target):
         problems.append(f"sw.js -> missing {asset}")

@@ -2,10 +2,12 @@
 
 import { t, number, dateMedium, setLanguage as setI18nLanguage } from '../i18n.js';
 import { PRAYERS } from '../core/dates.js';
-import { esc, signed } from './dom.js';
+import { clock, esc, notice as noticeHtml, signed } from './dom.js';
 import { icon } from './icons.js';
 import { LINKS, METHOD_LABELS, VERSION, supportsConfigured } from '../config.js';
 import { METHOD_IDS } from '../core/prayerTimes.js';
+import { normalizeReminders } from '../core/reminders.js';
+import { nextEvents, permission, primeAudio, requestPermission, sendTest } from '../notify.js';
 
 function card(title, body) {
   return `
@@ -253,6 +255,101 @@ export function render(app) {
     </div>`,
   );
 
+  const n = normalizeReminders(p.notifications);
+  const nextEvent = n.enabled ? nextEvents(app, 1)[0] : null;
+  const permissionState = permission();
+  const reminders = card(
+    t('settings.reminders'),
+    `<div class="card--pad" style="display:flex;flex-direction:column;gap:.55rem">
+      <button class="switch" role="switch" aria-checked="${n.enabled}" data-action="rem-toggle" data-key="enabled">
+        <span>
+          <span class="switch__label">${esc(t('reminders.enable'))}</span>
+          <span class="switch__hint">${esc(t('reminders.enableHint'))}</span>
+        </span>
+        <span class="switch__track"><span class="switch__thumb"></span></span>
+      </button>
+      ${
+        n.enabled
+          ? `
+        <div class="field">
+          <span class="field__label">${esc(t('reminders.prayers'))}</span>
+          <div class="segmented">
+            ${PRAYERS.map(
+              (prayer) => `<button class="segmented__btn" data-action="rem-toggle" data-key="${prayer}"
+                aria-pressed="${Boolean(n[prayer])}">${esc(t(`prayer.${prayer}`))}</button>`,
+            ).join('')}
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="field__label">${esc(t('reminders.lead'))}</span>
+          ${segmented(
+            [
+              ['0', t('reminders.leadNow')],
+              ['5', t('reminders.lead5')],
+              ['10', t('reminders.lead10')],
+              ['15', t('reminders.lead15')],
+            ],
+            n.lead,
+            'rem-lead',
+          )}
+        </div>
+
+        <button class="switch" role="switch" aria-checked="${n.qada}" data-action="rem-toggle" data-key="qada">
+          <span>
+            <span class="switch__label">${esc(t('reminders.qadaTitle'))}</span>
+            <span class="switch__hint">${esc(t('reminders.qadaHint'))}</span>
+          </span>
+          <span class="switch__track"><span class="switch__thumb"></span></span>
+        </button>
+        ${
+          n.qada
+            ? stepper({
+                label: t('reminders.qadaTime'),
+                value: n.qadaHour,
+                action: 'rem-qada-hour',
+                min: 0,
+                max: 23,
+                suffix: ':00',
+              })
+            : ''
+        }
+
+        <div style="display:flex;gap:.4rem">
+          <button class="switch" style="flex:1" role="switch" aria-checked="${n.sound}" data-action="rem-toggle" data-key="sound">
+            <span class="switch__label">${esc(t('reminders.sound'))}</span>
+            <span class="switch__track"><span class="switch__thumb"></span></span>
+          </button>
+          <button class="switch" style="flex:1" role="switch" aria-checked="${n.vibrate}" data-action="rem-toggle" data-key="vibrate">
+            <span class="switch__label">${esc(t('reminders.vibrate'))}</span>
+            <span class="switch__track"><span class="switch__thumb"></span></span>
+          </button>
+        </div>
+
+        <button class="btn btn--ghost btn--sm" data-action="rem-test">${icon('bell')} ${esc(
+          t('reminders.test'),
+        )}</button>
+
+        ${
+          nextEvent
+            ? `<div class="stat__hint">${esc(
+                t('reminders.next', { time: clock(nextEvent.time ?? nextEvent.atMinutes) }),
+              )}</div>`
+            : ''
+        }
+        ${
+          permissionState === 'denied'
+            ? noticeHtml(t('reminders.permissionDenied'), 'danger')
+            : permissionState !== 'granted'
+              ? noticeHtml(t('reminders.permissionNeeded'), 'info')
+              : ''
+        }`
+          : ''
+      }
+      <p class="field__hint">${esc(t('reminders.limits'))}</p>
+    </div>`,
+  );
+
   const about = card(
     t('settings.about'),
     `<div class="card--pad" style="display:flex;flex-direction:column;gap:.7rem">
@@ -285,10 +382,56 @@ export function render(app) {
     </div>`,
   );
 
-  return [language, appearance, prayer, obligation, pace, data, install, about].join('');
+  return [language, appearance, prayer, obligation, pace, reminders, data, install, about].join('');
 }
 
 export const handlers = {
+  'rem-toggle': async (app, el) => {
+    const key = el.dataset.key;
+    const config = normalizeReminders(app.model.profile.notifications);
+
+    if (key === 'enabled' && !config.enabled) {
+      const state = await requestPermission();
+      if (state !== 'granted') {
+        app.showToast(t('reminders.permissionDenied'));
+        app.render({ preserveScroll: true });
+        return;
+      }
+      primeAudio();
+    }
+
+    const next = { ...config, [key]: !config[key] };
+    app.commit((model) => model.updateProfile({ notifications: next }), { silent: true });
+  },
+
+  'rem-lead': (app, el) => {
+    const config = normalizeReminders(app.model.profile.notifications);
+    app.commit(
+      (model) =>
+        model.updateProfile({ notifications: { ...config, lead: Number(el.dataset.value) } }),
+      { silent: true },
+    );
+  },
+
+  'rem-qada-hour': (app, el) => {
+    const config = normalizeReminders(app.model.profile.notifications);
+    const hour = Math.max(0, Math.min(23, config.qadaHour + Number(el.dataset.delta)));
+    app.commit((model) => model.updateProfile({ notifications: { ...config, qadaHour: hour } }), {
+      silent: true,
+    });
+  },
+
+  'rem-test': async (app) => {
+    const state = await requestPermission();
+    if (state !== 'granted') {
+      app.showToast(t('reminders.permissionDenied'));
+      return;
+    }
+    primeAudio();
+    const ok = await sendTest(app);
+    if (!ok) app.showToast(t('reminders.permissionDenied'));
+  },
+
   'set-lang': (app, el) => {
     const code = el.dataset.value;
     app.lang = code;

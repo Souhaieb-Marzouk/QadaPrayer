@@ -151,6 +151,33 @@ intact"** simulates two weeks at 2 days/day, switches to 1 day/day, and asserts:
 
 ---
 
+## Reminders
+
+Two modules, split exactly along the testability line:
+
+- `core/reminders.js` — pure. Given today's and tomorrow's prayer windows, the
+  current minute, the settings and the remaining count, it returns an ordered
+  queue of `{ key, kind, atMinutes, delayMinutes }`. Quiet hours (which may wrap
+  midnight), lead times, disabled prayers and the evening nudge are all decided
+  here, so they can be proven without a browser.
+- `notify.js` — delivery. It owns permission, the notification call
+  (`ServiceWorkerRegistration.showNotification` with a `Notification`
+  fallback), the chime (WebAudio, primed on a user gesture), vibration, and a
+  single timer armed for the head of the queue. When it fires, the event is
+  remembered in a `Set` (so a reminder can never show twice for the same key)
+  and the queue is re-armed.
+
+The queue is rebuilt on boot, every 30 seconds, when the app becomes visible,
+and after every commit — so changing the location, the method or the pace is
+reflected immediately. Midnight resets the "already shown" memory.
+
+Known limits, stated in the UI rather than hidden: a web app can only deliver a
+reminder while it is alive, and browsers throttle background timers. Installing
+to the home screen improves delivery substantially on Android; on iOS it works
+while the app is open or recently backgrounded.
+
+---
+
 ## Persistence
 
 `Store` (app/js/store.js) is the only module that touches storage.
