@@ -23,3 +23,12 @@ screenshots/_probe*
 
 # Browser profile leftovers from screenshot tooling
 _ffprof/
+
+# Release artefacts (attached to a GitHub release, not committed)
+dist/
+
+# Signing material — never commit a keystore
+*.keystore
+*.jks
+*.aab
+*.apk

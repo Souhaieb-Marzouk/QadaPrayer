@@ -201,21 +201,26 @@ you lose them you can never update the app under the same identity.
 
 ## 10. Publish the site (GitHub Pages)
 
-1. Create a public repository and push this folder to `main`.
-2. **Settings → Pages → Source: Deploy from a branch**, branch `main`, folder
+This repository is already wired for it:
+
+- **Website** — <https://souhaieb-marzouk.github.io/Qada-App/>
+- **App** — <https://souhaieb-marzouk.github.io/Qada-App/app/>
+- **Repository** — <https://github.com/Souhaieb-Marzouk/Qada-App>
+
+1. **Settings → Pages → Source: Deploy from a branch**, branch `main`, folder
    `/ (root)`. Save.
-3. After a minute the site is at `https://<user>.github.io/<repo>/` and the app
-   at `https://<user>.github.io/<repo>/app/`.
-4. Replace every `REPLACE_ME` placeholder:
-   - `app/js/config.js` — Ko-fi, PayPal, repository URL
-   - `index.html` — release and support links
-   - `README.md` — support links
-5. Bump `VERSION` in `app/js/config.js` and the cache name in `app/sw.js`
-   (`qada-v1` → `qada-v2`) whenever you ship. The service worker only replaces
-   its cache when that name changes.
+2. After a minute the site is live at the URLs above.
+3. The only remaining placeholders are the tip links: `app/js/config.js`,
+   `index.html` and `README.md` (`ko-fi.com/REPLACE_ME`,
+   `paypal.me/REPLACE_ME`). Everything else already points at the real
+   repository and website.
+4. Bump `VERSION` in `app/js/config.js` and the cache name in `app/sw.js`
+   (`qada-v2` → `qada-v3`) whenever you ship. The service worker only replaces
+   its cache when that name changes — and installed copies use it to detect the
+   new version.
 
 Custom domain: add a `CNAME` file with your domain and point a DNS `CNAME`
-record at `<user>.github.io`.
+record at `souhaieb-marzouk.github.io`.
 
 ---
 

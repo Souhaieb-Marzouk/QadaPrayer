@@ -365,6 +365,9 @@ export function render(app) {
         <span class="field__hint">${esc(t('settings.version', { version: VERSION }))}</span>
         <span class="dim" style="font-size:.72rem" data-count="${number(projection.remaining)}"></span>
       </div>
+      <button class="btn btn--ghost btn--sm btn--block" data-action="check-updates">${icon(
+        'download',
+      )} ${esc(t('update.check'))}</button>
       ${
         supportsConfigured()
           ? `<a class="btn btn--ghost btn--block" href="${esc(

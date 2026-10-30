@@ -7,7 +7,11 @@ Qada counts every prayer from the day your obligation began until today, then
 folds a small, steady number of make-ups into the five prayers you are praying
 today. It is built on the Maliki position that missed prayers must be made up.
 
-**[Open the app](app/)** · **[Local setup](docs/LOCAL-DEVELOPMENT.md)** · **[How it works](docs/ARCHITECTURE.md)**
+**[Website](https://souhaieb-marzouk.github.io/Qada-App/)** ·
+**[Open the app](https://souhaieb-marzouk.github.io/Qada-App/app/)** ·
+**[Releases](https://github.com/Souhaieb-Marzouk/Qada-App/releases)** ·
+**[Local setup](docs/LOCAL-DEVELOPMENT.md)** ·
+**[How it works](docs/ARCHITECTURE.md)**
 
 ---
 
@@ -35,12 +39,17 @@ today. It is built on the Maliki position that missed prayers must be made up.
 ## Install
 
 - **Android** — download the latest `.apk` from
-  [releases](../../releases/latest) and open it, or add this repository to
+  [releases](https://github.com/Souhaieb-Marzouk/Qada-App/releases/latest) and
+  open it, or add this repository to
   [Obtainium](https://obtainium.imranr.dev/) for automatic updates.
 - **iPhone / iPad** — open the app in Safari, tap *Share* → *Add to Home Screen*.
 - **Desktop** — open the app in any modern browser.
 
 Detailed steps: [docs/LOCAL-DEVELOPMENT.md](docs/LOCAL-DEVELOPMENT.md).
+
+> Installed copies check for a new version on launch, when the app comes back to
+> the foreground and every 30 minutes, and offer a one-tap reload when one is
+> ready.
 
 ## Run it locally
 

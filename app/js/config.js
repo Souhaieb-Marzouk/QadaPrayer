@@ -11,7 +11,8 @@ export const LINKS = {
   // TODO: set your own handles (these are placeholders).
   koFi: 'https://ko-fi.com/REPLACE_ME',
   payPal: 'https://paypal.me/REPLACE_ME',
-  repository: 'https://github.com/REPLACE_ME/qada',
+  repository: 'https://github.com/Souhaieb-Marzouk/Qada-App',
+  website: 'https://souhaieb-marzouk.github.io/Qada-App/',
 };
 
 export function supportsConfigured() {

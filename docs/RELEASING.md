@@ -60,15 +60,52 @@ version lives in `app/sw.js` (`qada-vN`). Bump both when releasing.
 ## Release checklist
 
 1. `npm test` — all green.
-2. Update `VERSION` and the service-worker cache name.
-3. Update the download links if the asset names changed.
-4. Build the Android package (see `docs/LOCAL-DEVELOPMENT.md`, section 9).
+2. Update `VERSION` (`app/js/config.js` and `package.json`) and the
+   service-worker cache name in `app/sw.js` (`qada-v2` → `qada-v3`).
+3. `npm run package` — writes `dist/qada-<version>-web.zip` and its `.sha256`.
+4. Build the Android package if this release ships one (see below).
 5. Create the GitHub release:
    - **Tag:** `v0.2.0`
    - **Title:** `Qada 0.2.0 — <short human phrase>`
-   - **Body:** the description below, plus the attached assets.
-6. Attach: the signed `.apk`, and optionally the `.aab`.
+   - **Body:** the description below.
+6. Attach the assets produced in step 3 (and the `.apk` from step 4).
 7. Verify the landing page download link resolves to the new release.
+
+---
+
+## Release assets
+
+`npm run package` produces a deterministic archive — the same sources always
+yield the same bytes, so the checksum is meaningful:
+
+| File | What it is |
+| --- | --- |
+| `qada-<version>-web.zip` | deployable copy of the site and app (`index.html`, `site.css`, `app/`, `LICENSE`) |
+| `qada-<version>-web.zip.sha256` | SHA-256 of the archive, for a download check |
+
+Attach both to the release. The zip is also what you would hand to anyone who
+wants to self-host.
+
+### The Android `.apk`
+
+An APK cannot be produced from this repository alone — it needs the Android
+toolchain (or a signing service). The full walkthrough lives in
+[`android/README.md`](../android/README.md); in short:
+
+**Visual Studio + .NET MAUI.** Install the *.NET Multi-platform App UI
+development* workload, create a MAUI project named `Qada`, drop in the two files
+from `android/overrides/`, set the package id and version, then **Publish →
+Archive → Distribute → Ad Hoc** — Visual Studio creates the keystore and the
+signed `.apk`; **Distribute → Google Play** produces the `.aab`.
+
+**PWABuilder (no install, ~3 minutes).** Deploy the site first, then go to
+<https://www.pwabuilder.com/>, paste
+`https://souhaieb-marzouk.github.io/Qada-App/app/`, choose Android and download
+the package. It contains a signed `.apk`, an `.aab`, and the signing key it
+generated — **keep that key**, updates need it.
+
+Whichever route you take, name the result `qada-<version>.apk` so the link in
+`index.html` keeps working, and **never commit the keystore**.
 
 ---
 

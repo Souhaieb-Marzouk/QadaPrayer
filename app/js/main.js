@@ -22,6 +22,7 @@ import * as sheets from './ui/sheets.js';
 import * as lock from './ui/lock.js';
 import { renderLock } from './ui/lock.js';
 import { resetShown, scheduleReminders } from './notify.js';
+import { applyUpdate, checkForUpdate, initUpdater } from './updater.js';
 
 export const app = {
   store: new Store(),
@@ -104,6 +105,11 @@ export function boot() {
   document.addEventListener('change', onDocumentChange);
   document.addEventListener('input', onDocumentInput);
   document.addEventListener('keydown', onKeyDown);
+
+  // Offer the reload when a new version of the app is waiting.
+  initUpdater({
+    onAvailable: () => showToast(i18n.t('update.available'), i18n.t('update.reload'), 'reload'),
+  });
 
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
@@ -513,6 +519,20 @@ function onDocumentClick(event) {
   if (action === 'do-restore') {
     const payload = app.sheet?.payload;
     if (payload) performRestore(payload);
+    return;
+  }
+  if (action === 'reload') {
+    applyUpdate();
+    return;
+  }
+  if (action === 'check-updates') {
+    checkForUpdate().then((result) => {
+      if (!result.checked) {
+        showToast(i18n.t('update.unavailable'));
+        return;
+      }
+      if (!result.found) showToast(i18n.t('update.upToDate'));
+    });
     return;
   }
   if (action === 'close-sheet' || action === 'scrim-close') {

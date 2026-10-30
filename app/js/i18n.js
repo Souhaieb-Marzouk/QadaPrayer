@@ -276,6 +276,12 @@ const DICTIONARIES = {
     'notify.testTitle': 'Reminders are on',
     'notify.testBody': 'This is what a reminder will look like.',
 
+    'update.available': 'A new version of Qada is ready.',
+    'update.reload': 'Reload',
+    'update.check': 'Check for updates',
+    'update.upToDate': 'You are on the latest version.',
+    'update.unavailable': 'Update check is not available here.',
+
     'common.yes': 'Yes',
     'common.no': 'No',
     'common.cancel': 'Cancel',
@@ -580,6 +586,12 @@ const DICTIONARIES = {
     'notify.testTitle': 'Les rappels sont activés',
     'notify.testBody': 'Voici à quoi ressemblera un rappel.',
 
+    'update.available': 'Une nouvelle version de Qada est prête.',
+    'update.reload': 'Recharger',
+    'update.check': 'Vérifier les mises à jour',
+    'update.upToDate': 'Vous avez la dernière version.',
+    'update.unavailable': 'La vérification est indisponible ici.',
+
     'common.yes': 'Oui',
     'common.no': 'Non',
     'common.cancel': 'Annuler',
@@ -882,6 +894,12 @@ const DICTIONARIES = {
     'notify.qadaBody': 'بقي {count} صلاة للقضاء.',
     'notify.testTitle': 'التذكيرات مفعّلة',
     'notify.testBody': 'هكذا سيبدو التذكير.',
+
+    'update.available': 'نسخة جديدة من قضاء جاهزة.',
+    'update.reload': 'إعادة التحميل',
+    'update.check': 'تحقق من التحديثات',
+    'update.upToDate': 'أنت على أحدث نسخة.',
+    'update.unavailable': 'التحقق من التحديثات غير متاح هنا.',
 
     'common.yes': 'نعم',
     'common.no': 'لا',

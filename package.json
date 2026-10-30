@@ -4,9 +4,18 @@
   "private": true,
   "type": "module",
   "description": "Offline-first tracker for missed prayers (qada), Maliki framework.",
+  "homepage": "https://souhaieb-marzouk.github.io/Qada-App/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Souhaieb-Marzouk/Qada-App.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Souhaieb-Marzouk/Qada-App/issues"
+  },
   "license": "GPL-3.0-or-later",
   "scripts": {
     "test": "node --test --test-isolation=none \"tests/*.test.js\"",
-    "serve": "node tools/serve.mjs"
+    "serve": "node tools/serve.mjs",
+    "package": "node tools/package.mjs"
   }
 }

@@ -11,6 +11,7 @@ const SHELL = [
   './js/i18n.js',
   './js/store.js',
   './js/notify.js',
+  './js/updater.js',
   './js/core/dates.js',
   './js/core/astro.js',
   './js/core/prayerTimes.js',
@@ -39,7 +40,8 @@ self.addEventListener('install', (event) => {
     (async () => {
       const cache = await caches.open(VERSION);
       await cache.addAll(SHELL.map((url) => new Request(url, { cache: 'reload' })));
-      await self.skipWaiting();
+      // Deliberately do NOT skipWaiting: the page decides when to swap, so a
+      // user halfway through marking prayers is never reloaded under their feet.
     })(),
   );
 });
@@ -52,6 +54,13 @@ self.addEventListener('activate', (event) => {
       await self.clients.claim();
     })(),
   );
+});
+
+/* The page asks for the swap once the user accepts the update banner. */
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', (event) => {

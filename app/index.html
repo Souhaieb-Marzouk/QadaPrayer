@@ -38,14 +38,7 @@
       </p>
     </noscript>
     <script type="module" src="./js/main.js"></script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker.register('./sw.js').catch(function () {
-            /* offline mode unavailable — the app still works while online */
-          });
-        });
-      }
-    </script>
+    <!-- The service worker is registered by js/updater.js, which also handles
+         update detection and the "new version" prompt. -->
   </body>
 </html>
