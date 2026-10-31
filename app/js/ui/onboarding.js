@@ -406,16 +406,14 @@ export const handlers = {
       app.store.save(model, { immediate: true });
       rememberCode('');
 
-      app.model = model;
-      app.lang = model.profile.language || app.lang;
-      app.onb = null;
-      setI18nLanguage(app.lang);
-      app.applyVisualPreferences();
-      app.refreshClock();
-      app.cal.year = Number(app.today.slice(0, 4));
-      location.hash = '#/today';
-      app.render();
+      // The data is safely on disk. Start the app from scratch rather than
+      // trying to swap the wizard out in place: it is one reload, and it is the
+      // only path that cannot leave the wizard on screen with a restored ledger.
       app.showToast(t('sync.done'));
+      setTimeout(() => {
+        location.replace(`${location.pathname}#/today`);
+        location.reload();
+      }, 450);
     } catch (error) {
       const reason = String(error?.message || error || '');
       app.onb.syncBusy = false;
