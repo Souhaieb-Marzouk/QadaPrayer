@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Application shell: boot, routing, clock, rendering and event dispatch.
  *
  * Rendering is a full re-render of a template string on every state change.
@@ -7,6 +7,7 @@
  */
 
 import { Store } from './store.js';
+import { supportsConfigured } from './config.js';
 import { Qada, slotIndex } from './core/engine.js';
 import { PRAYERS, addDays, instantToLocalParts, todayISO } from './core/dates.js';
 import { computeDay } from './core/prayerTimes.js';
@@ -122,6 +123,10 @@ export function boot() {
       const data = event.data || {};
       if (data.type === 'MARK_PRAYED' && data.dateISO && data.prayer) {
         markFromNotification(data.dateISO, data.prayer);
+      }
+      // Tapping a reminder without action buttons: open the confirmation.
+      if (data.type === 'OPEN_PRAYER' && data.dateISO && data.prayer) {
+        openPrayerSheet(data.dateISO, data.prayer);
       }
     });
   }
@@ -335,6 +340,20 @@ export function replaceModel(model) {
 }
 
 /**
+ * Open the prayer confirmation for a date, from a notification tap.
+ * The second platform fallback when notifications have no action buttons.
+ */
+export function openPrayerSheet(dateISO, prayer) {
+  if (!app.model || !PRAYERS.includes(prayer)) return false;
+  refreshClock();
+  app.route = 'today';
+  if (location.hash !== '#/today') history.replaceState(null, '', '#/today');
+  app.openSheet('prayer', { date: dateISO, prayer, checked: ['self'] });
+  render();
+  return true;
+}
+
+/**
  * Mark a prayer as prayed without going through the confirmation sheet.
  * Used by the "I prayed" button on a reminder notification.
  */
@@ -528,6 +547,13 @@ function renderTopbar() {
         </div>
       </div>
       <div class="topbar__spacer"></div>
+      ${
+        supportsConfigured()
+          ? `<button class="icon-btn icon-btn--heart" data-action="open-support" aria-label="${esc(
+              i18n.t('support.title'),
+            )}">${icon('heart')}</button>`
+          : ''
+      }
       ${
         canUndo
           ? `<button class="icon-btn" data-action="undo" aria-label="${esc(i18n.t('common.undo'))}">${icon(

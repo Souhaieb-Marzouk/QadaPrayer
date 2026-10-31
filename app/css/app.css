@@ -2094,3 +2094,27 @@ input[type='range']::-moz-range-thumb {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Support: the heart in the topbar */
+.icon-btn--heart {
+  color: var(--gold-soft);
+}
+
+.icon-btn--heart:hover {
+  color: var(--gold);
+}
+
+/* Sync code */
+.sync-code {
+  display: block;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px dashed var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  text-align: center;
+  color: var(--gold-soft);
+  word-break: break-all;
+}

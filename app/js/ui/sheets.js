@@ -408,6 +408,50 @@ function nameSheet(app) {
   });
 }
 
+function syncSheet(app) {
+  const sheet = app.sheet;
+  const code = app.store?.meta?.syncCode || '';
+
+  if (sheet.mode === 'manage' && code) {
+    return sheetShell({
+      title: esc(t('sync.title')),
+      subtitle: esc(t('sync.codeHint')),
+      body: `
+        <code class="sync-code">${esc(code)}</code>
+        <p class="field__hint">${esc(t('sync.hint'))}</p>
+        <button class="btn btn--ghost btn--sm btn--block" data-action="sync-copy">${esc(
+          t('sync.copy'),
+        )}</button>
+      `,
+      foot: `<button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>
+             <button class="btn btn--ghost" data-action="sync-forget">${esc(t('sync.deleteRemote'))}</button>
+             <button class="btn btn--primary" data-action="sync-now">${esc(t('sync.now'))}</button>`,
+    });
+  }
+
+  return sheetShell({
+    title: esc(t('sync.title')),
+    subtitle: esc(t('sync.hint')),
+    body: `
+      <div class="field">
+        <label class="field__label">${esc(t('sync.join'))}</label>
+        <input class="input" data-live="sync-input" value="${esc(sheet.input || '')}"
+          placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field">
+        <label class="field__label">${esc(t('sync.server'))}</label>
+        <input class="input" data-live="sync-endpoint" value="${esc(sheet.endpointValue || '')}"
+          placeholder="https://…" autocomplete="off" spellcheck="false">
+      </div>
+      <button class="btn btn--ghost btn--sm btn--block" data-action="sync-create">${esc(
+        t('sync.create'),
+      )}</button>
+    `,
+    foot: `<button class="btn" data-action="close-sheet">${esc(t('common.cancel'))}</button>
+           <button class="btn btn--primary" data-action="sync-join">${esc(t('sync.use'))}</button>`,
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* PIN                                                                 */
 /* ------------------------------------------------------------------ */
@@ -529,6 +573,8 @@ export function renderSheet(app) {
       return extraSheet(app);
     case 'name':
       return nameSheet(app);
+    case 'sync':
+      return syncSheet(app);
     case 'support':
       return supportSheet();
     default:
@@ -876,6 +922,12 @@ export const changes = {
 export const live = {
   'name-input': (app, el) => {
     if (app.sheet) app.sheet.value = el.value;
+  },
+  'sync-input': (app, el) => {
+    if (app.sheet) app.sheet.input = el.value;
+  },
+  'sync-endpoint': (app, el) => {
+    if (app.sheet) app.sheet.endpointValue = el.value;
   },
   'city-query': (app, el) => {
     app.sheet.query = el.value;

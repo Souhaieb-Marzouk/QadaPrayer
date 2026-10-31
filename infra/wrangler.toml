@@ -1,0 +1,9 @@
+name = "qada-sync"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+
+# Create it with:  wrangler kv namespace create QADA
+# then paste the id below.
+[[kv_namespaces]]
+binding = "QADA"
+id = "cb79b4e9f6d443e5b26ba39fb0c8c757"

@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Tests and checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Unit tests
+        run: node --test --test-isolation=none "tests/*.test.js"
+
+      - name: Local links and manifest
+        run: python3 tools/check-links.py
+
+      - name: Landing pages are up to date
+        run: |
+          node tools/build-site.mjs
+          git diff --exit-code -- index.html index-ar.html index-fr.html
+
+  release-files:
+    name: Release files
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Tag matches package.json
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          version="$(node -p "require('./package.json').version")"
+          if [ "$tag" != "$version" ]; then
+            echo "tag $tag does not match package.json $version"
+            exit 1
+          fi
+
+      - name: Build the web bundle
+        run: node tools/package.mjs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qada-web-${{ github.ref_name }}
+          path: dist/*.zip
+          if-no-files-found: error

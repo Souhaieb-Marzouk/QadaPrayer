@@ -1,6 +1,6 @@
 /* Qada service worker — offline shell, no network dependency at runtime. */
 
-const VERSION = 'qada-v8';
+const VERSION = 'qada-v10';
 const SHELL = [
   './',
   './index.html',
@@ -14,6 +14,12 @@ const SHELL = [
   './js/updater.js',
   './js/exporter.js',
   './js/native.js',
+  './js/merge.js',
+  './js/profiles.js',
+  './js/sync/code.js',
+  './js/sync/crypto.js',
+  './js/sync/client.js',
+  './js/sync/sync.js',
   './js/core/dates.js',
   './js/core/astro.js',
   './js/core/prayerTimes.js',
@@ -135,10 +141,22 @@ self.addEventListener('notificationclick', (event) => {
 
       if (client) {
         await client.focus();
+        // A plain tap on a prayer reminder goes straight to the confirmation.
+        if (event.action !== 'later' && data.dateISO && data.prayer) {
+          client.postMessage({
+            type: 'OPEN_PRAYER',
+            dateISO: data.dateISO,
+            prayer: data.prayer,
+          });
+        }
         return;
       }
       if (self.clients.openWindow) {
-        await self.clients.openWindow('./#/today');
+        await self.clients.openWindow(
+          data.dateISO && data.prayer && event.action !== 'later'
+            ? `./?mark=${data.dateISO}:${data.prayer}`
+            : './#/today',
+        );
       }
     })(),
   );

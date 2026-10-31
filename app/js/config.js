@@ -5,13 +5,15 @@
  * nothing else in the codebase needs to change.
  */
 
-export const VERSION = '0.8.0';
+export const VERSION = '0.5.0';
 
 export const LINKS = {
   koFi: 'https://ko-fi.com/cyberpulseacademy',
   payPal: 'https://www.paypal.com/donate/?hosted_button_id=KNUSPQTVR9WCU',
   repository: 'https://github.com/Souhaieb-Marzouk/Qada-App',
   website: 'https://souhaieb-marzouk.github.io/Qada-App/',
+  // Base URL of the sync worker (see infra/README.md). Empty hides the card.
+  syncEndpoint: 'https://qada-sync.marzouk-souhaieb.workers.dev',
 };
 
 export function supportsConfigured() {

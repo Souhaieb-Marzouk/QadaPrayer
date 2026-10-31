@@ -10,6 +10,72 @@ import { normalizeReminders } from '../core/reminders.js';
 import { nextEvents, permission, primeAudio, requestPermission, sendTest } from '../notify.js';
 import { exportName, ledgerCsv } from '../exporter.js';
 import { hasNativeBridge } from '../native.js';
+import { generateCode, normalizeCode } from '../sync/code.js';
+import { forgetRemote, syncOnce } from '../sync/sync.js';
+
+function syncCard(app) {
+  const code = app.store?.meta?.syncCode || '';
+  const last = app.store?.meta?.lastSyncAt || '';
+  const endpoint = app.store?.meta?.syncEndpoint || LINKS.syncEndpoint || '';
+
+  const body = !endpoint
+    ? `<div class="card--pad" style="display:flex;flex-direction:column;gap:.6rem">
+        <p class="field__hint">${esc(t('sync.hint'))}</p>
+        <button class="btn btn--ghost btn--sm btn--block" data-action="open-sync">${icon('upload')} ${esc(
+          t('sync.enable'),
+        )}</button>
+      </div>`
+    : code
+      ? `<div class="card--pad" style="display:flex;flex-direction:column;gap:.6rem">
+        <p class="field__hint">${esc(t('sync.hint'))}</p>
+        <code class="sync-code">${esc(code)}</code>
+        <div class="stat__hint">${esc(t('sync.last'))}: ${esc(last ? last.slice(0, 10) : t('sync.never'))}</div>
+        <button class="btn btn--primary btn--sm btn--block" data-action="sync-now">${icon('upload')} ${esc(
+          t('sync.now'),
+        )}</button>
+        <button class="btn btn--ghost btn--sm btn--block" data-action="sync-copy">${esc(
+          t('sync.copy'),
+        )}</button>
+        <button class="btn btn--ghost btn--sm btn--block" data-action="open-sync">${esc(
+          t('sync.deleteRemote'),
+        )}</button>
+      </div>`
+      : `<div class="card--pad" style="display:flex;flex-direction:column;gap:.6rem">
+        <p class="field__hint">${esc(t('sync.hint'))}</p>
+        <button class="btn btn--ghost btn--sm btn--block" data-action="open-sync">${icon('upload')} ${esc(
+          t('sync.enable'),
+        )}</button>
+      </div>`;
+
+  return card(t('sync.title'), body);
+}
+
+/** Run one sync against the configured server. */
+async function performSync(app, { quiet = false } = {}) {
+  const code = app.store?.meta?.syncCode;
+  const endpoint = app.store?.meta?.syncEndpoint || LINKS.syncEndpoint;
+  if (!code || !endpoint) return;
+
+  if (!quiet) app.showToast(t('sync.working'));
+
+  try {
+    const result = await syncOnce({ endpoint, code, model: app.model });
+    if (result.changed) {
+      app.model = result.model;
+      app.store.save(app.model, { immediate: true });
+      app.refreshClock();
+    }
+    app.store.writeMeta({ lastSyncAt: new Date().toISOString() });
+    app.sheet = null;
+    app.render({ preserveScroll: true });
+    if (!quiet) app.showToast(t('sync.done'));
+  } catch (error) {
+    app.render({ preserveScroll: true });
+    app.showToast(error?.message === 'bad-code' ? t('sync.badCode') : t('sync.error'));
+  }
+}
+
+export { performSync };
 
 function card(title, body) {
   return `
@@ -233,7 +299,9 @@ export function render(app) {
           </button>
           ${
             entry.active
-              ? icon('check')
+              ? `${icon('check')}<button class="icon-btn" data-action="rename-profile" data-id="${
+                  entry.id
+                }" aria-label="${esc(t('people.rename'))}">${icon('edit')}</button>`
               : `<button class="icon-btn" data-action="delete-profile" data-id="${entry.id}"
                    aria-label="${esc(t('common.delete'))}">${icon('trash')}</button>`
           }
@@ -252,6 +320,8 @@ export function render(app) {
       </div>
     </div>`,
   );
+
+  const sync = syncCard(app);
 
   const data = card(
     t('settings.data'),
@@ -454,6 +524,7 @@ export function render(app) {
     pace,
     reminders,
     people,
+    sync,
     data,
     install,
     about,
@@ -559,6 +630,92 @@ export const handlers = {
     app.commit((model) => model.setQuota(next), { silent: true });
   },
   'open-city': (app) => app.openSheet('city', { query: '' }),
+  'open-support': (app) => app.openSheet('support', {}),
+
+  'open-sync': (app) => {
+    const code = app.store?.meta?.syncCode || '';
+    if (code) {
+      app.openSheet('sync', { mode: 'manage' });
+      return;
+    }
+    app.openSheet('sync', {
+      mode: 'join',
+      input: '',
+      endpointValue: app.store?.meta?.syncEndpoint || LINKS.syncEndpoint || '',
+    });
+  },
+
+  'sync-create': (app) => {
+    const endpoint = String(app.sheet?.endpointValue || '').trim();
+    if (!/^https?:\/\//.test(endpoint)) {
+      app.showToast(t('sync.error'));
+      return;
+    }
+    const code = generateCode();
+    app.store.writeMeta({ syncCode: code, syncEndpoint: endpoint });
+    app.sheet = null;
+    app.render({ preserveScroll: true });
+    performSync(app);
+  },
+
+  'sync-join': (app) => {
+    const code = normalizeCode(app.sheet?.input || '');
+    if (!code) {
+      app.showToast(t('sync.badCode'));
+      return;
+    }
+    const endpoint = String(app.sheet?.endpointValue || '').trim();
+    if (!/^https?:\/\//.test(endpoint)) {
+      app.showToast(t('sync.error'));
+      return;
+    }
+    app.store.writeMeta({ syncCode: code, syncEndpoint: endpoint });
+    app.sheet = null;
+    app.render({ preserveScroll: true });
+    performSync(app);
+  },
+
+  'sync-now': (app) => {
+    performSync(app);
+  },
+
+  'sync-copy': async (app) => {
+    const code = app.store?.meta?.syncCode || '';
+    try {
+      await navigator.clipboard.writeText(code);
+      app.showToast(t('sync.copied'));
+    } catch {
+      app.showToast(code);
+    }
+  },
+
+  'sync-forget': (app) => {
+    app.openSheet('confirm', {
+      title: t('sync.deleteRemote'),
+      body: t('sync.confirmDelete'),
+      confirmLabel: t('sync.deleteRemote'),
+      action: 'do-sync-forget',
+      danger: true,
+    });
+  },
+
+  'do-sync-forget': async (app) => {
+    const code = app.store?.meta?.syncCode;
+    const endpoint = app.store?.meta?.syncEndpoint || LINKS.syncEndpoint;
+    app.sheet = null;
+    app.render({ preserveScroll: true });
+    if (!code || !endpoint) return;
+
+    try {
+      await forgetRemote({ endpoint, code });
+      app.store.writeMeta({ syncCode: '', lastSyncAt: '' });
+      app.render();
+      app.showToast(t('sync.deleted'));
+    } catch {
+      app.showToast(t('sync.error'));
+    }
+  },
+
   'add-person': (app) => {
     if ((app.store.listProfiles?.() || []).length >= 8) {
       app.showToast(t('people.limit', { n: 8 }));
@@ -584,6 +741,13 @@ export const handlers = {
 
     const name = (app.store.listProfiles() || []).find((entry) => entry.active)?.name || '';
     app.showToast(t('people.switched', { name }));
+  },
+
+  'rename-profile': (app, el) => {
+    const id = el.dataset.id;
+    const entry = (app.store.listProfiles() || []).find((profile) => profile.id === id);
+    if (!entry) return;
+    app.openSheet('name', { mode: 'rename', id, value: entry.name });
   },
 
   'delete-profile': (app, el) => {

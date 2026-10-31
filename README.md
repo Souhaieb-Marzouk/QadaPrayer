@@ -21,6 +21,7 @@
 - **غيّر وتيرتك ولا تخسر سجلك** — تقليل الوتيرة لا يعيد كتابة صلاة قضيتها.
 - **أوقات صلاة تناسبك** — تُحسب في الهاتف، مع طريقة الحساب وظلّ العصر ودقائق تعديل لكل صلاة.
 - **بلا إنترنت وبلا حساب** — نسخ احتياطية مشفّرة، وقفل برمز، وثلاث لغات مع دعم كامل للعربية.
+- **مزامنة اختيارية بين الأجهزة** — مشفّرة من الطرف إلى الطرف: خادم صغير يخزّن كتلة لا يستطيع قراءتها، ورمز سري واحد يربط هاتفيك.
 
 ### التثبيت
 
@@ -37,7 +38,7 @@
 
 ### ما سيأتي
 
-- مزامنة مشفّرة بين الأجهزة (تشفير من الطرف إلى الطرف، بلا نصّ صريح على أي خادم).
+- مراجعة أسبوعية وشهرية في شاشة مستقلة.
 - ودجت الشاشة الرئيسية (متوفّر في نسخة أندرويد).
 
 ### الرخصة
@@ -69,6 +70,8 @@ Free, open source, no account, no ads. Works fully offline, and your data never 
   and per-prayer minute offsets.
 - **Offline and private** — encrypted backups, optional PIN lock, three languages including
   right-to-left Arabic.
+- **Optional sync between phones** — end-to-end encrypted: a small server stores a blob it cannot
+  read, and one private code links your devices.
 
 ### Install
 
@@ -90,7 +93,7 @@ a tip keeps the updates coming. A duʿāʾ counts too.
 
 ### Roadmap
 
-- Encrypted sync between devices (end-to-end, no plaintext on any server).
+- A weekly and monthly review screen.
 - A home-screen widget, shipped with the Android build.
 
 ### Licence
@@ -121,6 +124,8 @@ données ne quittent jamais votre téléphone.
   et des décalages par prière.
 - **Hors ligne et privé** — sauvegardes chiffrées, verrouillage par code, trois langues dont
   l’arabe de droite à gauche.
+- **Synchro optionnelle entre téléphones** — chiffrée de bout en bout : un petit serveur stocke un
+  bloc qu’il ne peut pas lire, et un code privé relie vos appareils.
 
 ### Installer
 
@@ -142,7 +147,7 @@ trouvé sa place dans vos journées, un pourboire fait vivre les mises à jour. 
 
 ### À venir
 
-- Synchronisation chiffrée entre appareils (de bout en bout, sans clair sur un serveur).
+- Un écran de bilan hebdomadaire et mensuel.
 - Un widget d’écran d’accueil, livré avec la version Android.
 
 ### Licence

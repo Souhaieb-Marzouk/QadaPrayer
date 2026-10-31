@@ -88,10 +88,27 @@ function vibrate(pattern) {
 /* ------------------------------------------------------------------ */
 
 export async function show({ title, body, tag, data }) {
+  const canAct = (() => {
+    try {
+      return (Notification.maxActions || 0) > 0;
+    } catch {
+      return false;
+    }
+  })();
+
+  // Where action buttons do not exist (iOS, most desktops), tell the user that a
+  // tap is enough — and keep the body short enough not to be truncated.
+  let text = body;
+  if (!canAct && data?.prayer && body && body.length < 90) {
+    text = `${body} · ${t('notify.tapToMark')}`;
+  }
+
   const options = {
-    body,
+    body: text,
     tag,
-    data,
+    data: data?.prayer
+      ? { ...data, url: `./?mark=${data.dateISO}:${data.prayer}` }
+      : data,
     icon: './assets/icon-192.png',
     badge: './assets/icon-192.png',
     silent: true, // we play our own chime so it also works on desktop
@@ -99,15 +116,11 @@ export async function show({ title, body, tag, data }) {
 
   // Action buttons ("I prayed") exist on Android/Chrome; other platforms
   // silently ignore the field, so it is always safe to send.
-  try {
-    if ((Notification.maxActions || 0) > 0) {
-      options.actions = [
-        { action: 'prayed', title: t('notify.actionPrayed') },
-        { action: 'later', title: t('notify.actionLater') },
-      ];
-    }
-  } catch {
-    /* no action support */
+  if (canAct) {
+    options.actions = [
+      { action: 'prayed', title: t('notify.actionPrayed') },
+      { action: 'later', title: t('notify.actionLater') },
+    ];
   }
 
   try {
