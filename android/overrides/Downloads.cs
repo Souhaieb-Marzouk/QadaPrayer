@@ -46,12 +46,12 @@ public class QadaDownloadListener : Java.Lang.Object, Android.Webkit.IDownloadLi
                 ? header.Split(';')[0]
                 : mimetype!;
 
-            Save(Application.Context, NameFor(mime), mime, bytes);
+            Save(Android.App.Application.Context, NameFor(mime), mime, bytes);
         }
         catch (Exception error)
         {
             Log.Warn("Qada", "download failed: " + error.Message);
-            Toast.MakeText(Application.Context, "Could not save the file", ToastLength.Long)?.Show();
+            Toast.MakeText(Android.App.Application.Context, "Could not save the file", ToastLength.Long)?.Show();
         }
     }
 
