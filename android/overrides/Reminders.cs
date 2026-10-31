@@ -144,7 +144,12 @@ public static class Reminders
 
             var at = DateTimeOffset.UtcNow.AddSeconds(Math.Max(5, seconds)).ToUnixTimeMilliseconds();
 
-            if (OperatingSystem.IsAndroidVersionAtLeast(23))
+            // Android 12+ may refuse exact alarms; an inexact one still arrives.
+            if (OperatingSystem.IsAndroidVersionAtLeast(31) && !alarms.CanScheduleExactAlarms())
+            {
+                alarms.Set(AlarmType.RtcWakeup, at, pending);
+            }
+            else if (OperatingSystem.IsAndroidVersionAtLeast(23))
             {
                 alarms.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, at, pending);
             }
@@ -152,6 +157,10 @@ public static class Reminders
             {
                 alarms.SetExact(AlarmType.RtcWakeup, at, pending);
             }
+
+            // Show one right away: if this appears, the channel and the
+            // permission are fine and only the timer is left to prove.
+            Post(context, "QadaPrayer", $"Test reminder in {Math.Max(5, seconds)} seconds.", MaxAlarms - 2);
 
             Log.Info("Qada", $"test reminder in {seconds}s");
         }

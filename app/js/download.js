@@ -29,8 +29,12 @@ function toBase64(text) {
  */
 export function saveFile({ name, mime, text }) {
   if (inShell()) {
-    // data: URLs are what the shell's DownloadListener understands.
-    window.location.href = `data:${mime};base64,${toBase64(text)}`;
+    // `application/octet-stream` matters: WebView tries to *render* types like
+    // application/json, the navigation is blocked as a data: URL, and no
+    // download ever starts. Octet-stream always goes to the download listener.
+    // The real file name travels in the URL because the mime no longer says it.
+    const params = `application/octet-stream;name=${encodeURIComponent(name)};base64`;
+    window.location.href = `data:${params},${toBase64(text)}`;
     return 'shell';
   }
 

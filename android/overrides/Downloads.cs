@@ -10,7 +10,8 @@ namespace QadaPrayer;
 /// Saves files the page produces (backup, CSV) into the Downloads folder.
 ///
 /// A WebView has no download manager of its own and cannot read a blob URL, so
-/// the page hands the content over as a data: URL and this listener writes it.
+/// the page hands the content over as a data: URL with
+/// `application/octet-stream;name=&lt;file&gt;` and this listener writes it.
 /// </summary>
 public class QadaDownloadListener : Java.Lang.Object, Android.Webkit.IDownloadListener
 {
@@ -42,17 +43,37 @@ public class QadaDownloadListener : Java.Lang.Object, Android.Webkit.IDownloadLi
                 ? Convert.FromBase64String(payload)
                 : System.Text.Encoding.UTF8.GetBytes(Uri.UnescapeDataString(payload));
 
-            var mime = string.IsNullOrWhiteSpace(mimetype)
-                ? header.Split(';')[0]
-                : mimetype!;
+            var name = Param(header, "name") ?? NameFor(mimetype ?? header);
+            var mime = string.IsNullOrWhiteSpace(mimetype) ? "application/octet-stream" : mimetype!;
 
-            Save(Android.App.Application.Context, NameFor(mime), mime, bytes);
+            Save(Android.App.Application.Context, Sanitize(name), mime, bytes);
         }
         catch (Exception error)
         {
             Log.Warn("Qada", "download failed: " + error.Message);
             Toast.MakeText(Android.App.Application.Context, "Could not save the file", ToastLength.Long)?.Show();
         }
+    }
+
+    /// <summary>Read `name=…` out of the data URL parameters.</summary>
+    private static string? Param(string header, string key)
+    {
+        foreach (var part in header.Split(';'))
+        {
+            var index = part.IndexOf('=');
+            if (index <= 0) continue;
+            if (!part.Substring(0, index).Trim().Equals(key, StringComparison.OrdinalIgnoreCase)) continue;
+            return Uri.UnescapeDataString(part.Substring(index + 1).Trim());
+        }
+        return null;
+    }
+
+    /// <summary>No slashes, no control characters: this is a file name.</summary>
+    private static string Sanitize(string name)
+    {
+        var clean = new string(name.Where((c) => !char.IsControl(c) && c != '/' && c != '\\').ToArray());
+        if (string.IsNullOrWhiteSpace(clean)) clean = "qadaprayer-file";
+        return clean.Length > 120 ? clean.Substring(0, 120) : clean;
     }
 
     private static string NameFor(string mime)
