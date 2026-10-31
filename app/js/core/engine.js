@@ -516,18 +516,102 @@ export class Qada {
     const out = [];
     for (let offset = days - 1; offset >= 0; offset -= 1) {
       const dateISO = addDays(today, -offset);
-      let owed = 0;
-      let done = 0;
-      for (const prayer of PRAYERS) {
-        const index = slotIndex(dateISO, prayer);
-        if (!this.isOwed(index)) continue;
-        const mark = this.get(index);
-        if (mark === MARK_EXEMPT) continue;
-        owed += 1;
-        if (mark === MARK_DONE) done += 1;
-      }
-      out.push({ dateISO, owed, done });
+      out.push({ dateISO, ...this.dayTally(dateISO) });
     }
     return out;
+  }
+
+  /** Owed / done / exempt prayers of a single day. */
+  dayTally(dateISO) {
+    let owed = 0;
+    let done = 0;
+    let exempt = 0;
+    for (const prayer of PRAYERS) {
+      const index = slotIndex(dateISO, prayer);
+      if (!this.isOwed(index)) continue;
+      const mark = this.get(index);
+      if (mark === MARK_EXEMPT) {
+        exempt += 1;
+        continue;
+      }
+      owed += 1;
+      if (mark === MARK_DONE) done += 1;
+    }
+    return { owed, done, exempt };
+  }
+
+  /**
+   * Consecutive days on which every owed prayer was prayed.
+   *
+   * A day with nothing owed (exempt, or before the obligation) neither breaks
+   * nor extends the run. Today is not counted against you while it is still in
+   * progress: if it is complete it is added, if not the streak simply keeps the
+   * value it had yesterday.
+   */
+  streaks(today = this.today) {
+    const start = this.startIndex;
+    if (start === null) return { current: 0, best: 0 };
+
+    const firstDay = Math.floor(start / SLOTS_PER_DAY);
+    const yesterday = dayOfISO(addDays(today, -1));
+
+    let run = 0;
+    let best = 0;
+
+    for (let day = firstDay; day <= yesterday; day += 1) {
+      const tally = this.dayTally(toISO(fromDateNumber(day)));
+      if (tally.owed === 0) continue;
+      if (tally.done === tally.owed) {
+        run += 1;
+        if (run > best) best = run;
+      } else {
+        run = 0;
+      }
+    }
+
+    const todayTally = this.dayTally(today);
+    let current = run;
+    if (todayTally.owed > 0 && todayTally.done === todayTally.owed) {
+      current = run + 1;
+      if (current > best) best = current;
+    }
+
+    return { current, best };
+  }
+
+  /** Totals over an inclusive date range (used by the weekly/monthly review). */
+  rangeSummary(fromDate, toDate) {
+    const from = dayOfISO(fromDate);
+    const to = dayOfISO(toDate);
+    const summary = { days: 0, complete: 0, partial: 0, missed: 0, exempt: 0, owed: 0, done: 0 };
+
+    for (let day = from; day <= to; day += 1) {
+      const tally = this.dayTally(toISO(fromDateNumber(day)));
+      summary.days += 1;
+      summary.owed += tally.owed;
+      summary.done += tally.done;
+      if (tally.owed === 0) summary.exempt += 1;
+      else if (tally.done === tally.owed) summary.complete += 1;
+      else if (tally.done === 0) summary.missed += 1;
+      else summary.partial += 1;
+    }
+
+    return summary;
+  }
+
+  /**
+   * "I prayed extra make-ups": consume the oldest N owed prayers from the queue.
+   * Returns the slots that were marked, so the UI can offer an undo.
+   */
+  markNextMakeUps(count, today = this.today) {
+    const howMany = Math.max(0, Math.min(500, Math.floor(Number(count) || 0)));
+    if (howMany === 0) return [];
+
+    const indices = this.firstUndone(this.startIndex, this.backlogEnd(today), howMany);
+    if (!indices.length) return [];
+
+    this.markMany(indices, MARK_DONE);
+    this.log({ kind: 'extra', count: indices.length });
+    return indices;
   }
 }

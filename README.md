@@ -34,6 +34,10 @@ today. It is built on the Maliki position that missed prayers must be made up.
 - **Hijri date** — the Umm al-Qura date under today’s header, in your language.
 - **Exports** — the whole ledger as CSV, and a printable plan of the make-ups
   still owed.
+- **Momentum** — a daily streak, the best one you have had, and this week's and
+  this month's completion at a glance.
+- **“I prayed extra”** — recorded a batch of make-ups in one tap; it comes off
+  the oldest ones you still owe.
 - **Progress you can feel** — remaining count, completion, projected finish
   date, seven-day activity and milestones.
 - **Private by construction** — no account, no server, no analytics. Backups are
@@ -81,7 +85,7 @@ leave a tip:
 
 - Home-screen widget with today's prayers and remaining make-ups.
 - Encrypted cloud sync between devices (end-to-end, no server-side plaintext).
-- A weekly and monthly review screen with streaks.
+- Profiles for more than one person on the same phone.
 
 ## Licence
 

@@ -152,6 +152,7 @@ for (const language of ['en', 'fr', 'ar']) {
       { type: 'backup', passphrase: '' },
       { type: 'confirm', title: 'Test', body: 'Test body', action: 'noop' },
       { type: 'pin', mode: 'set', value: '12' },
+      { type: 'extra', count: 5 },
       { type: 'support' },
     ];
     for (const sheet of cases) {

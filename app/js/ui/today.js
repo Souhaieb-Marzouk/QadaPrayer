@@ -159,6 +159,14 @@ export function render(app) {
     </div>
 
     ${
+      projection.remaining > 0
+        ? `<button class="btn btn--ghost btn--block" data-action="extra-open">${icon(
+            'spark',
+          )} ${esc(t('today.extra'))}</button>`
+        : ''
+    }
+
+    ${
       projection.remaining === 0
         ? `<div class="notice">${icon('moonCheck')}<span>${esc(t('today.allDone'))}</span></div>`
         : ''

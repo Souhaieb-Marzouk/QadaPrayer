@@ -435,6 +435,49 @@ function supportSheet() {
 }
 
 /* ------------------------------------------------------------------ */
+/* Extra make-ups                                                      */
+/* ------------------------------------------------------------------ */
+
+function extraSheet(app) {
+  const count = Math.max(1, Math.min(50, Number(app.sheet.count) || 5));
+  const remaining = app.model.stats(app.today).remaining;
+
+  if (remaining === 0) {
+    return sheetShell({
+      title: esc(t('extra.title')),
+      body: `<div class="notice">${icon('moonCheck')}<span>${esc(t('extra.none'))}</span></div>`,
+      foot: `<button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>`,
+    });
+  }
+
+  const usable = Math.min(count, remaining);
+  const label = usable === 1 ? t('extra.countOne') : t('extra.count', { n: usable });
+
+  return sheetShell({
+    title: esc(t('extra.title')),
+    subtitle: esc(t('extra.hint')),
+    body: `
+      <div class="stepper">
+        <span class="stepper__controls">
+          <button class="stepper__btn" data-action="extra-step" data-delta="-1" ${
+            count <= 1 ? 'disabled' : ''
+          }>−</button>
+          <span class="stepper__value">${esc(String(usable))}</span>
+          <button class="stepper__btn" data-action="extra-step" data-delta="1" ${
+            usable >= 50 ? 'disabled' : ''
+          }>+</button>
+        </span>
+      </div>
+      <div class="notice">${icon('spark')}<span>${esc(label)}</span></div>
+    `,
+    foot: `<button class="btn" data-action="close-sheet">${esc(t('sheet.cancel'))}</button>
+           <button class="btn btn--primary" data-action="extra-confirm">${esc(
+             t('extra.confirm'),
+           )}</button>`,
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* Dispatcher                                                          */
 /* ------------------------------------------------------------------ */
 
@@ -458,6 +501,8 @@ export function renderSheet(app) {
       return confirmSheet(app);
     case 'pin':
       return pinSheet(app);
+    case 'extra':
+      return extraSheet(app);
     case 'support':
       return supportSheet();
     default:
@@ -653,6 +698,33 @@ export const handlers = {
   },
 
   'noop': () => {},
+
+  'extra-open': (app) => {
+    const remaining = app.model.stats(app.today).remaining;
+    app.openSheet('extra', { count: Math.min(5, Math.max(1, remaining)) });
+  },
+
+  'extra-step': (app, el) => {
+    const sheet = app.sheet;
+    const next = Math.max(1, Math.min(50, (Number(sheet.count) || 5) + Number(el.dataset.delta)));
+    sheet.count = next;
+    app.render({ preserveScroll: true });
+  },
+
+  'extra-confirm': (app) => {
+    const count = Number(app.sheet.count) || 0;
+    let marked = 0;
+    app.commit(
+      (model) => {
+        marked = model.markNextMakeUps(count, app.today).length;
+      },
+      { silent: true },
+    );
+    app.closeSheet();
+    if (marked > 0) {
+      app.showToast(t('extra.done', { n: marked }), t('common.undo'), 'undo');
+    }
+  },
 
   'pin-key': (app, el) => {
     const sheet = app.sheet;

@@ -5,7 +5,7 @@
  * nothing else in the codebase needs to change.
  */
 
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 
 export const LINKS = {
   // TODO: set your own handles (these are placeholders).

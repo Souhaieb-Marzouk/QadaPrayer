@@ -1,7 +1,7 @@
 /** Progress: the numbers that tell the user they are actually moving. */
 
 import { t, number, percent, dateMedium, weekdayNames, dateShort } from '../i18n.js';
-import { addDays, weekdayOf } from '../core/dates.js';
+import { addDays, startOfMonth, weekdayOf } from '../core/dates.js';
 import { clock, esc, ringWithCenter } from './dom.js';
 import { icon } from './icons.js';
 
@@ -64,6 +64,10 @@ export function render(app) {
     )}</div></div>`,
   );
 
+  const streaks = model.streaks(app.today);
+  const week = model.rangeSummary(addDays(app.today, -6), app.today);
+  const month = model.rangeSummary(startOfMonth(app.today), app.today);
+
   return `
     <div class="section-title">
       <h2>${esc(t('stats.title'))}</h2>
@@ -113,6 +117,42 @@ export function render(app) {
         projection.finishDate ? dateMedium(projection.finishDate) : t('onboarding.summaryUnknown'),
       )}</div>
       <div class="stat__hint">${esc(t('stats.netHint'))}</div>
+    </div>
+
+    <div class="section-title"><h2>${esc(t('stats.momentum'))}</h2></div>
+    <div class="card card--pad">
+      <div class="stat-grid" style="margin-bottom:.7rem">
+        <div class="stat">
+          <div class="stat__label">${esc(t('stats.streak'))}</div>
+          <div class="stat__value">${esc(
+            streaks.current === 1
+              ? t('stats.streakOne')
+              : t('stats.streakDays', { n: number(streaks.current) }),
+          )}</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">${esc(t('stats.best'))}</div>
+          <div class="stat__value">${esc(
+            streaks.best === 1
+              ? t('stats.streakOne')
+              : t('stats.streakDays', { n: number(streaks.best) }),
+          )}</div>
+        </div>
+      </div>
+      <div class="list">
+        <div class="list__row" style="padding:.5rem 0">
+          <span class="list__label">${esc(t('stats.week'))}</span>
+          <span class="list__value">${esc(
+            t('stats.daysComplete', { done: number(week.complete), total: number(week.days) }),
+          )}</span>
+        </div>
+        <div class="list__row" style="padding:.5rem 0;border-bottom:0">
+          <span class="list__label">${esc(t('stats.month'))}</span>
+          <span class="list__value">${esc(
+            t('stats.daysComplete', { done: number(month.complete), total: number(month.days) }),
+          )}</span>
+        </div>
+      </div>
     </div>
 
     <div class="section-title"><h2>${esc(t('stats.last7'))}</h2></div>
