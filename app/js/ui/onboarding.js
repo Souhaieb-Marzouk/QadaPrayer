@@ -69,19 +69,44 @@ function footer(app, { next = true, nextLabel = null, finish = false } = {}) {
     </div>`;
 }
 
+const CODE_KEY = 'qada.syncCodeInput';
+
+function rememberedCode() {
+  try {
+    return sessionStorage.getItem(CODE_KEY) || '';
+  } catch {
+    return '';
+  }
+}
+
+function rememberCode(value) {
+  try {
+    if (value) sessionStorage.setItem(CODE_KEY, value);
+    else sessionStorage.removeItem(CODE_KEY);
+  } catch {
+    /* storage is optional */
+  }
+}
+
 /** "Do you already use Qada?" — asked once, before anything else. */
 function stepSyncIntro(state) {
+  const status = state.syncStatus || '';
+  const busy = Boolean(state.syncBusy);
+
   return `
     <h1 class="onb__title">${esc(t('onboarding.syncTitle'))}</h1>
     <p class="onb__lead">${esc(t('onboarding.syncBody'))}</p>
     <div class="field">
       <label class="field__label">${esc(t('sync.join'))}</label>
-      <input class="input" data-live="onb-sync-code" value="${esc(state.syncInput || '')}"
-        placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+      <input class="input" data-live="onb-sync-code" value="${esc(
+        state.syncInput || rememberedCode(),
+      )}" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters"
+        spellcheck="false" ${busy ? 'disabled' : ''}>
     </div>
-    <button class="btn btn--primary btn--block" data-action="onb-sync-restore">${esc(
-      t('onboarding.syncRestore'),
-    )}</button>
+    ${status ? `<div class="notice">${icon('info')}<span>${esc(status)}</span></div>` : ''}
+    <button class="btn btn--primary btn--block" data-action="onb-sync-restore" ${
+      busy ? 'disabled' : ''
+    }>${esc(t('onboarding.syncRestore'))}</button>
     <button class="btn btn--ghost btn--block" data-action="onb-sync-skip">${esc(
       t('onboarding.syncSkip'),
     )}</button>
@@ -336,24 +361,36 @@ export const handlers = {
   },
 
   'onb-sync-restore': async (app) => {
-    const code = normalizeCode(app.onb?.syncInput || '');
+    // Read the field itself first: a re-render between typing and tapping must
+    // never lose what the user pasted.
+    const field = document.querySelector('[data-live="onb-sync-code"]');
+    const raw = String(field?.value ?? app.onb?.syncInput ?? '').trim();
+    const code = normalizeCode(raw);
+
     if (!code) {
-      app.showToast(t('sync.badCode'));
+      const digits = raw.replace(/[^A-Za-z0-9]/g, '').length;
+      app.onb.syncStatus = `${t('sync.badCode')} — ${digits}/20`;
+      app.render();
       return;
     }
 
     const endpoint = LINKS.syncEndpoint || app.store?.meta?.syncEndpoint || '';
     if (!endpoint) {
-      app.showToast(t('sync.server'));
+      app.onb.syncStatus = t('sync.server');
+      app.render();
       return;
     }
 
-    app.showToast(t('sync.working'));
+    app.onb.syncBusy = true;
+    app.onb.syncStatus = t('sync.working');
+    app.render();
 
     try {
       const remote = await fetchRemote({ endpoint, code });
       if (!remote) {
-        app.showToast(t('onboarding.syncEmpty'));
+        app.onb.syncBusy = false;
+        app.onb.syncStatus = t('onboarding.syncEmpty');
+        app.render();
         return;
       }
 
@@ -367,6 +404,7 @@ export const handlers = {
         lang: model.profile.language || app.lang,
       });
       app.store.save(model, { immediate: true });
+      rememberCode('');
 
       app.model = model;
       app.lang = model.profile.language || app.lang;
@@ -380,13 +418,14 @@ export const handlers = {
       app.showToast(t('sync.done'));
     } catch (error) {
       const reason = String(error?.message || error || '');
-      app.showToast(
+      app.onb.syncBusy = false;
+      app.onb.syncStatus =
         reason === 'bad-code'
           ? t('sync.badCode')
           : reason === 'no-crypto'
             ? t('sync.noCrypto')
-            : `${t('sync.error')} (${reason})`,
-      );
+            : `${t('sync.error')} (${reason})`;
+      app.render();
     }
   },
 
@@ -522,6 +561,7 @@ export const changes = {
 export const live = {
   'onb-sync-code': (app, el) => {
     if (app.onb) app.onb.syncInput = el.value;
+    rememberCode(el.value);
   },
   'onb-city-search': (app, el) => {
     app.onb.draft.cityQuery = el.value;

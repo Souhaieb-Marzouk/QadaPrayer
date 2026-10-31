@@ -39,9 +39,19 @@ export async function initUpdater({ onAvailable } = {}) {
   });
 
   // A new worker has taken over: the page is still running old code, so reload
-  // once. Skipped on the very first activation, where there was no controller.
+  // once. Skipped on the very first activation, where there was no controller —
+  // and never while something is being typed, or the user loses the field.
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!hadController || reloading) return;
+
+    const active = document.activeElement;
+    const typing = active && ['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName);
+    if (typing) {
+      // Offer it instead of doing it: the reload can wait for a tap.
+      notifier?.();
+      return;
+    }
+
     reloading = true;
     window.location.reload();
   });
