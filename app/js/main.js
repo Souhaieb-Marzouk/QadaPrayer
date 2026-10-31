@@ -19,11 +19,12 @@ import * as todayScreen from './ui/today.js';
 import * as calendarScreen from './ui/calendar.js';
 import * as statsScreen from './ui/stats.js';
 import * as settingsScreen from './ui/settings.js';
+import * as reviewScreen from './ui/review.js';
 import * as sheets from './ui/sheets.js';
 import * as lock from './ui/lock.js';
 import * as printScreen from './ui/print.js';
 import { renderLock } from './ui/lock.js';
-import { resetShown, scheduleReminders } from './notify.js';
+import { resetShown, scheduleReminders, snoozeFrom } from './notify.js';
 import { applyUpdate, checkForUpdate, initUpdater } from './updater.js';
 import { buildSnapshot, publishSnapshot } from './native.js';
 import { mergeModels } from './merge.js';
@@ -54,6 +55,7 @@ const HANDLERS = {
   ...calendarScreen.handlers,
   ...statsScreen.handlers,
   ...settingsScreen.handlers,
+  ...reviewScreen.handlers,
   ...sheets.handlers,
   ...lock.handlers,
   ...printScreen.handlers,
@@ -125,6 +127,9 @@ export function boot() {
         markFromNotification(data.dateISO, data.prayer);
       }
       // Tapping a reminder without action buttons: open the confirmation.
+      if (data.type === 'SNOOZE' && data.dateISO && data.prayer) {
+        snoozeFrom(app, data);
+      }
       if (data.type === 'OPEN_PRAYER' && data.dateISO && data.prayer) {
         openPrayerSheet(data.dateISO, data.prayer);
       }
@@ -240,7 +245,9 @@ function detectLanguage() {
 
 function normaliseRoute(hash) {
   const raw = String(hash || '').replace(/^#\/?/, '');
-  return ['today', 'calendar', 'stats', 'settings', 'print'].includes(raw) ? raw : 'today';
+  return ['today', 'calendar', 'stats', 'review', 'settings', 'print'].includes(raw)
+    ? raw
+    : 'today';
 }
 
 /** Recompute "now", today's date and prayer times. Returns true if the date changed. */
@@ -522,11 +529,14 @@ function publishWidget() {
   widgetTimer = setTimeout(() => {
     widgetTimer = null;
     try {
+      const profiles = app.store?.listProfiles?.() || [];
       const snapshot = buildSnapshot({
         today: app.today,
         day: app.day,
         model: app.model,
         now: app.now,
+        profiles: profiles.length,
+        profileName: profiles.find((entry) => entry.active)?.name || '',
       });
       publishSnapshot(snapshot);
     } catch {
@@ -545,6 +555,8 @@ function currentScreen() {
       return settingsScreen;
     case 'print':
       return printScreen;
+    case 'review':
+      return reviewScreen;
     default:
       return todayScreen;
   }

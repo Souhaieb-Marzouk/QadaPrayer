@@ -469,6 +469,9 @@ function syncSheet(app) {
         <button class="btn btn--ghost btn--sm btn--block" data-action="sync-copy">${esc(
           t('sync.copy'),
         )}</button>
+        <button class="btn btn--ghost btn--sm btn--block" data-action="sync-stop">${esc(
+          t('sync.stop'),
+        )}</button>
       `,
       foot: `<button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>
              <button class="btn btn--ghost" data-action="sync-forget">${esc(t('sync.deleteRemote'))}</button>
@@ -499,6 +502,33 @@ function syncSheet(app) {
     `,
     foot: `<button class="btn" data-action="close-sheet">${esc(t('common.cancel'))}</button>
            <button class="btn btn--primary" data-action="sync-join">${esc(t('sync.use'))}</button>`,
+  });
+}
+
+function snapshotsSheet(app) {
+  const list = app.store?.listSnapshots?.() || [];
+
+  const body = list.length
+    ? `<div class="list">${list
+        .map(
+          (entry) => `
+        <div class="list__row">
+          <span class="list__label">${esc(dateLong(entry.at.slice(0, 10)))}<span class="field__hint" style="display:block">${esc(
+            entry.at.slice(11, 16),
+          )}</span></span>
+          <button class="btn btn--ghost btn--sm" data-action="snapshot-restore" data-at="${esc(
+            entry.at,
+          )}">${esc(t('snapshots.restore'))}</button>
+        </div>`,
+        )
+        .join('')}</div>`
+    : `<div class="notice">${icon('info')}<span>${esc(t('snapshots.empty'))}</span></div>`;
+
+  return sheetShell({
+    title: esc(t('snapshots.title')),
+    subtitle: esc(t('snapshots.hint')),
+    body,
+    foot: `<button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>`,
   });
 }
 
@@ -627,6 +657,8 @@ export function renderSheet(app) {
       return nameSheet(app);
     case 'sync':
       return syncSheet(app);
+    case 'snapshots':
+      return snapshotsSheet(app);
     case 'support':
       return supportSheet();
     default:

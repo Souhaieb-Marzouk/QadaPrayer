@@ -27,6 +27,9 @@ const DOC_KEY = 'qada.state.v2';
 const STATE_KEY = 'qada.state.v1';
 const MIGRATED_KEY = 'qada.state.v1.migrated';
 const META_KEY = 'qada.meta.v1';
+const SNAP_KEY = 'qada.snapshots.v1';
+const SNAP_LIMIT = 5;
+const SNAP_MIN_MS = 60 * 1000;
 const UNDO_LIMIT = 12;
 const PBKDF2_ITERATIONS = 310000;
 
@@ -320,10 +323,57 @@ export class Store {
     try {
       if (this.storage) this.storage.setItem(DOC_KEY, payload);
       else this.memory = payload;
+      this.rememberSnapshot(payload);
       return true;
     } catch (error) {
       console.error('[qada] could not persist state', error);
       return false;
+    }
+  }
+
+  /** Rolling local copies: five of them, at most one a minute. */
+  readSnapshots() {
+    try {
+      const raw = this.storage?.getItem(SNAP_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch {
+      return [];
+    }
+  }
+
+  rememberSnapshot(payload) {
+    if (!this.storage || !payload) return;
+    const now = Date.now();
+    if (this.lastSnapAt && now - this.lastSnapAt < SNAP_MIN_MS) return;
+    this.lastSnapAt = now;
+    try {
+      const list = this.readSnapshots();
+      list.unshift({ at: new Date(now).toISOString(), payload });
+      this.storage.setItem(SNAP_KEY, JSON.stringify(list.slice(0, SNAP_LIMIT)));
+    } catch {
+      /* the ledger itself is already saved */
+    }
+  }
+
+  listSnapshots() {
+    return this.readSnapshots().map((entry) => ({
+      at: entry.at,
+      size: String(entry.payload || '').length,
+    }));
+  }
+
+  restoreSnapshot(at) {
+    const entry = this.readSnapshots().find((item) => item.at === at);
+    if (!entry) return null;
+    try {
+      const doc = normalizeDoc(JSON.parse(entry.payload), 'Me');
+      if (!doc) return null;
+      this.doc = doc;
+      this.persistNow();
+      return this.buildModel();
+    } catch {
+      return null;
     }
   }
 

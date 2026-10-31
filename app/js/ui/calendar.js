@@ -1,6 +1,6 @@
 /** Calendar: year heat map → month → day, plus bulk editing. */
 
-import { t, number, monthName, monthShort, weekdayNames, yearLabel } from '../i18n.js';
+import { t, number, monthName, monthShort, weekdayNames, yearLabel, hijriMonthRange } from '../i18n.js';
 import {
   addDays,
   dayOfISO,
@@ -112,6 +112,12 @@ function renderMonth(app, model) {
         'chevron-left',
       )}</button>
       <div class="cal-head__title">${esc(`${monthName(month, year)} ${yearLabel(year)}`)}</div>
+      <div class="cal-head__sub dim">${esc(
+        hijriMonthRange(
+          `${year}-${String(month + 1).padStart(2, '0')}-01`,
+          `${year}-${String(month + 1).padStart(2, '0')}-28`,
+        ),
+      )}</div>
       <div class="cal-head__nav">
         <span class="pill pill--gold">${esc(`${done}/${total}`)}</span>
       </div>

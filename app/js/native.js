@@ -16,7 +16,7 @@ import { prayerStateAt } from './core/prayerTimes.js';
 export const WIDGET_PREFS = 'qada_widget';
 
 /** Build the strings the home-screen widget will show. */
-export function buildSnapshot({ today, day, model, now }) {
+export function buildSnapshot({ today, day, model, now, profileName = '', profiles = 1 }) {
   if (!model || !day) return null;
 
   const projection = model.projection(today);
@@ -28,8 +28,14 @@ export function buildSnapshot({ today, day, model, now }) {
   const nextKey = state.current || state.next;
   const nextAt = state.current ? day.windows[nextKey].end : day.windows[nextKey].start;
 
+  const streak = model.streaks(today).current;
+  const parts = [];
+  if (profiles > 1 && profileName) parts.push(profileName);
+  parts.push(`${t('today.progressToday')} ${done}/${owed}`);
+  if (streak > 1) parts.push(`${streak}d`);
+
   return {
-    headline: `${t('today.progressToday')} ${done}/${owed}`,
+    headline: parts.join(' · '),
     big: number(projection.remaining),
     next: `${t(state.current ? 'today.now' : 'today.next')} ${t(`prayer.${nextKey}`)} · ${clock(
       nextAt,

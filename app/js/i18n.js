@@ -351,6 +351,35 @@ const DICTIONARIES = {
     'sync.deleted': 'Deleted from the server.',
     'sync.on': 'On',
     'sync.server': 'Server address',
+    'sync.stop': 'Stop syncing this profile',
+    'sync.stopHint': 'The copy on the server is kept; this phone forgets the code.',
+    'sync.stopped': 'Sync stopped on this phone.',
+    'reminders.quietFrom': 'Quiet from',
+    'reminders.quietTo': 'Quiet to',
+    'reminders.quietHint': 'No reminders between these hours.',
+    'backup.nudgeTitle': 'No backup for a while',
+    'backup.nudgeBody': 'Your ledger lives on this phone only. An encrypted backup takes a minute.',
+    'backup.nudgeAction': 'Back up now',
+    'backup.nudgeLater': 'Later',
+    'snapshots.title': 'Restore a point in time',
+    'snapshots.hint': 'Automatic copies kept on this phone. The newest is a few minutes old at most.',
+    'snapshots.empty': 'No snapshots yet.',
+    'snapshots.restore': 'Restore',
+    'snapshots.restored': 'Snapshot restored.',
+    'snapshots.at': 'Saved',
+    'notify.snoozed': 'Reminder snoozed for 10 minutes.',
+    'review.title': 'Review',
+    'review.week': 'This week',
+    'review.month': 'This month',
+    'review.lastWeek': 'Last week',
+    'review.bestDay': 'Best day',
+    'review.weakest': 'Weakest day',
+    'review.days': '{done}/{total} days complete',
+    'review.none': 'Nothing recorded yet.',
+    'review.open': 'See the full review',
+    'review.streak': 'Streak',
+    'review.breakdown': 'The last four weeks',
+    'review.back': 'Back',
     'sync.create': 'Create a new code',
 
     'csv.exported': 'CSV downloaded.',
@@ -771,6 +800,35 @@ const DICTIONARIES = {
     'sync.deleted': 'Supprimé du serveur.',
     'sync.on': 'Activée',
     'sync.server': 'Adresse du serveur',
+    'sync.stop': 'Arrêter la synchro de ce profil',
+    'sync.stopHint': 'La copie sur le serveur est conservée ; ce téléphone oublie le code.',
+    'sync.stopped': 'Synchro arrêtée sur ce téléphone.',
+    'reminders.quietFrom': 'Silencieux de',
+    'reminders.quietTo': 'Silencieux jusqu’à',
+    'reminders.quietHint': 'Aucun rappel entre ces heures.',
+    'backup.nudgeTitle': 'Pas de sauvegarde depuis un moment',
+    'backup.nudgeBody': 'Votre registre ne vit que sur ce téléphone. Une sauvegarde chiffrée prend une minute.',
+    'backup.nudgeAction': 'Sauvegarder',
+    'backup.nudgeLater': 'Plus tard',
+    'snapshots.title': 'Revenir à un instant',
+    'snapshots.hint': 'Copies automatiques gardées sur ce téléphone. La plus récente a quelques minutes au plus.',
+    'snapshots.empty': 'Aucune copie pour le moment.',
+    'snapshots.restore': 'Restaurer',
+    'snapshots.restored': 'Copie restaurée.',
+    'snapshots.at': 'Enregistrée',
+    'notify.snoozed': 'Rappel reporté de 10 minutes.',
+    'review.title': 'Bilan',
+    'review.week': 'Cette semaine',
+    'review.month': 'Ce mois',
+    'review.lastWeek': 'La semaine dernière',
+    'review.bestDay': 'Meilleur jour',
+    'review.weakest': 'Jour le plus faible',
+    'review.days': '{done}/{total} jours complets',
+    'review.none': 'Rien d’enregistré pour l’instant.',
+    'review.open': 'Voir le bilan complet',
+    'review.streak': 'Série',
+    'review.breakdown': 'Les quatre dernières semaines',
+    'review.back': 'Retour',
     'sync.create': 'Créer un nouveau code',
 
     'csv.exported': 'Fichier CSV téléchargé.',
@@ -1190,6 +1248,35 @@ const DICTIONARIES = {
     'sync.deleted': 'تم الحذف من الخادم.',
     'sync.on': 'مفعّلة',
     'sync.server': 'عنوان الخادم',
+    'sync.stop': 'إيقاف مزامنة هذا الملف',
+    'sync.stopHint': 'النسخة على الخادم تبقى؛ هذا الهاتف ينسى الرمز.',
+    'sync.stopped': 'أُوقفت المزامنة على هذا الهاتف.',
+    'reminders.quietFrom': 'سكوت من',
+    'reminders.quietTo': 'سكوت حتى',
+    'reminders.quietHint': 'لا تنبيهات بين هاتين الساعتين.',
+    'backup.nudgeTitle': 'لا نسخة احتياطية منذ مدة',
+    'backup.nudgeBody': 'سجلك يعيش في هذا الهاتف فقط. النسخة المشفّرة تستغرق دقيقة.',
+    'backup.nudgeAction': 'أنشئ نسخة',
+    'backup.nudgeLater': 'لاحقًا',
+    'snapshots.title': 'العودة إلى لحظة سابقة',
+    'snapshots.hint': 'نسخ تلقائية محفوظة في هذا الهاتف. أحدثها عمره دقائق.',
+    'snapshots.empty': 'لا توجد نسخ بعد.',
+    'snapshots.restore': 'استعادة',
+    'snapshots.restored': 'تمت استعادة النسخة.',
+    'snapshots.at': 'حُفظت',
+    'notify.snoozed': 'أُجّل التنبيه عشر دقائق.',
+    'review.title': 'الحصيلة',
+    'review.week': 'هذا الأسبوع',
+    'review.month': 'هذا الشهر',
+    'review.lastWeek': 'الأسبوع الماضي',
+    'review.bestDay': 'أفضل يوم',
+    'review.weakest': 'أضعف يوم',
+    'review.days': '{done}/{total} أيام كاملة',
+    'review.none': 'لا شيء مسجّل بعد.',
+    'review.open': 'اطّلع على الحصيلة',
+    'review.streak': 'التتابع',
+    'review.breakdown': 'الأسابيع الأربعة الأخيرة',
+    'review.back': 'رجوع',
     'sync.create': 'إنشاء رمز جديد',
 
     'csv.exported': 'تم تنزيل الملف.',
@@ -1335,6 +1422,24 @@ export function percent(value) {
  * Hijri (Umm al-Qura) date for a civil date, in the current language.
  * Falls back to an empty string on engines without the islamic calendar.
  */
+
+/** The Hijri month(s) covered by a Gregorian range, for the calendar header. */
+export function hijriMonthRange(fromISO, toISO) {
+  try {
+    const format = (iso) =>
+      new Intl.DateTimeFormat(locale(), {
+        calendar: 'islamic-umalqura',
+        month: 'long',
+        year: 'numeric',
+      }).format(new Date(`${iso}T12:00:00Z`));
+    const first = format(fromISO);
+    const last = format(toISO);
+    return first === last ? first : `${first} — ${last}`;
+  } catch {
+    return '';
+  }
+}
+
 export function hijriDate(iso) {
   try {
     return new Intl.DateTimeFormat(locale(), {

@@ -139,6 +139,9 @@ export function render(app) {
           )}</div>
         </div>
       </div>
+      <button class="btn btn--ghost btn--sm btn--block" data-action="open-review">${esc(
+        t('review.open'),
+      )}</button>
       <div class="list">
         <div class="list__row" style="padding:.5rem 0">
           <span class="list__label">${esc(t('stats.week'))}</span>
@@ -185,6 +188,13 @@ export const handlers = {
     const quota = Number(el.dataset.quota);
     app.simQuota = null;
     app.commit((model) => model.setQuota(quota), { message: t('settings.saved') });
+  },
+
+  'open-review': (app) => {
+    app.route = 'review';
+    if (location.hash !== '#/review') history.replaceState(null, '', '#/review');
+    window.scrollTo({ top: 0 });
+    app.render();
   },
 };
 

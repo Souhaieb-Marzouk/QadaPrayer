@@ -2153,3 +2153,91 @@ input[type='range']::-moz-range-thumb {
 html {
   background-color: var(--bg);
 }
+
+/* Review page */
+.review__days {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  height: 64px;
+  margin: 0.5rem 0 0.3rem;
+}
+
+.review__day {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  height: 100%;
+}
+
+.review__bar {
+  width: 100%;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.review__bar--full {
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+}
+
+.review__bar--part {
+  background: rgba(212, 162, 76, 0.45);
+}
+
+.review__bar--none {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.review__bar--empty {
+  background: transparent;
+  border: 1px dashed var(--line-soft);
+}
+
+.review__dow {
+  font-size: 0.55rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.review__legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+}
+
+/* Calendar: Hijri month under the Gregorian one */
+.cal-head__sub {
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+/* Two inputs on one line (quiet hours) */
+.field__row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field__row .input {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+}
+
+/* Backup nudge */
+.notice--nudge {
+  align-items: flex-start;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.row-actions .btn {
+  flex: 1;
+}

@@ -1,6 +1,6 @@
 /* Qada service worker — offline shell, no network dependency at runtime. */
 
-const VERSION = 'qada-v19';
+const VERSION = 'qada-v20';
 const SHELL = [
   './',
   './index.html',
@@ -32,6 +32,7 @@ const SHELL = [
   './js/ui/calendar.js',
   './js/ui/stats.js',
   './js/ui/settings.js',
+  './js/ui/review.js',
   './js/ui/onboarding.js',
   './js/ui/sheets.js',
   './js/ui/lock.js',
@@ -123,6 +124,23 @@ self.addEventListener('notificationclick', (event) => {
         includeUncontrolled: true,
       });
       const client = clientList.find((entry) => entry.url.includes('/app/'));
+
+      // "Later": ask the page to show it again in ten minutes.
+      if (event.action === 'later' && data.dateISO && data.prayer) {
+        if (client) {
+          client.postMessage({
+            type: 'SNOOZE',
+            dateISO: data.dateISO,
+            prayer: data.prayer,
+            title: event.notification.title,
+            body: event.notification.body,
+          });
+          await client.focus();
+          return;
+        }
+        await self.clients.openWindow(`./?mark=${data.dateISO}:${data.prayer}`);
+        return;
+      }
 
       // "I prayed": mark it without making the user do anything.
       if (event.action === 'prayed' && data.dateISO && data.prayer) {

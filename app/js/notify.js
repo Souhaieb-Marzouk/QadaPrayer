@@ -248,6 +248,22 @@ export async function sendTest(app) {
 }
 
 /** Reset the "already shown" memory — used when the day changes. */
+/** Re-show a reminder ten minutes later (the "later" action). */
+export function snoozeFrom(app, data, minutes = 10) {
+  setTimeout(() => {
+    show({
+      title: data.title || t('app.name'),
+      body: data.body || '',
+      tag: 'snooze',
+      data: { kind: 'snooze', prayer: data.prayer, dateISO: data.dateISO },
+    });
+    chime();
+    vibrate([80]);
+  }, minutes * 60 * 1000);
+
+  app?.showToast?.(t('notify.snoozed'));
+}
+
 export function resetShown() {
   shown.clear();
 }

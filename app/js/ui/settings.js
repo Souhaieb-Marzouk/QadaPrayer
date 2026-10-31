@@ -369,6 +369,13 @@ export function render(app) {
         hint: t('settings.csvHint'),
       })}
       ${row({
+        label: t('snapshots.title'),
+        value: '',
+        action: 'open-snapshots',
+        iconName: 'clock',
+        hint: t('snapshots.hint'),
+      })}
+      ${row({
         label: t('settings.print'),
         value: '',
         action: 'open-print',
@@ -446,6 +453,18 @@ export function render(app) {
             n.lead,
             'rem-lead',
           )}
+        </div>
+
+        <div class="field">
+          <span class="field__label">${esc(t('reminders.quietFrom'))} — ${esc(t('reminders.quietTo'))}</span>
+          <div class="field__row">
+            <input class="input" type="number" min="0" max="23" inputmode="numeric"
+              value="${n.quietFrom}" data-change="rem-quiet" data-key="quietFrom">
+            <span class="dim">→</span>
+            <input class="input" type="number" min="0" max="23" inputmode="numeric"
+              value="${n.quietTo}" data-change="rem-quiet" data-key="quietTo">
+          </div>
+          <span class="field__hint">${esc(t('reminders.quietHint'))}</span>
         </div>
 
         <button class="switch" role="switch" aria-checked="${n.qada}" data-action="rem-toggle" data-key="qada">
@@ -659,6 +678,39 @@ export const handlers = {
   },
   'open-city': (app) => app.openSheet('city', { query: '' }),
   'open-support': (app) => app.openSheet('support', {}),
+
+  'open-snapshots': (app) => app.openSheet('snapshots', {}),
+
+  'snapshot-restore': (app, el) => {
+    const model = app.store.restoreSnapshot(el.dataset.at);
+    if (!model) {
+      app.showToast(t('snapshots.empty'));
+      return;
+    }
+    app.model = model;
+    app.store.save(model, { immediate: true });
+    app.refreshClock();
+    app.sheet = null;
+    app.render();
+    app.showToast(t('snapshots.restored'));
+  },
+
+  'sync-stop': (app) => {
+    app.openSheet('confirm', {
+      title: t('sync.stop'),
+      body: t('sync.stopHint'),
+      confirmLabel: t('sync.stop'),
+      action: 'do-sync-stop',
+      danger: true,
+    });
+  },
+
+  'do-sync-stop': (app) => {
+    app.sheet = null;
+    app.store.setSync({ code: '', endpoint: '', lastSyncAt: '', lastError: '' });
+    app.render({ preserveScroll: true });
+    app.showToast(t('sync.stopped'));
+  },
 
   'open-sync': (app) => {
     const code = app.store?.getSync?.().code || '';
@@ -897,6 +949,16 @@ export const handlers = {
 };
 
 export const changes = {
+  'rem-quiet': (app, el) => {
+    const config = normalizeReminders(app.model.profile.notifications);
+    const key = el.dataset.key;
+    const value = Math.max(0, Math.min(23, Math.round(Number(el.value) || 0)));
+    app.commit(
+      (model) => model.updateProfile({ notifications: { ...config, [key]: value } }),
+      { silent: true },
+    );
+  },
+
   'set-method': (app, el) => {
     app.commit((model) => model.updateProfile({ method: el.value }), { silent: true });
     app.refreshClock();

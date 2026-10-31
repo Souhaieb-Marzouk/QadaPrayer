@@ -189,8 +189,43 @@ export function render(app) {
         ? `<div class="notice">${icon('info')}<span>${esc(t('today.quotaOff'))}</span></div>`
         : ''
     }
+    ${backupNudge(app, projection)}
     <p class="dim center" style="font-size:.72rem;margin-top:.4rem">${esc(t('today.makeUpHint'))}</p>
   `;
+}
+
+/**
+ * A gentle nudge when the ledger has been living on this phone, unbacked, for
+ * over a month. Shown at most once a fortnight and dismissable.
+ */
+function backupNudge(app, projection) {
+  if (projection.done < 20) return '';
+
+  const meta = app.store?.meta || {};
+  const day = 86400000;
+  const lastBackup = meta.lastBackupAt ? Date.parse(meta.lastBackupAt) : 0;
+  const lastNudge = meta.backupNudgeAt ? Date.parse(meta.backupNudgeAt) : 0;
+  const sinceBackup = lastBackup ? (Date.now() - lastBackup) / day : Number.POSITIVE_INFINITY;
+  const sinceNudge = lastNudge ? (Date.now() - lastNudge) / day : Number.POSITIVE_INFINITY;
+
+  if (sinceBackup < 30 || sinceNudge < 14) return '';
+
+  return `
+    <div class="notice notice--nudge">
+      ${icon('shield')}
+      <span>
+        <strong>${esc(t('backup.nudgeTitle'))}</strong><br>
+        ${esc(t('backup.nudgeBody'))}
+      </span>
+    </div>
+    <div class="row-actions">
+      <button class="btn btn--primary btn--sm" data-action="backup-nudge">${esc(
+        t('backup.nudgeAction'),
+      )}</button>
+      <button class="btn btn--ghost btn--sm" data-action="backup-nudge-later">${esc(
+        t('backup.nudgeLater'),
+      )}</button>
+    </div>`;
 }
 
 function lowestBit(mask) {
@@ -220,6 +255,16 @@ export const handlers = {
       focusIndex: index,
     });
   },
+  'backup-nudge': (app) => {
+    app.store.writeMeta({ backupNudgeAt: new Date().toISOString() });
+    app.openSheet('backup', { passphrase: '' });
+  },
+
+  'backup-nudge-later': (app) => {
+    app.store.writeMeta({ backupNudgeAt: new Date().toISOString() });
+    app.render({ preserveScroll: true });
+  },
+
   'resume-today': (app) => {
     app.commit((model) => model.clearPause(app.today), { message: t('today.resume') });
   },
