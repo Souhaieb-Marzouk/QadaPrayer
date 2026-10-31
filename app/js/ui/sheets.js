@@ -13,6 +13,9 @@ import { LINKS } from '../config.js';
 import { guidance, headingFrom, qiblaBearing, smoothHeading } from '../core/qibla.js';
 import { searchCities } from '../../data/cities.js';
 
+/** A lifetime ledger is a few KB; 4 MB is already generous. */
+const MAX_BACKUP_BYTES = 4 * 1024 * 1024;
+
 /* ------------------------------------------------------------------ */
 /* Shared pieces                                                       */
 /* ------------------------------------------------------------------ */
@@ -1142,13 +1145,22 @@ export const changes = {
   'backup-file': async (app, el) => {
     const file = el.files?.[0];
     if (!file) return;
-    const text = await file.text();
-    const passphrase = app.sheet?.passphrase || '';
-    if (isEncryptedBackup(text) && !passphrase) {
-      app.showToast(t('backup.needPassphrase'));
+
+    // A ledger is a few kilobytes. Anything huge is a mistake or an attack on
+    // the tab's memory, so it is refused before it is read.
+    if (file.size > MAX_BACKUP_BYTES) {
+      app.showToast(t('backup.tooLarge'));
       return;
     }
+
+    const passphrase = app.sheet?.passphrase || '';
+
     try {
+      const text = await file.text();
+      if (isEncryptedBackup(text) && !passphrase) {
+        app.showToast(t('backup.needPassphrase'));
+        return;
+      }
       const data = await readBackup(text, { passphrase });
       app.restoreBackup(data);
     } catch (error) {

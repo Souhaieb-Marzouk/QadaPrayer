@@ -16,6 +16,21 @@ import { forgetRemote, syncOnce } from '../sync/sync.js';
 import { attachCompass } from './sheets.js';
 import { checkForApkUpdate, installUpdate } from '../apk.js';
 
+
+/** The sync server must be https — except a localhost test server. */
+function isAcceptableEndpoint(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol === 'https:') return true;
+    if (url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 function syncCard(app) {
   const sync = app.store?.getSync?.() || {};
   const code = sync.code || '';
@@ -798,7 +813,7 @@ export const handlers = {
       app.store?.getSync?.().endpoint ||
       LINKS.syncEndpoint ||
       '';
-    if (!/^https?:\/\//.test(endpoint)) {
+    if (!isAcceptableEndpoint(endpoint)) {
       app.showToast(t('sync.server'));
       return;
     }
@@ -820,7 +835,7 @@ export const handlers = {
       app.store?.getSync?.().endpoint ||
       LINKS.syncEndpoint ||
       '';
-    if (!/^https?:\/\//.test(endpoint)) {
+    if (!isAcceptableEndpoint(endpoint)) {
       app.showToast(t('sync.server'));
       return;
     }

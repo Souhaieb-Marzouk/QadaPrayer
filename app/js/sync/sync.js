@@ -12,6 +12,9 @@ import { hashCode, normalizeCode } from './code.js';
 import { makeClient } from './client.js';
 import { seal, unseal } from './crypto.js';
 
+/** A lifetime ledger is a few KB; 1 MB is already paranoid. */
+const MAX_REMOTE_BYTES = 1024 * 1024;
+
 /**
  * @param {object} options
  * @param {string} options.endpoint  base URL of the sync server
@@ -38,6 +41,11 @@ export async function syncOnce({ endpoint, code, model, fetchImpl }) {
   }
 
   const remote = await client.get(id);
+
+  // The server is a stranger: never let it hand us a giant payload.
+  if (remote && JSON.stringify(remote).length > MAX_REMOTE_BYTES) {
+    throw new Error('too-large');
+  }
 
   if (!remote) {
     await client.put(id, await seal(normalised, model.toJSON()));

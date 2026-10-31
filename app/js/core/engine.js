@@ -95,6 +95,25 @@ function fromDateNumber(dayNumberValue) {
   return { y: dt.getUTCFullYear(), m: dt.getUTCMonth() + 1, d: dt.getUTCDate() };
 }
 
+
+/** Hard limits for anything that arrives from a file, a backup or another phone. */
+const MAX_RUNS = 200000;
+const MAX_SLOTS = 400000; // roughly 219 years of five prayers
+const FORBIDDEN_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
+
+/** Keep only plausible date keys and 5-bit masks — never let __proto__ through. */
+function sanitizePauses(raw) {
+  const clean = {};
+  if (!raw || typeof raw !== 'object') return clean;
+
+  for (const [key, value] of Object.entries(raw)) {
+    if (FORBIDDEN_KEYS.has(key) || !isISO(key)) continue;
+    const mask = Number(value);
+    if (Number.isInteger(mask) && mask >= 0 && mask < 32) clean[key] = mask;
+  }
+  return clean;
+}
+
 function clampProfile(profile) {
   const merged = {
     ...DEFAULT_PROFILE,
@@ -111,7 +130,28 @@ function clampProfile(profile) {
   merged.asrShadow = merged.asrShadow === 2 ? 2 : 1;
   merged.textScale = Math.min(1.5, Math.max(0.85, Number(merged.textScale) || 1));
   if (!['en', 'fr', 'ar'].includes(merged.language)) merged.language = 'en';
-  if (!['dark', 'light', 'auto'].includes(merged.theme)) merged.theme = 'dark';
+  if (!['dark', 'light', 'sepia', 'night', 'auto'].includes(merged.theme)) merged.theme = 'dark';
+  if (!['auto', 'arabic'].includes(merged.numerals)) merged.numerals = 'auto';
+
+  // A profile can come from a file or another phone: keep it plausible.
+  const lat = Number(merged.location.lat);
+  const lon = Number(merged.location.lon);
+  merged.location.lat = Number.isFinite(lat) ? Math.max(-90, Math.min(90, lat)) : DEFAULT_PROFILE.location.lat;
+  merged.location.lon = Number.isFinite(lon)
+    ? Math.max(-180, Math.min(180, lon))
+    : DEFAULT_PROFILE.location.lon;
+  merged.location.name =
+    typeof merged.location.name === 'string' && merged.location.name.trim()
+      ? merged.location.name.slice(0, 80)
+      : DEFAULT_PROFILE.location.name;
+  try {
+    new Intl.DateTimeFormat('en', { timeZone: merged.location.tz });
+  } catch {
+    merged.location.tz = DEFAULT_PROFILE.location.tz;
+  }
+  if (typeof merged.method !== 'string' || merged.method.length > 32) {
+    merged.method = DEFAULT_PROFILE.method;
+  }
   return merged;
 }
 
@@ -154,9 +194,11 @@ export class Qada {
     const data = {
       v: STATE_VERSION,
       profile: clampProfile(raw.profile),
-      marks: Array.isArray(raw.marks) ? raw.marks : [],
-      pauses: raw.pauses && typeof raw.pauses === 'object' ? raw.pauses : {},
-      log: Array.isArray(raw.log) ? raw.log.slice(-200) : [],
+      marks: Array.isArray(raw.marks) ? raw.marks.slice(0, MAX_RUNS) : [],
+      pauses: sanitizePauses(raw.pauses),
+      log: Array.isArray(raw.log)
+        ? raw.log.filter((entry) => entry && typeof entry === 'object').slice(-200)
+        : [],
       createdAt: raw.createdAt || new Date().toISOString(),
       updatedAt: raw.updatedAt || new Date().toISOString(),
     };
@@ -164,7 +206,7 @@ export class Qada {
       (sum, run) => sum + (Number(run?.[1]) || 0),
       0,
     );
-    const size = Math.max(Qada.ledgerSize(today), runTotal);
+    const size = Math.min(Math.max(Qada.ledgerSize(today), runTotal), MAX_SLOTS);
     const ledger = decodeRuns(data.marks, size);
     const model = new Qada(data, ledger, today);
     model.ensureCapacity(dayOfISO(today) * SLOTS_PER_DAY + SLOTS_PER_DAY);

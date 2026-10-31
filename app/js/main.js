@@ -527,15 +527,33 @@ export function render({ preserveScroll = false } = {}) {
   }
 
   const screen = currentScreen();
-  root.innerHTML = `
-    <div class="app-shell">
-      ${renderTopbar()}
-      <main class="screen" id="screen">${screen.render(app)}</main>
-    </div>
-    ${app.route === 'print' ? '' : renderNav()}
-    ${sheets.renderSheet(app)}
-    ${renderToast()}
-  `;
+
+  // One bad value must never leave a blank screen: if a screen throws, show a
+  // way out instead of nothing.
+  try {
+    root.innerHTML = `
+      <div class="app-shell">
+        ${renderTopbar()}
+        <main class="screen" id="screen">${screen.render(app)}</main>
+      </div>
+      ${app.route === 'print' ? '' : renderNav()}
+      ${sheets.renderSheet(app)}
+      ${renderToast()}
+    `;
+  } catch (error) {
+    console.error('[qada] render failed', error);
+    root.innerHTML = `
+      <div class="app-shell">
+        ${renderTopbar()}
+        <main class="screen">
+          <div class="notice">${icon('info')}<span>${esc(i18n.t('error.generic'))}</span></div>
+          <button class="btn btn--primary btn--block" data-action="recover">${esc(
+            i18n.t('common.back'),
+          )}</button>
+        </main>
+      </div>
+    `;
+  }
 
   if (preserveScroll) window.scrollTo({ top: scrollY });
   publishWidget();
@@ -667,6 +685,14 @@ function onDocumentClick(event) {
       window.scrollTo({ top: 0 });
       render();
     }
+    return;
+  }
+  if (action === 'recover') {
+    app.route = 'today';
+    app.sheet = null;
+    app.toast = null;
+    if (location.hash !== '#/today') history.replaceState(null, '', '#/today');
+    render();
     return;
   }
   if (action === 'toggle-theme') {
