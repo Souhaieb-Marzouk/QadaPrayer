@@ -63,9 +63,21 @@ function prayerSheet(app, sheet) {
   const isToday = date === app.today;
   const plan = isToday ? model.plan(date) : null;
   const item = plan?.items.find((entry) => entry.prayer === prayer);
-  const qada = item ? item.qada : [];
-  const mark = model.get(slotIndex(date, prayer));
-  const checked = sheet.checked || [];
+  const slot = slotIndex(date, prayer);
+  const mark = model.get(slot);
+
+  // Make-ups still owed under this prayer, plus the ones already marked under it,
+  // so a batch can be corrected one line at a time.
+  const owed = item ? item.qada : [];
+  const already = model.lastQadaIndices(date, prayer);
+  const qada = [...new Set([...already, ...owed])].sort((a, b) => a - b);
+
+  const checked = sheet.checked
+    ? new Set(sheet.checked.map(String))
+    : new Set([
+        ...(mark === MARK_DONE ? ['self'] : []),
+        ...qada.filter((index) => model.get(index) === MARK_DONE).map(String),
+      ]);
 
   const qadaRows = qada.map((index) =>
     checkRow({
@@ -73,7 +85,7 @@ function prayerSheet(app, sheet) {
       label: `${esc(t(`prayer.${PRAYERS[index % 5]}`))} <span class="dim">${esc(
         dateMedium(dayISO(index)),
       )}</span>`,
-      checked: checked.includes(index) || checked.includes(String(index)),
+      checked: checked.has(String(index)),
     }),
   );
 
@@ -84,20 +96,24 @@ function prayerSheet(app, sheet) {
       id: 'self',
       label: prayerLabel(prayer),
       hint: time,
-      checked: checked.includes('self'),
+      checked: checked.has('self'),
     })}
     ${qada.length ? `<div class="field__label" style="margin-top:.4rem">${esc(t('sheet.qadaTitle'))}</div>` : ''}
     ${qadaRows.join('')}
-    ${qada.length > 1 ? `<p class="field__hint">${esc(t('sheet.warningOrder'))}</p>` : ''}
+    ${qada.length ? `<p class="field__hint">${esc(t('sheet.uncheckHint'))}</p>` : ''}
   `;
 
-  const foot = isToday
-    ? `<button class="btn" data-action="sheet-not-prayed">${esc(t('sheet.confirmNo'))}</button>
-       <button class="btn btn--primary" data-action="sheet-prayed">${esc(t('sheet.confirmYes'))}</button>`
-    : `<button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>
-       <button class="btn btn--primary" data-action="sheet-save-day" data-prayer="${prayer}">${esc(
-         t('sheet.save'),
-       )}</button>`;
+  const done = mark === MARK_DONE;
+  const foot = done
+    ? `<button class="btn" data-action="close-sheet">${esc(t('common.cancel'))}</button>
+       <button class="btn btn--primary" data-action="sheet-save-marks">${esc(t('sheet.save'))}</button>`
+    : isToday
+      ? `<button class="btn" data-action="sheet-not-prayed">${esc(t('sheet.confirmNo'))}</button>
+         <button class="btn btn--primary" data-action="sheet-prayed">${esc(t('sheet.confirmYes'))}</button>`
+      : `<button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>
+         <button class="btn btn--primary" data-action="sheet-save-day" data-prayer="${prayer}">${esc(
+           t('sheet.save'),
+         )}</button>`;
 
   return sheetShell({
     title: esc(t('sheet.title', { prayer: t(`prayer.${prayer}`) })),
@@ -146,6 +162,31 @@ function deferSheet(app, sheet) {
   });
 }
 
+function deferQadaSheet(app, sheet) {
+  const count = sheet.pending?.length || 0;
+  return sheetShell({
+    title: esc(t('sheet.deferQadaTitle')),
+    subtitle: esc(t('sheet.deferQadaHint', { count })),
+    body: `
+      <button class="check-row" data-action="sheet-defer-qada" data-mode="next" style="align-items:flex-start">
+        <span class="check-row__box">${icon('arrow-right')}</span>
+        <span>
+          <span class="check-row__label">${esc(t('sheet.deferNext'))}</span>
+          <span class="field__hint">${esc(t('sheet.deferNextHint'))}</span>
+        </span>
+      </button>
+      <button class="check-row" data-action="sheet-defer-qada" data-mode="tomorrow" style="align-items:flex-start">
+        <span class="check-row__box">${icon('calendar')}</span>
+        <span>
+          <span class="check-row__label">${esc(t('sheet.deferTomorrow'))}</span>
+          <span class="field__hint">${esc(t('sheet.deferTomorrowHint'))}</span>
+        </span>
+      </button>
+    `,
+    foot: `<button class="btn" data-action="close-sheet">${esc(t('sheet.cancel'))}</button>`,
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* Day detail                                                          */
 /* ------------------------------------------------------------------ */
@@ -174,10 +215,16 @@ export function renderDaySheet(app, sheet) {
   `;
 
   const foot = `
+    <button class="btn" data-action="day-step" data-delta="-1" aria-label="${esc(
+      t('today.previousDay'),
+    )}">${icon('chevronLeft')}</button>
     <button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>
     <button class="btn btn--primary" data-action="day-mark-all" data-date="${date}">${esc(
       t('calendar.markAllDay'),
     )}</button>
+    <button class="btn" data-action="day-step" data-delta="1" aria-label="${esc(
+      t('today.nextDay'),
+    )}">${icon('chevronRight')}</button>
   `;
 
   return sheetShell({
@@ -446,6 +493,9 @@ function syncSheet(app) {
       <button class="btn btn--ghost btn--sm btn--block" data-action="sync-create">${esc(
         t('sync.create'),
       )}</button>
+      <button class="btn btn--ghost btn--sm btn--block" data-action="sync-test">${esc(
+        t('sync.test'),
+      )}</button>
     `,
     foot: `<button class="btn" data-action="close-sheet">${esc(t('common.cancel'))}</button>
            <button class="btn btn--primary" data-action="sync-join">${esc(t('sync.use'))}</button>`,
@@ -557,6 +607,8 @@ export function renderSheet(app) {
       return prayerSheet(app, sheet);
     case 'defer':
       return deferSheet(app, sheet);
+    case 'deferQada':
+      return deferQadaSheet(app, sheet);
     case 'day':
       return renderDaySheet(app, sheet);
     case 'bulk':
@@ -586,6 +638,45 @@ export function closeSheetState(app) {
   app.sheet = null;
 }
 
+/**
+ * Apply exactly what is ticked in the prayer sheet: the prayer itself and each
+ * make-up under it — including un-ticking ones that were marked before.
+ */
+function applyPrayerSelection(app, { proposeDefer }) {
+  const sheet = app.sheet;
+  const model = app.model;
+  if (!sheet) return;
+
+  const checked = new Set((sheet.checked || []).map(String));
+  const { date, prayer } = sheet;
+
+  const plan = date === app.today ? model.plan(date) : null;
+  const item = plan?.items.find((entry) => entry.prayer === prayer);
+  const owed = item ? item.qada : [];
+  const listed = [...new Set([...model.lastQadaIndices(date, prayer), ...owed])];
+
+  const self = checked.has('self') ? MARK_DONE : MARK_MISSED;
+  const qada = {};
+  for (const index of listed) {
+    qada[index] = checked.has(String(index)) ? MARK_DONE : MARK_MISSED;
+  }
+
+  const unmarked = listed.filter((index) => !checked.has(String(index)));
+
+  app.commit(
+    (instance) => instance.applySelection({ dateISO: date, prayer, self, qada }),
+    { message: self === MARK_DONE ? t('common.undoDone') : t('common.undo') },
+  );
+
+  if (proposeDefer && self === MARK_DONE && unmarked.length && date === app.today) {
+    app.openSheet('deferQada', { date, prayer, pending: unmarked });
+    app.render();
+    return;
+  }
+
+  app.closeSheet();
+}
+
 export const handlers = {
   'toggle-sheet-check': (app, el) => {
     const id = el.dataset.id;
@@ -602,26 +693,9 @@ export const handlers = {
     app.render({ preserveScroll: true });
   },
 
-  'sheet-prayed': (app) => {
-    const sheet = app.sheet;
-    const checked = new Set((sheet.checked || []).map((v) => (typeof v === 'string' && /^\d+$/.test(v) ? Number(v) : v)));
-    if (!checked.has('self')) {
-      app.closeSheet();
-      return;
-    }
-    const qada = [...checked].filter((v) => typeof v === 'number');
-    app.commit(
-      (model) =>
-        model.applyOutcome({
-          dateISO: sheet.date,
-          prayer: sheet.prayer,
-          prayed: true,
-          qadaIndices: qada,
-        }),
-      { message: t('common.undoDone') },
-    );
-    app.closeSheet();
-  },
+  'sheet-prayed': (app) => applyPrayerSelection(app, { proposeDefer: true }),
+
+  'sheet-save-marks': (app) => applyPrayerSelection(app, { proposeDefer: false }),
 
   'sheet-not-prayed': (app) => {
     const sheet = app.sheet;
@@ -649,6 +723,21 @@ export const handlers = {
       { message: t('common.undoDefer') },
     );
     app.closeSheet();
+  },
+
+  'sheet-defer-qada': (app, el) => {
+    const sheet = app.sheet;
+    const mode = el.dataset.mode;
+    app.sheet = null;
+
+    if (mode === 'tomorrow') {
+      app.commit((model) => model.pausePrayer(sheet.date, sheet.prayer), {
+        message: t('sheet.deferTomorrow'),
+      });
+      return;
+    }
+
+    app.render({ preserveScroll: true });
   },
 
   'sheet-save-day': (app, el) => {

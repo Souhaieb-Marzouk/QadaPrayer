@@ -38,6 +38,10 @@ const PATHS = {
   flame: `<path d="M12 21c3.4 0 5.6-2.2 5.6-5.2 0-3.6-3.6-5.4-4.4-9.8-2.4 1.4-3 3.6-3 5.2 0 1-.4 1.6-1 1.6-.7 0-1.1-.6-1.2-1.4C6.8 13 6.4 14.3 6.4 15.8 6.4 18.8 8.6 21 12 21z"/>`,
   edit: `<path d="M4 20h4l11-11-4-4L4 16z"/><path d="M14.5 5.5l4 4"/>`,
   moonCheck: `<path d="M20 14.4A8.2 8.2 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4z"/><path d="M7.6 13.2 9.4 15l3-3"/>`,
+  sliders: `<path d="M4 7h8M16 7h4M4 17h4M12 17h8"/><circle cx="14" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/>`,
+  undo: `<path d="M4 9h9.5a4.5 4.5 0 0 1 0 9H8"/><path d="M7.5 5.5 4 9l3.5 3.5"/>`,
+  chevronLeft: `<path d="M14.5 5.5 8 12l6.5 6.5"/>`,
+  chevronRight: `<path d="M9.5 5.5 16 12l-6.5 6.5"/>`,
 };
 
 export function icon(name, extraClass = '') {

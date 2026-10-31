@@ -14,6 +14,18 @@ export function makeClient({ endpoint, fetchImpl } = {}) {
   const url = (id) => `${base}/${id}`;
 
   return {
+    /**
+     * Cheap reachability probe with no encryption involved, so a network problem
+     * is told apart from a code problem. A 404 is the expected answer.
+     */
+    async ping() {
+      const response = await call(`${base}/0000000000000000000000000000000000000000`, {
+        method: 'GET',
+        cache: 'no-store',
+      });
+      return response.status;
+    },
+
     /** Returns the stored envelope, or null when nothing was pushed yet. */
     async get(id) {
       const response = await call(url(id), { method: 'GET', cache: 'no-store' });

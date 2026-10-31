@@ -217,6 +217,10 @@ public partial class MainPage : ContentPage
         settings.DatabaseEnabled = true;
         settings.SetSupportMultipleWindows(false);
         settings.MediaPlaybackRequiresUserGesture = false;
+
+        // Paint the native view the same colour as the app: without it Android
+        // shows its own background for a frame, which reads as a black flash.
+        webView.SetBackgroundColor(Android.Graphics.Color.ParseColor("#06100F"));
     }
 #endif
 

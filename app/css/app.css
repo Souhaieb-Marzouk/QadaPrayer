@@ -2118,3 +2118,38 @@ input[type='range']::-moz-range-thumb {
   color: var(--gold-soft);
   word-break: break-all;
 }
+
+
+/* Day navigator (Today) */
+.day-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0.1rem 0 0.9rem;
+}
+
+.day-nav__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.day-nav__label .dim {
+  font-size: 0.68rem;
+  font-weight: 400;
+}
+
+/* No flash between paints: the page background is painted before anything else */
+html {
+  background-color: var(--bg);
+}

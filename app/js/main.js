@@ -142,6 +142,12 @@ export function boot() {
     render({ preserveScroll: true });
   });
 
+  // Sync quietly on launch once it has been set up: the ledger on this device
+  // catches up with the other one without the user doing anything.
+  if (app.model && app.store.meta?.syncCode) {
+    setTimeout(() => settingsScreen.performSync(app, { quiet: true }), 1200);
+  }
+
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && app.model) {
       const changed = refreshClock();
@@ -304,6 +310,16 @@ export function commit(mutator, { message, silent = false } = {}) {
   // Profile edits (location, method, offsets) change today's timetable, so the
   // day is always rebuilt after a mutation — it costs well under a millisecond.
   app.day = computeDayFor(app.today);
+
+  // Keep the undo affordance only while the change is still "fresh"; after that
+  // the toolbar goes back to its quiet state.
+  app.undoVisible = true;
+  if (app.undoTimer) clearTimeout(app.undoTimer);
+  app.undoTimer = setTimeout(() => {
+    app.undoVisible = false;
+    if (app.model) render({ preserveScroll: true });
+  }, 9000);
+
   render({ preserveScroll: true });
   scheduleReminders(app);
   if (message && !silent) showToast(message, i18n.t('common.undo'), 'undo');
@@ -555,15 +571,15 @@ function renderTopbar() {
           : ''
       }
       ${
-        canUndo
+        app.undoVisible && canUndo
           ? `<button class="icon-btn" data-action="undo" aria-label="${esc(i18n.t('common.undo'))}">${icon(
-              'edit',
+              'undo',
             )}</button>`
           : ''
       }
-      <button class="icon-btn" data-action="go" data-to="settings" aria-label="${esc(
-        i18n.t('nav.settings'),
-      )}">${icon('gear')}</button>
+      <button class="icon-btn" data-action="toggle-theme" aria-label="${esc(
+        i18n.t('settings.theme'),
+      )}">${icon(document.documentElement.dataset.theme === 'light' ? 'isha' : 'sun')}</button>
     </header>`;
 }
 
@@ -620,12 +636,20 @@ function onDocumentClick(event) {
     }
     return;
   }
+  if (action === 'toggle-theme') {
+    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+    commit((model) => model.updateProfile({ theme: next }), { silent: true });
+    applyVisualPreferences();
+    render({ preserveScroll: true });
+    return;
+  }
   if (action === 'undo') {
     const restored = app.store.undo();
     if (restored) {
       app.model = restored;
       app.store.save(restored);
       refreshClock();
+      app.undoVisible = false;
       render({ preserveScroll: true });
       showToast(i18n.t('common.undo'));
     }

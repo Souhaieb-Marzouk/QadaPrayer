@@ -25,7 +25,17 @@ export async function syncOnce({ endpoint, code, model, fetchImpl }) {
   if (!normalised) throw new Error('bad-code');
 
   const client = makeClient({ endpoint, fetchImpl });
-  const id = await hashCode(normalised);
+
+  // Encryption needs a secure context; say so plainly instead of failing later
+  // with a misleading network error.
+  if (typeof crypto === 'undefined' || !crypto.subtle) throw new Error('no-crypto');
+
+  let id;
+  try {
+    id = await hashCode(normalised);
+  } catch {
+    throw new Error('no-crypto');
+  }
 
   const remote = await client.get(id);
 

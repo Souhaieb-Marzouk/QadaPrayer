@@ -1,7 +1,7 @@
 /** Today: the five prayers, with their make-ups woven underneath. */
 
 import { t, number, percent, dateMedium, dateShort, hijriDate } from '../i18n.js';
-import { PRAYERS, fromDayNumber, toISO } from '../core/dates.js';
+import { PRAYERS, addDays, fromDayNumber, toISO } from '../core/dates.js';
 import { prayerStateAt } from '../core/prayerTimes.js';
 import { MARK_DONE, MARK_EXEMPT, slotIndex } from '../core/engine.js';
 import { clock, duration, esc, ringWithCenter, statusPill } from './dom.js';
@@ -127,6 +127,19 @@ export function render(app) {
 
     <p class="dateline">${esc(hijriDate(app.today))}</p>
 
+    <div class="day-nav">
+      <button class="icon-btn" data-action="day-step" data-delta="-1" aria-label="${esc(
+        t('today.previousDay'),
+      )}">${icon('chevronLeft')}</button>
+      <button class="day-nav__label" data-action="day-step" data-delta="0">
+        ${esc(t('today.openDay'))}
+        <span class="dim">${esc(t('today.previousOrNext'))}</span>
+      </button>
+      <button class="icon-btn" data-action="day-step" data-delta="1" aria-label="${esc(
+        t('today.nextDay'),
+      )}">${icon('chevronRight')}</button>
+    </div>
+
     <div class="next-prayer">
       <span class="next-prayer__icon">${icon(PRAYER_ICON[nextKey])}</span>
       <div>
@@ -190,6 +203,12 @@ function nextMinuteDistance(now, target) {
 }
 
 export const handlers = {
+  'day-step': (app, el) => {
+    const delta = Number(el.dataset.delta) || 0;
+    const date = delta === 0 ? app.today : addDays(app.viewDate || app.today, delta);
+    app.viewDate = date;
+    app.openSheet('day', { date });
+  },
   'prayer-sheet': (app, el) => {
     app.openSheet('prayer', { date: app.today, prayer: el.dataset.prayer });
   },

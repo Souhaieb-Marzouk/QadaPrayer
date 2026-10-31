@@ -404,6 +404,56 @@ export class Qada {
   }
 
   /**
+   * Set the exact marks chosen in the prayer sheet: the prayer itself and every
+   * make-up listed under it, including un-marking ones that were done before.
+   * `self` and each entry of `qada` are a mark value (done / missed).
+   */
+  applySelection({ dateISO, prayer, self, qada = {} }) {
+    const index = slotIndex(dateISO, prayer);
+    let touched = 0;
+
+    if (self !== undefined && this.isOwed(index) && this.get(index) !== self) {
+      this.set(index, self);
+      touched += 1;
+    }
+
+    for (const [key, value] of Object.entries(qada)) {
+      const slot = Number(key);
+      if (!Number.isInteger(slot) || !this.isOwed(slot)) continue;
+      if (this.get(slot) === value) continue;
+      this.set(slot, value);
+      touched += 1;
+    }
+
+    if (touched) {
+      this.log({ kind: 'selection', dateISO, prayer, changes: touched });
+      this.touch();
+    }
+    return touched;
+  }
+
+  /** The make-ups that were marked done under a given prayer, most recent first. */
+  lastQadaIndices(dateISO, prayer) {
+    const log = this.data.log || [];
+    for (let index = log.length - 1; index >= 0; index -= 1) {
+      const entry = log[index];
+      if (entry.kind === 'prayed' && entry.dateISO === dateISO && entry.prayer === prayer) {
+        return Array.isArray(entry.indices) ? entry.indices : [];
+      }
+    }
+    return [];
+  }
+
+  /** Move everything planned under one prayer of `dateISO` to the next day. */
+  pausePrayer(dateISO, prayer) {
+    const index = PRAYER_INDEX[prayer];
+    if (index === undefined) return;
+    this.data.pauses[dateISO] = this.pausedMask(dateISO) | (1 << index);
+    this.log({ kind: 'defer', mode: 'tomorrow', dateISO, prayer });
+    this.touch();
+  }
+
+  /**
    * Mark every owed slot in an inclusive date range.
    * Dates are clamped to the owed window; future dates are refused.
    */
@@ -436,7 +486,7 @@ export class Qada {
     if (prayed) {
       if (this.isOwed(index)) this.set(index, MARK_DONE);
       this.markMany(qadaIndices, MARK_DONE);
-      this.log({ kind: 'prayed', dateISO, prayer, qada: qadaIndices.length });
+      this.log({ kind: 'prayed', dateISO, prayer, qada: qadaIndices.length, indices: [...qadaIndices] });
     } else {
       const mask = this.pausedMask(dateISO);
       const bits = defer === 'tomorrow'

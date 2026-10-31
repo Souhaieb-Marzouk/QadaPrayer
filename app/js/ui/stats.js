@@ -200,6 +200,10 @@ export const live = {
     if (label) label.textContent = t('stats.paceValue', { n: number(quota) });
     if (finishEl) finishEl.textContent = finish ? dateMedium(finish) : '—';
     const button = document.querySelector('[data-action="apply-pace"]');
-    if (button) button.dataset.quota = String(quota);
+    if (button) {
+      button.dataset.quota = String(quota);
+      // The button is only meaningful when the value differs from the saved pace.
+      button.disabled = quota === projection.quota;
+    }
   },
 };

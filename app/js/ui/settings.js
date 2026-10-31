@@ -11,6 +11,7 @@ import { nextEvents, permission, primeAudio, requestPermission, sendTest } from 
 import { exportName, ledgerCsv } from '../exporter.js';
 import { hasNativeBridge } from '../native.js';
 import { generateCode, normalizeCode } from '../sync/code.js';
+import { makeClient } from '../sync/client.js';
 import { forgetRemote, syncOnce } from '../sync/sync.js';
 
 function syncCard(app) {
@@ -71,7 +72,11 @@ async function performSync(app, { quiet = false } = {}) {
     if (!quiet) app.showToast(t('sync.done'));
   } catch (error) {
     app.render({ preserveScroll: true });
-    app.showToast(error?.message === 'bad-code' ? t('sync.badCode') : t('sync.error'));
+    const reason = String(error?.message || '');
+    const key =
+      reason === 'bad-code' ? 'sync.badCode' : reason === 'no-crypto' ? 'sync.noCrypto' : 'sync.error';
+    const detail = reason && !['bad-code', 'no-crypto'].includes(reason) ? ` (${reason})` : '';
+    app.showToast(`${t(key)}${detail}`);
   }
 }
 
@@ -677,6 +682,23 @@ export const handlers = {
 
   'sync-now': (app) => {
     performSync(app);
+  },
+
+  'sync-test': async (app) => {
+    const endpoint =
+      app.store?.meta?.syncEndpoint ||
+      LINKS.syncEndpoint ||
+      String(app.sheet?.endpointValue || '').trim();
+    if (!endpoint) {
+      app.showToast(t('sync.server'));
+      return;
+    }
+    try {
+      const status = await makeClient({ endpoint }).ping();
+      app.showToast(`${t('sync.ok')} (HTTP ${status})`);
+    } catch (error) {
+      app.showToast(`${t('sync.offline')} (${String(error?.message || error)})`);
+    }
   },
 
   'sync-copy': async (app) => {
