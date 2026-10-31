@@ -83,7 +83,9 @@ leave a tip:
 
 ## Roadmap
 
-- Home-screen widget with today's prayers and remaining make-ups.
+- **Home-screen widget** — the web side and the native add-on are ready in
+  `android/widget/`; it needs one APK rebuild and is not part of the current
+  release.
 - Encrypted cloud sync between devices (end-to-end, no server-side plaintext).
 - Profiles for more than one person on the same phone.
 

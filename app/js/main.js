@@ -24,6 +24,7 @@ import * as printScreen from './ui/print.js';
 import { renderLock } from './ui/lock.js';
 import { resetShown, scheduleReminders } from './notify.js';
 import { applyUpdate, checkForUpdate, initUpdater } from './updater.js';
+import { buildSnapshot, publishSnapshot } from './native.js';
 
 export const app = {
   store: new Store(),
@@ -450,6 +451,29 @@ export function render({ preserveScroll = false } = {}) {
   `;
 
   if (preserveScroll) window.scrollTo({ top: scrollY });
+  publishWidget();
+}
+
+let widgetTimer = null;
+
+/** Keep the Android widget in step with the app, at most once every 20 s. */
+function publishWidget() {
+  if (!app.model || !app.day) return;
+  if (widgetTimer) return;
+  widgetTimer = setTimeout(() => {
+    widgetTimer = null;
+    try {
+      const snapshot = buildSnapshot({
+        today: app.today,
+        day: app.day,
+        model: app.model,
+        now: app.now,
+      });
+      publishSnapshot(snapshot);
+    } catch {
+      /* the widget is an extra, never a reason to break a render */
+    }
+  }, 2000);
 }
 
 function currentScreen() {

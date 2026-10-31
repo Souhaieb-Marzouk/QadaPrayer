@@ -47,6 +47,22 @@ public partial class MainPage : ContentPage
             settings.DatabaseEnabled = true;
             settings.SetSupportMultipleWindows(false);
             settings.MediaPlaybackRequiresUserGesture = false;
+
+#if QADA_WIDGET
+            // Home-screen widget bridge. Only compiled when the widget files are
+            // present and QADA_WIDGET is defined in the csproj (see
+            // android/widget/README.md).
+            try
+            {
+                webView.AddJavascriptInterface(
+                    new QadaNativeBridge(Android.App.Application.Context),
+                    "QadaNative");
+            }
+            catch
+            {
+                // A missing widget must never stop the app from starting.
+            }
+#endif
         }
 #endif
     }

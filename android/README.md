@@ -388,7 +388,6 @@ users without touching the store.
 ---
 
 ## 12. Offline behaviour
-
 The first launch downloads the app and the service worker caches it, so later
 launches work without a connection. Two things to know:
 
@@ -431,3 +430,13 @@ does not need).
 | "App not installed" on the phone | An older build with a different signing key is installed — uninstall it first |
 | Update refused | `ApplicationVersion` was not increased |
 | Blank white screen | Check the URL in `MainPage.xaml.cs` and that the site is reachable |
+
+---
+
+## 13. Home-screen widget
+
+Optional add-on, not part of the current APK. The web side is already shipped —
+the page publishes three strings to a JavaScript bridge — so adding the widget is
+five files plus one define in the csproj, then a rebuild.
+
+Full instructions: [`widget/README.md`](widget/README.md).

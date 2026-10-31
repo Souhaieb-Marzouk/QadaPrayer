@@ -1,6 +1,6 @@
 /* Qada service worker — offline shell, no network dependency at runtime. */
 
-const VERSION = 'qada-v4';
+const VERSION = 'qada-v5';
 const SHELL = [
   './',
   './index.html',
@@ -13,6 +13,7 @@ const SHELL = [
   './js/notify.js',
   './js/updater.js',
   './js/exporter.js',
+  './js/native.js',
   './js/core/dates.js',
   './js/core/astro.js',
   './js/core/prayerTimes.js',
