@@ -32,6 +32,15 @@ export default {
     const id = new URL(request.url).pathname.replace(/^\/+/, '');
     if (!ID_PATTERN.test(id)) return reply('bad id', 400);
 
+    // A cheap per-IP budget, so one client cannot hammer the namespace.
+    // Two KV operations per request, well inside the free tier.
+    const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+    const minute = Math.floor(Date.now() / 60000);
+    const budgetKey = `rl:${ip}:${minute}`;
+    const used = Number((await env.QADA.get(budgetKey)) || 0);
+    if (used > 120) return reply('too many requests', 429);
+    await env.QADA.put(budgetKey, String(used + 1), { expirationTtl: 120 });
+
     const key = `blob:${id}`;
 
     if (request.method === 'GET') {

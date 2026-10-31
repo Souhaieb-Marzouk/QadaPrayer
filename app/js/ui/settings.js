@@ -15,10 +15,11 @@ import { makeClient } from '../sync/client.js';
 import { forgetRemote, syncOnce } from '../sync/sync.js';
 
 function syncCard(app) {
-  const code = app.store?.meta?.syncCode || '';
-  const last = app.store?.meta?.lastSyncAt || '';
-  const status = app.store?.meta?.lastSyncError || '';
-  const endpoint = app.store?.meta?.syncEndpoint || LINKS.syncEndpoint || '';
+  const sync = app.store?.getSync?.() || {};
+  const code = sync.code || '';
+  const last = sync.lastSyncAt || '';
+  const status = sync.lastError || '';
+  const endpoint = sync.endpoint || LINKS.syncEndpoint || '';
 
   const body = !endpoint
     ? `<div class="card--pad" style="display:flex;flex-direction:column;gap:.6rem">
@@ -61,11 +62,12 @@ function syncCard(app) {
 
 /** Run one sync against the configured server. */
 async function performSync(app, { quiet = false } = {}) {
-  const code = app.store?.meta?.syncCode;
-  const endpoint = app.store?.meta?.syncEndpoint || LINKS.syncEndpoint;
+  const sync = app.store?.getSync?.() || {};
+  const code = sync.code;
+  const endpoint = sync.endpoint || LINKS.syncEndpoint;
 
   if (!code || !endpoint) {
-    app.store?.writeMeta({ lastSyncError: !code ? 'no-code' : 'no-endpoint' });
+    app.store?.setSync({ lastError: !code ? 'no-code' : 'no-endpoint' });
     app.render({ preserveScroll: true });
     if (!quiet) app.showToast(!code ? t('sync.badCode') : t('sync.server'));
     return;
@@ -80,14 +82,18 @@ async function performSync(app, { quiet = false } = {}) {
       app.store.save(app.model, { immediate: true });
       app.refreshClock();
     }
-    app.store.writeMeta({ lastSyncAt: new Date().toISOString(), lastSyncError: '' });
+    app.store.setSync({ lastSyncAt: new Date().toISOString(), lastError: '' });
     app.sheet = null;
     app.render({ preserveScroll: true });
-    if (!quiet) app.showToast(t('sync.done'));
+
+    // Say when the other phone brought something in — a silent change is
+    // unsettling on a ledger.
+    if (result.changed) app.showToast(t('sync.pulled'));
+    else if (!quiet) app.showToast(t('sync.done'));
   } catch (error) {
     const reason = String(error?.message || error || 'unknown');
     // Kept on the card, so a failure is still readable once the toast is gone.
-    app.store?.writeMeta({ lastSyncError: reason });
+    app.store?.setSync({ lastError: reason });
     app.render({ preserveScroll: true });
 
     const key =
@@ -655,7 +661,7 @@ export const handlers = {
   'open-support': (app) => app.openSheet('support', {}),
 
   'open-sync': (app) => {
-    const code = app.store?.meta?.syncCode || '';
+    const code = app.store?.getSync?.().code || '';
     if (code) {
       app.openSheet('sync', { mode: 'manage' });
       return;
@@ -663,14 +669,14 @@ export const handlers = {
     app.openSheet('sync', {
       mode: 'join',
       input: '',
-      endpointValue: app.store?.meta?.syncEndpoint || LINKS.syncEndpoint || '',
+      endpointValue: app.store?.getSync?.().endpoint || LINKS.syncEndpoint || '',
     });
   },
 
   'sync-create': (app) => {
     const endpoint =
       String(app.sheet?.endpointValue || '').trim() ||
-      app.store?.meta?.syncEndpoint ||
+      app.store?.getSync?.().endpoint ||
       LINKS.syncEndpoint ||
       '';
     if (!/^https?:\/\//.test(endpoint)) {
@@ -678,7 +684,7 @@ export const handlers = {
       return;
     }
     const code = generateCode();
-    app.store.writeMeta({ syncCode: code, syncEndpoint: endpoint });
+    app.store.setSync({ code, endpoint });
     app.sheet = null;
     app.render({ preserveScroll: true });
     performSync(app);
@@ -692,14 +698,14 @@ export const handlers = {
     }
     const endpoint =
       String(app.sheet?.endpointValue || '').trim() ||
-      app.store?.meta?.syncEndpoint ||
+      app.store?.getSync?.().endpoint ||
       LINKS.syncEndpoint ||
       '';
     if (!/^https?:\/\//.test(endpoint)) {
       app.showToast(t('sync.server'));
       return;
     }
-    app.store.writeMeta({ syncCode: code, syncEndpoint: endpoint });
+    app.store.setSync({ code, endpoint });
     app.sheet = null;
     app.render({ preserveScroll: true });
     performSync(app);
@@ -711,7 +717,7 @@ export const handlers = {
 
   'sync-test': async (app) => {
     const endpoint =
-      app.store?.meta?.syncEndpoint ||
+      app.store?.getSync?.().endpoint ||
       LINKS.syncEndpoint ||
       String(app.sheet?.endpointValue || '').trim();
     if (!endpoint) {
@@ -727,7 +733,7 @@ export const handlers = {
   },
 
   'sync-copy': async (app) => {
-    const code = app.store?.meta?.syncCode || '';
+    const code = app.store?.getSync?.().code || '';
     try {
       await navigator.clipboard.writeText(code);
       app.showToast(t('sync.copied'));
@@ -747,15 +753,16 @@ export const handlers = {
   },
 
   'do-sync-forget': async (app) => {
-    const code = app.store?.meta?.syncCode;
-    const endpoint = app.store?.meta?.syncEndpoint || LINKS.syncEndpoint;
+    const sync = app.store?.getSync?.() || {};
+    const code = sync.code;
+    const endpoint = sync.endpoint || LINKS.syncEndpoint;
     app.sheet = null;
     app.render({ preserveScroll: true });
     if (!code || !endpoint) return;
 
     try {
       await forgetRemote({ endpoint, code });
-      app.store.writeMeta({ syncCode: '', lastSyncAt: '' });
+      app.store.setSync({ code: '', lastSyncAt: '', lastError: '' });
       app.render();
       app.showToast(t('sync.deleted'));
     } catch {

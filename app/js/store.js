@@ -12,6 +12,8 @@ import {
   DOC_VERSION,
   activeData,
   addProfile as pushProfile,
+  profileSync,
+  setProfileSync,
   defaultName,
   normalizeDoc,
   removeProfile as dropProfile,
@@ -287,6 +289,17 @@ export class Store {
         }
       }
 
+      // Sync settings used to live in the app metadata. They belong to a profile
+      // now, so each person can keep their own code.
+      if (!profileSync(this.doc).code && this.meta?.syncCode) {
+        setProfileSync(this.doc, {
+          code: this.meta.syncCode,
+          endpoint: this.meta.syncEndpoint || '',
+          lastSyncAt: this.meta.lastSyncAt || '',
+        });
+        this.persistNow();
+      }
+
       return this.buildModel();
     } catch (error) {
       console.error('[qada] could not read the saved state', error);
@@ -330,6 +343,17 @@ export class Store {
 
   get activeId() {
     return this.doc?.activeId ?? null;
+  }
+
+  /** Sync settings of the active profile — one code per person. */
+  getSync() {
+    return profileSync(this.doc);
+  }
+
+  setSync(patch) {
+    if (!this.doc) return;
+    setProfileSync(this.doc, patch);
+    this.persistNow();
   }
 
   switchTo(id, currentModel) {

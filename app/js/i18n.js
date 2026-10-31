@@ -327,6 +327,7 @@ const DICTIONARIES = {
     'sync.offline': 'No connection.',
     'sync.noCrypto': 'Encryption is not available here (needs https).',
     'sync.lastError': 'Last error',
+    'sync.pulled': 'Updated from your other phone.',
 
     'sync.title': 'Sync between devices',
     'sync.hint': 'End-to-end encrypted: the server only stores a blob it cannot read.',
@@ -746,6 +747,7 @@ const DICTIONARIES = {
     'sync.offline': 'Pas de connexion.',
     'sync.noCrypto': 'Chiffrement indisponible ici (https requis).',
     'sync.lastError': 'Dernière erreur',
+    'sync.pulled': 'Mis à jour depuis votre autre téléphone.',
 
     'sync.title': 'Synchronisation entre appareils',
     'sync.hint': 'Chiffré de bout en bout : le serveur ne stocke qu’un bloc qu’il ne peut pas lire.',
@@ -1164,6 +1166,7 @@ const DICTIONARIES = {
     'sync.offline': 'لا يوجد اتصال.',
     'sync.noCrypto': 'التشفير غير متاح هنا (يلزم https).',
     'sync.lastError': 'آخر خطأ',
+    'sync.pulled': 'تم التحديث من هاتفك الآخر.',
 
     'sync.title': 'المزامنة بين الأجهزة',
     'sync.hint': 'مشفّرة من الطرف إلى الطرف: الخادم لا يخزّن إلا كتلة لا يستطيع قراءتها.',

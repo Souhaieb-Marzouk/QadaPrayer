@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Multi-profile document: migration from the single-user format, and the
  * operations the People screen relies on.
  */
@@ -15,8 +15,10 @@ import {
   addProfile,
   isEmpty,
   normalizeDoc,
+  profileSync,
   removeProfile,
   renameProfile,
+  setProfileSync,
   setActiveData,
   switchTo,
   wrapState,
@@ -168,6 +170,37 @@ test('setActiveData writes only the active ledger', () => {
 
   assert.equal(Qada.fromJSON(aData, TODAY).stats().done, 0);
   assert.equal(Qada.fromJSON(bData, TODAY).stats().done, 14);
+});
+
+test('each profile keeps its own sync code', () => {
+  const doc = normalizeDoc(state(), 'A');
+  const aId = doc.activeId;
+
+  setProfileSync(doc, { code: 'AAAA-AAAA-AAAA-AAAA-AAAA', endpoint: 'https://a.test' });
+
+  addProfile(doc, 'B', state());
+  const bId = doc.activeId;
+
+  // A new profile starts empty: no code is inherited from the first one.
+  assert.deepEqual(profileSync(doc), {});
+  setProfileSync(doc, { code: 'BBBB-BBBB-BBBB-BBBB-BBBB', endpoint: 'https://b.test' });
+
+  switchTo(doc, aId);
+  assert.equal(profileSync(doc).code, 'AAAA-AAAA-AAAA-AAAA-AAAA');
+  assert.equal(profileSync(doc).endpoint, 'https://a.test');
+
+  switchTo(doc, bId);
+  assert.equal(profileSync(doc).code, 'BBBB-BBBB-BBBB-BBBB-BBBB');
+  assert.equal(profileSync(doc).endpoint, 'https://b.test');
+});
+
+test('sync settings survive a round trip through JSON', () => {
+  const doc = normalizeDoc(state(), 'A');
+  setProfileSync(doc, { code: 'CCCC-CCCC-CCCC-CCCC-CCCC', lastSyncAt: '2026-10-29T10:00:00Z' });
+
+  const again = normalizeDoc(JSON.parse(JSON.stringify(doc)), 'A');
+  assert.equal(profileSync(again).code, 'CCCC-CCCC-CCCC-CCCC-CCCC');
+  assert.equal(profileSync(again).lastSyncAt, '2026-10-29T10:00:00Z');
 });
 
 

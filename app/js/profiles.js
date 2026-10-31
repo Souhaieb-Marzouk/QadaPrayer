@@ -34,7 +34,9 @@ export function wrapState(state, name) {
   return {
     v: DOC_VERSION,
     activeId: id,
-    profiles: [{ id, name: String(name || defaultName()).slice(0, 40), createdAt: now, data: state }],
+    profiles: [
+      { id, name: String(name || defaultName()).slice(0, 40), createdAt: now, data: state, sync: {} },
+    ],
   };
 }
 
@@ -53,6 +55,7 @@ export function normalizeDoc(raw, fallbackName = 'Me') {
         name: String(entry.name || fallbackName).slice(0, 40),
         createdAt: entry.createdAt || new Date().toISOString(),
         data: entry.data,
+        sync: entry.sync && typeof entry.sync === 'object' ? entry.sync : {},
       }));
     if (!profiles.length) return null;
     const activeId = profiles.some((entry) => entry.id === raw.activeId)
@@ -92,6 +95,19 @@ export function switchTo(doc, id) {
   return doc;
 }
 
+/** Sync settings belong to one profile: each person keeps their own code. */
+export function profileSync(doc) {
+  const profile = activeProfile(doc);
+  return (profile && profile.sync) || {};
+}
+
+export function setProfileSync(doc, patch) {
+  const profile = activeProfile(doc);
+  if (!profile) return doc;
+  profile.sync = { ...(profile.sync || {}), ...patch };
+  return doc;
+}
+
 export function addProfile(doc, name, data) {
   if (doc.profiles.length >= MAX_PROFILES) {
     throw new Error('too-many-profiles');
@@ -102,6 +118,7 @@ export function addProfile(doc, name, data) {
     name: String(name || defaultName()).slice(0, 40),
     createdAt: new Date().toISOString(),
     data,
+    sync: {},
   });
   doc.activeId = id;
   return doc;

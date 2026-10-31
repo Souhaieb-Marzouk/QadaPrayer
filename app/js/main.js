@@ -144,7 +144,7 @@ export function boot() {
 
   // Sync quietly on launch once it has been set up: the ledger on this device
   // catches up with the other one without the user doing anything.
-  if (app.model && app.store.meta?.syncCode) {
+  if (app.model && app.store.getSync?.().code) {
     setTimeout(() => settingsScreen.performSync(app, { quiet: true }), 1200);
   }
 

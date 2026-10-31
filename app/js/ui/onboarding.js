@@ -374,7 +374,7 @@ export const handlers = {
       return;
     }
 
-    const endpoint = LINKS.syncEndpoint || app.store?.meta?.syncEndpoint || '';
+    const endpoint = LINKS.syncEndpoint || app.store?.getSync?.().endpoint || '';
     if (!endpoint) {
       app.onb.syncStatus = t('sync.server');
       app.render();
@@ -396,14 +396,14 @@ export const handlers = {
 
       const tz = remote?.profile?.location?.tz || 'UTC';
       const model = Qada.fromJSON(remote, todayISO(tz));
-      app.store.writeMeta({
-        syncCode: code,
-        syncEndpoint: endpoint,
-        lastSyncAt: new Date().toISOString(),
-        lastSyncError: '',
-        lang: model.profile.language || app.lang,
-      });
+      app.store.writeMeta({ lang: model.profile.language || app.lang });
       app.store.save(model, { immediate: true });
+      app.store.setSync({
+        code,
+        endpoint,
+        lastSyncAt: new Date().toISOString(),
+        lastError: '',
+      });
       rememberCode('');
 
       // The data is safely on disk. Start the app from scratch rather than
