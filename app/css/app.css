@@ -1877,6 +1877,172 @@ input[type='range']::-moz-range-thumb {
   border-color: var(--gold);
 }
 
+/* ------------------------------------------------------------------ */
+/* Hijri date + printable plan                                         */
+/* ------------------------------------------------------------------ */
+
+.dateline {
+  margin: -0.35rem 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.print-page {
+  max-width: 44rem;
+  margin-inline: auto;
+  padding: 0.5rem 0 2rem;
+}
+
+.print-head h1 {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.print-sub {
+  color: var(--muted);
+  font-size: 0.84rem;
+  margin-top: 0.15rem;
+}
+
+.print-meta {
+  color: var(--muted-2);
+  font-size: 0.78rem;
+  margin-top: 0.2rem;
+}
+
+.print-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin: 1.2rem 0;
+}
+
+.print-stat {
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+
+.print-stat__label {
+  display: block;
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.print-stat__value {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.print-h2 {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin: 1.2rem 0 0.4rem;
+}
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.print-table th,
+.print-table td {
+  padding: 0.34rem 0.5rem;
+  border-bottom: 1px solid var(--line-soft);
+  text-align: start;
+}
+
+.print-table .num {
+  text-align: end;
+}
+
+.print-table tfoot th {
+  border-top: 1px solid var(--line);
+  border-bottom: 0;
+}
+
+.print-note {
+  margin-top: 1.2rem;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.print-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.print-actions .btn {
+  flex: 1;
+}
+
+@media print {
+  body::before,
+  body::after {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+
+  .topbar,
+  .nav,
+  .toast,
+  .scrim,
+  .sheet,
+  .no-print {
+    display: none !important;
+  }
+
+  .app-shell {
+    max-width: none;
+    padding: 0;
+  }
+
+  .screen {
+    padding: 0;
+    gap: 0;
+  }
+
+  .print-page {
+    max-width: none;
+    padding: 0;
+    color: #111111;
+  }
+
+  .print-stat,
+  .print-table th,
+  .print-table td {
+    border-color: #cccccc;
+  }
+
+  .print-note,
+  .print-meta,
+  .print-sub,
+  .print-h2,
+  .print-stat__label {
+    color: #444444 !important;
+  }
+
+  a {
+    color: inherit;
+  }
+}
+
 @media (max-width: 380px) {
   .hero {
     grid-template-columns: 1fr;

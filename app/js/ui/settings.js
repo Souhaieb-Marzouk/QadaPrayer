@@ -8,6 +8,7 @@ import { LINKS, METHOD_LABELS, VERSION, supportsConfigured } from '../config.js'
 import { METHOD_IDS } from '../core/prayerTimes.js';
 import { normalizeReminders } from '../core/reminders.js';
 import { nextEvents, permission, primeAudio, requestPermission, sendTest } from '../notify.js';
+import { exportName, ledgerCsv } from '../exporter.js';
 
 function card(title, body) {
   return `
@@ -221,6 +222,20 @@ export function render(app) {
         action: 'open-backup',
         iconName: 'download',
         hint: t('settings.backupHint'),
+      })}
+      ${row({
+        label: t('settings.csv'),
+        value: '',
+        action: 'export-csv',
+        iconName: 'chart',
+        hint: t('settings.csvHint'),
+      })}
+      ${row({
+        label: t('settings.print'),
+        value: '',
+        action: 'open-print',
+        iconName: 'edit',
+        hint: t('settings.printHint'),
       })}
       ${row({
         label: t('settings.lock'),
@@ -488,6 +503,33 @@ export const handlers = {
   },
   'open-city': (app) => app.openSheet('city', { query: '' }),
   'open-backup': (app) => app.openSheet('backup', { passphrase: '' }),
+
+  'export-csv': (app) => {
+    try {
+      const csv = ledgerCsv(app.model, { today: app.today });
+      // The BOM keeps Excel from mangling the file.
+      const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${exportName(app.model, 'ledger', app.today)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      app.showToast(t('csv.exported'));
+    } catch {
+      app.showToast(t('csv.failed'));
+    }
+  },
+
+  'open-print': (app) => {
+    app.route = 'print';
+    app.sheet = null;
+    if (location.hash !== '#/print') history.replaceState(null, '', '#/print');
+    window.scrollTo({ top: 0 });
+    app.render();
+  },
   'toggle-lock': (app) => {
     if (app.model.profile.lock?.enabled) {
       app.openSheet('pin', { mode: 'remove', value: '' });

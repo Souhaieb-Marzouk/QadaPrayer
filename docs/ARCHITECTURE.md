@@ -176,6 +176,30 @@ reminder while it is alive, and browsers throttle background timers. Installing
 to the home screen improves delivery substantially on Android; on iOS it works
 while the app is open or recently backgrounded.
 
+Where the platform supports notification actions (Android/Chrome), the reminder
+carries an **I prayed** button. The service worker never touches the ledger
+itself — it cannot, the state lives in `localStorage`. Instead it posts a
+`MARK_PRAYED` message to an open window, or opens the app with `?mark=<date>:<prayer>`
+when none is open. Both paths end in `markFromNotification()`, which calls the
+same `applyOutcome()` used by the confirmation sheet: one code path, no special
+cases, and the same undo.
+
+---
+
+## Exports
+
+`js/exporter.js` holds two pure functions and no DOM:
+
+- `ledgerCsv` — one row per owed prayer (`date,prayer,status`), the raw record.
+- `summaryByYear` — totals per Gregorian year, used by the printable plan.
+
+`js/ui/print.js` renders those totals as a plain page (no app chrome, own light
+palette under `@media print`) so it can be printed or shown to a scholar. The
+route `#/print` hides the bottom navigation.
+
+Both are covered by Node tests, which is why the CSV format is asserted row by
+row rather than eyeballed.
+
 ---
 
 ## Persistence

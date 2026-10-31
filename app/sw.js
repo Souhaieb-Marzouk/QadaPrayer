@@ -1,6 +1,6 @@
 /* Qada service worker — offline shell, no network dependency at runtime. */
 
-const VERSION = 'qada-v2';
+const VERSION = 'qada-v3';
 const SHELL = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const SHELL = [
   './js/store.js',
   './js/notify.js',
   './js/updater.js',
+  './js/exporter.js',
   './js/core/dates.js',
   './js/core/astro.js',
   './js/core/prayerTimes.js',
@@ -27,6 +28,7 @@ const SHELL = [
   './js/ui/onboarding.js',
   './js/ui/sheets.js',
   './js/ui/lock.js',
+  './js/ui/print.js',
   './data/cities.js',
   './assets/icon-192.png',
   './assets/icon-512.png',
@@ -102,20 +104,37 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-/* Focus an open Qada window when a reminder is tapped, or open the app. */
+/* A reminder was tapped — or one of its action buttons. */
 self.addEventListener('notificationclick', (event) => {
+  const data = event.notification.data || {};
   event.notification.close();
+
   event.waitUntil(
     (async () => {
       const clientList = await self.clients.matchAll({
         type: 'window',
         includeUncontrolled: true,
       });
-      for (const client of clientList) {
-        if (client.url.includes('/app/') && 'focus' in client) {
+      const client = clientList.find((entry) => entry.url.includes('/app/'));
+
+      // "I prayed": mark it without making the user do anything.
+      if (event.action === 'prayed' && data.dateISO && data.prayer) {
+        if (client) {
+          client.postMessage({
+            type: 'MARK_PRAYED',
+            dateISO: data.dateISO,
+            prayer: data.prayer,
+          });
           await client.focus();
           return;
         }
+        await self.clients.openWindow(`./?mark=${data.dateISO}:${data.prayer}`);
+        return;
+      }
+
+      if (client) {
+        await client.focus();
+        return;
       }
       if (self.clients.openWindow) {
         await self.clients.openWindow('./#/today');

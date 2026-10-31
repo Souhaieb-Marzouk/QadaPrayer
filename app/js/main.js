@@ -8,7 +8,7 @@
 
 import { Store } from './store.js';
 import { Qada, slotIndex } from './core/engine.js';
-import { addDays, instantToLocalParts, todayISO } from './core/dates.js';
+import { PRAYERS, addDays, instantToLocalParts, todayISO } from './core/dates.js';
 import { computeDay } from './core/prayerTimes.js';
 import * as i18n from './i18n.js';
 import { icon } from './ui/icons.js';
@@ -20,6 +20,7 @@ import * as statsScreen from './ui/stats.js';
 import * as settingsScreen from './ui/settings.js';
 import * as sheets from './ui/sheets.js';
 import * as lock from './ui/lock.js';
+import * as printScreen from './ui/print.js';
 import { renderLock } from './ui/lock.js';
 import { resetShown, scheduleReminders } from './notify.js';
 import { applyUpdate, checkForUpdate, initUpdater } from './updater.js';
@@ -51,6 +52,7 @@ const HANDLERS = {
   ...settingsScreen.handlers,
   ...sheets.handlers,
   ...lock.handlers,
+  ...printScreen.handlers,
 };
 
 const CHANGE_HANDLERS = {
@@ -110,6 +112,16 @@ export function boot() {
   initUpdater({
     onAvailable: () => showToast(i18n.t('update.available'), i18n.t('update.reload'), 'reload'),
   });
+
+  // "I prayed" tapped on a reminder: the service worker forwards it here.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (event) => {
+      const data = event.data || {};
+      if (data.type === 'MARK_PRAYED' && data.dateISO && data.prayer) {
+        markFromNotification(data.dateISO, data.prayer);
+      }
+    });
+  }
 
   window.addEventListener('beforeinstallprompt', (event) => {
     event.preventDefault();
@@ -172,6 +184,15 @@ function applyUrlState(params) {
     app.onb = { step: Number(step) || 0, draft: null };
   }
 
+  // A reminder action that had to open the app: ?mark=2026-10-31:asr
+  const mark = params.get('mark');
+  if (mark && app.model) {
+    const [dateISO, prayer] = mark.split(':');
+    if (dateISO && prayer) {
+      setTimeout(() => markFromNotification(dateISO, prayer), 0);
+    }
+  }
+
   const sheet = params.get('sheet');
   if (sheet && app.model) {
     const [type, arg] = sheet.split(':');
@@ -205,7 +226,7 @@ function detectLanguage() {
 
 function normaliseRoute(hash) {
   const raw = String(hash || '').replace(/^#\/?/, '');
-  return ['today', 'calendar', 'stats', 'settings'].includes(raw) ? raw : 'today';
+  return ['today', 'calendar', 'stats', 'settings', 'print'].includes(raw) ? raw : 'today';
 }
 
 /** Recompute "now", today's date and prayer times. Returns true if the date changed. */
@@ -310,6 +331,35 @@ export function replaceModel(model) {
   render();
 }
 
+/**
+ * Mark a prayer as prayed without going through the confirmation sheet.
+ * Used by the "I prayed" button on a reminder notification.
+ */
+export function markFromNotification(dateISO, prayer) {
+  if (!app.model || !PRAYERS.includes(prayer)) return false;
+  refreshClock();
+  const item =
+    dateISO === app.today
+      ? app.model.plan(dateISO).items.find((entry) => entry.prayer === prayer)
+      : null;
+
+  app.route = 'today';
+  app.sheet = null;
+  if (location.hash !== '#/today') history.replaceState(null, '', '#/today');
+
+  commit(
+    (model) =>
+      model.applyOutcome({
+        dateISO,
+        prayer,
+        prayed: true,
+        qadaIndices: item ? item.qada : [],
+      }),
+    { message: i18n.t('common.undoDone') },
+  );
+  return true;
+}
+
 export function restoreBackup(data) {
   app.openSheet('confirm', {
     title: i18n.t('backup.importTitle'),
@@ -394,7 +444,7 @@ export function render({ preserveScroll = false } = {}) {
       ${renderTopbar()}
       <main class="screen" id="screen">${screen.render(app)}</main>
     </div>
-    ${renderNav()}
+    ${app.route === 'print' ? '' : renderNav()}
     ${sheets.renderSheet(app)}
     ${renderToast()}
   `;
@@ -410,6 +460,8 @@ function currentScreen() {
       return statsScreen;
     case 'settings':
       return settingsScreen;
+    case 'print':
+      return printScreen;
     default:
       return todayScreen;
   }

@@ -96,6 +96,20 @@ export async function show({ title, body, tag, data }) {
     badge: './assets/icon-192.png',
     silent: true, // we play our own chime so it also works on desktop
   };
+
+  // Action buttons ("I prayed") exist on Android/Chrome; other platforms
+  // silently ignore the field, so it is always safe to send.
+  try {
+    if ((Notification.maxActions || 0) > 0) {
+      options.actions = [
+        { action: 'prayed', title: t('notify.actionPrayed') },
+        { action: 'later', title: t('notify.actionLater') },
+      ];
+    }
+  } catch {
+    /* no action support */
+  }
+
   try {
     const registration = await navigator.serviceWorker?.getRegistration();
     if (registration?.showNotification) {
@@ -183,7 +197,12 @@ function fire(app, event) {
     body = t('notify.prayerBody', { prayer: t(`prayer.${event.prayer}`) });
   }
 
-  show({ title, body, tag: event.key, data: { kind: event.kind, prayer: event.prayer } });
+  show({
+    title,
+    body,
+    tag: event.key,
+    data: { kind: event.kind, prayer: event.prayer, dateISO: event.dateISO },
+  });
   if (settings.sound) chime();
   if (settings.vibrate) vibrate([180, 90, 180]);
 

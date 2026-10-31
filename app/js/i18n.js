@@ -282,6 +282,36 @@ const DICTIONARIES = {
     'update.upToDate': 'You are on the latest version.',
     'update.unavailable': 'Update check is not available here.',
 
+    'notify.actionPrayed': 'I prayed',
+    'notify.actionLater': 'Later',
+
+    'settings.dataTools': 'Export',
+    'settings.csv': 'Export the ledger (CSV)',
+    'settings.csvHint': 'One row per prayer, for Excel or a spreadsheet.',
+    'settings.print': 'Printable plan',
+    'settings.printHint': 'A clean page to keep, or to show a scholar.',
+
+    'csv.exported': 'CSV downloaded.',
+    'csv.failed': 'Could not build the file.',
+
+    'print.title': 'Make-up plan',
+    'print.subtitle': 'Qada — a personal tracker, not a fatwa.',
+    'print.generated': 'Generated on {date}',
+    'print.from': 'Obligation from {date}',
+    'print.summary': 'Summary',
+    'print.owed': 'Prayers owed',
+    'print.done': 'Made up',
+    'print.remaining': 'Remaining',
+    'print.pace': 'Daily pace',
+    'print.finish': 'Projected finish',
+    'print.byYear': 'Year by year',
+    'print.year': 'Year',
+    'print.doneShort': 'Done',
+    'print.leftShort': 'Left',
+    'print.note': 'This page lists the prayers still owed. Many scholars hold that make-ups are performed in order and interleaved with the current prayers; when the number is very large the order obligation is considered lifted.',
+    'print.print': 'Print',
+    'print.back': 'Back',
+
     'common.yes': 'Yes',
     'common.no': 'No',
     'common.cancel': 'Cancel',
@@ -592,6 +622,36 @@ const DICTIONARIES = {
     'update.upToDate': 'Vous avez la dernière version.',
     'update.unavailable': 'La vérification est indisponible ici.',
 
+    'notify.actionPrayed': 'J\u2019ai prié',
+    'notify.actionLater': 'Plus tard',
+
+    'settings.dataTools': 'Export',
+    'settings.csv': 'Exporter le registre (CSV)',
+    'settings.csvHint': 'Une ligne par prière, pour Excel ou un tableur.',
+    'settings.print': 'Plan imprimable',
+    'settings.printHint': 'Une page propre à garder, ou à montrer à un savant.',
+
+    'csv.exported': 'Fichier CSV téléchargé.',
+    'csv.failed': 'Impossible de créer le fichier.',
+
+    'print.title': 'Plan de rattrapage',
+    'print.subtitle': 'Qada — un suivi personnel, pas une fatwa.',
+    'print.generated': 'Généré le {date}',
+    'print.from': 'Obligation depuis le {date}',
+    'print.summary': 'Résumé',
+    'print.owed': 'Prières dues',
+    'print.done': 'Rattrapées',
+    'print.remaining': 'Restant',
+    'print.pace': 'Rythme quotidien',
+    'print.finish': 'Fin estimée',
+    'print.byYear': 'Année par année',
+    'print.year': 'Année',
+    'print.doneShort': 'Fait',
+    'print.leftShort': 'Reste',
+    'print.note': 'Cette page liste les prières encore dues. Beaucoup de savants considèrent que les rattrapages se font dans l\u2019ordre et mêlés aux prières du jour ; quand leur nombre est très grand, l\u2019obligation d\u2019ordre est levée.',
+    'print.print': 'Imprimer',
+    'print.back': 'Retour',
+
     'common.yes': 'Oui',
     'common.no': 'Non',
     'common.cancel': 'Annuler',
@@ -901,6 +961,36 @@ const DICTIONARIES = {
     'update.upToDate': 'أنت على أحدث نسخة.',
     'update.unavailable': 'التحقق من التحديثات غير متاح هنا.',
 
+    'notify.actionPrayed': 'صليتها',
+    'notify.actionLater': 'لاحقًا',
+
+    'settings.dataTools': 'تصدير',
+    'settings.csv': 'تصدير السجل (CSV)',
+    'settings.csvHint': 'سطر لكل صلاة، لإكسل أو أي جدول.',
+    'settings.print': 'خطة للطباعة',
+    'settings.printHint': 'صفحة نظيفة تحتفظ بها أو تعرضها على عالم.',
+
+    'csv.exported': 'تم تنزيل الملف.',
+    'csv.failed': 'تعذّر إنشاء الملف.',
+
+    'print.title': 'خطة القضاء',
+    'print.subtitle': 'قضاء — متابعة شخصية وليست فتوى.',
+    'print.generated': 'أُنشئت في {date}',
+    'print.from': 'التكليف منذ {date}',
+    'print.summary': 'الخلاصة',
+    'print.owed': 'الصلوات المترتبة',
+    'print.done': 'ما تم قضاؤه',
+    'print.remaining': 'الباقي',
+    'print.pace': 'الوتيرة اليومية',
+    'print.finish': 'الانتهاء المتوقع',
+    'print.byYear': 'سنة بسنة',
+    'print.year': 'السنة',
+    'print.doneShort': 'تم',
+    'print.leftShort': 'بقي',
+    'print.note': 'تسرد هذه الصفحة الصلوات الباقية. يرى كثير من العلماء أن القضاء يكون بالترتيب ومتداخلًا مع صلوات اليوم، ويسقط الترتيب عند كثرة الفوائت.',
+    'print.print': 'طباعة',
+    'print.back': 'رجوع',
+
     'common.yes': 'نعم',
     'common.no': 'لا',
     'common.cancel': 'إلغاء',
@@ -999,6 +1089,23 @@ export function percent(value) {
     style: 'percent',
     maximumFractionDigits: value < 0.1 ? 1 : 0,
   }).format(value);
+}
+
+/**
+ * Hijri (Umm al-Qura) date for a civil date, in the current language.
+ * Falls back to an empty string on engines without the islamic calendar.
+ */
+export function hijriDate(iso) {
+  try {
+    return new Intl.DateTimeFormat(locale(), {
+      calendar: 'islamic-umalqura',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(`${iso}T12:00:00Z`));
+  } catch {
+    return '';
+  }
 }
 
 export function dateLong(iso) {

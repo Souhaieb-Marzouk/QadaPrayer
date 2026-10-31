@@ -29,6 +29,11 @@ today. It is built on the Maliki position that missed prayers must be made up.
 - **Exemptions** — days that were not due are excluded from what you owe.
 - **Reminders** — a notification at each prayer and one evening nudge with the
   make-ups still waiting, with a lead time, quiet hours, chime and vibration.
+- **Mark from the notification** — on Android, “I prayed” records the prayer
+  without opening the app.
+- **Hijri date** — the Umm al-Qura date under today’s header, in your language.
+- **Exports** — the whole ledger as CSV, and a printable plan of the make-ups
+  still owed.
 - **Progress you can feel** — remaining count, completion, projected finish
   date, seven-day activity and milestones.
 - **Private by construction** — no account, no server, no analytics. Backups are
@@ -75,9 +80,8 @@ leave a tip:
 ## Roadmap
 
 - Home-screen widget with today's prayers and remaining make-ups.
-- Tap-to-mark actions directly inside a reminder notification.
 - Encrypted cloud sync between devices (end-to-end, no server-side plaintext).
-- Printable make-up plan for review with a scholar.
+- A weekly and monthly review screen with streaks.
 
 ## Licence
 

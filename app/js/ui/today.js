@@ -1,6 +1,6 @@
 /** Today: the five prayers, with their make-ups woven underneath. */
 
-import { t, number, percent, dateMedium, dateShort } from '../i18n.js';
+import { t, number, percent, dateMedium, dateShort, hijriDate } from '../i18n.js';
 import { PRAYERS, fromDayNumber, toISO } from '../core/dates.js';
 import { prayerStateAt } from '../core/prayerTimes.js';
 import { MARK_DONE, MARK_EXEMPT, slotIndex } from '../core/engine.js';
@@ -124,6 +124,8 @@ export function render(app) {
         </div>
       </div>
     </section>
+
+    <p class="dateline">${esc(hijriDate(app.today))}</p>
 
     <div class="next-prayer">
       <span class="next-prayer__icon">${icon(PRAYER_ICON[nextKey])}</span>
