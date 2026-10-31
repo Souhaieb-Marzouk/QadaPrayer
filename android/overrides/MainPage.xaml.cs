@@ -22,6 +22,7 @@ public partial class MainPage : ContentPage
 {
     // Must match the deployed path, including the trailing slash.
     private const string AppUrl = "https://souhaieb-marzouk.github.io/QadaPrayer/app/";
+    private const string InstallScheme = "qadaprayer";
 
     private bool bridgeAttached;
     private bool navigationStarted;
@@ -61,7 +62,7 @@ public partial class MainPage : ContentPage
         if (navigationStarted) return;
         if (Browser.Handler is null) return;
         navigationStarted = true;
-        Browser.Source = new Uri(AppUrl);
+        Browser.Source = new Uri($"{AppUrl}?apk={Uri.EscapeDataString(AppVersion())}");
     }
 
     /* -------------------------------------------------------------- */
@@ -224,11 +225,69 @@ public partial class MainPage : ContentPage
     }
 #endif
 
+
+    /// <summary>The installed version name, so the page can compare releases.</summary>
+    private static string AppVersion()
+    {
+        try
+        {
+            return AppInfo.Current.VersionString;
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// qadaprayer://install?url=... is how the page asks the shell to update:
+    /// a scheme interception is far more reliable than a JavaScript interface.
+    /// </summary>
+    private void HandleAppLink(string url)
+    {
+#if ANDROID
+        try
+        {
+            var uri = new Uri(url);
+            if (!uri.Scheme.Equals(InstallScheme, StringComparison.OrdinalIgnoreCase)) return;
+
+            if (!uri.Host.Equals("install", StringComparison.OrdinalIgnoreCase)) return;
+
+            var target = (uri.Query ?? string.Empty)
+                .TrimStart('?')
+                .Split('&', StringSplitOptions.RemoveEmptyEntries)
+                .Select((part) => part.Split('=', 2))
+                .Where((pair) => pair.Length == 2 && pair[0].Equals("url", StringComparison.OrdinalIgnoreCase))
+                .Select((pair) => Uri.UnescapeDataString(pair[1]))
+                .FirstOrDefault();
+
+            if (!ApkInstaller.IsTrusted(target))
+            {
+                Android.Util.Log.Warn("Qada", "apk install refused: untrusted url");
+                return;
+            }
+
+            _ = ApkInstaller.InstallAsync(target!);
+        }
+        catch (Exception error)
+        {
+            Android.Util.Log.Warn("Qada", "bad app link: " + error.Message);
+        }
+#endif
+    }
+
     /// <summary>Keep external links in the system browser.</summary>
     private async void OnBrowserNavigating(object? sender, WebNavigatingEventArgs e)
     {
         if (string.IsNullOrEmpty(e.Url))
         {
+            return;
+        }
+
+        if (e.Url.StartsWith($"{InstallScheme}://", StringComparison.OrdinalIgnoreCase))
+        {
+            e.Cancel = true;
+            HandleAppLink(e.Url);
             return;
         }
 

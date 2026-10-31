@@ -14,6 +14,7 @@ import { generateCode, normalizeCode } from '../sync/code.js';
 import { makeClient } from '../sync/client.js';
 import { forgetRemote, syncOnce } from '../sync/sync.js';
 import { attachCompass } from './sheets.js';
+import { checkForApkUpdate, installUpdate } from '../apk.js';
 
 function syncCard(app) {
   const sync = app.store?.getSync?.() || {};
@@ -563,6 +564,22 @@ export function render(app) {
         </div>
       </div>
       <hr class="hr">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="field__hint">${esc(t('update.apkCurrent'))}</span>
+        <span class="dim" style="font-size:.72rem">${esc(
+          app.apkVersion || '—',
+        )}</span>
+      </div>
+      ${
+        app.apkUpdate
+          ? `<div class="notice">${icon('download')}<span>${esc(
+              t('update.apkAvailable', { version: app.apkUpdate.version }),
+            )}</span></div>
+             <button class="btn btn--primary btn--sm btn--block" data-action="install-apk">${esc(
+               t('update.apkInstall'),
+             )}</button>`
+          : ''
+      }
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span class="field__hint">${esc(t('settings.version', { version: VERSION }))}</span>
         <span class="dim" style="font-size:.72rem" data-count="${number(projection.remaining)}"></span>

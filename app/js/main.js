@@ -20,6 +20,7 @@ import * as calendarScreen from './ui/calendar.js';
 import * as statsScreen from './ui/stats.js';
 import * as settingsScreen from './ui/settings.js';
 import * as reviewScreen from './ui/review.js';
+import { checkForApkUpdate, installedVersion, installUpdate } from './apk.js';
 import * as sheets from './ui/sheets.js';
 import * as lock from './ui/lock.js';
 import * as printScreen from './ui/print.js';
@@ -44,6 +45,8 @@ export const app = {
   lang: 'en',
   installPrompt: null,
   demo: false,
+  apkVersion: '',
+  apkUpdate: null,
   addingProfile: false,
   onb: null,
   lockPin: '',
@@ -174,10 +177,25 @@ export function boot() {
 
   render();
   scheduleReminders(app);
+
+  // Once a day, ask GitHub whether a newer APK exists. Quiet on failure: this is
+  // an extra, never a reason to disturb the app.
+  if (app.apkVersion) {
+    setTimeout(() => {
+      checkForApkUpdate(app)
+        .then((result) => {
+          app.apkUpdate = result.available ? result : null;
+          if (result.available && app.route === 'settings') render({ preserveScroll: true });
+        })
+        .catch(() => {});
+    }, 1500);
+  }
 }
 
 /** Deep-link helpers used by the screenshot tooling: ?lang=ar&theme=light&sheet=prayer:asr */
 function applyUrlState(params) {
+  app.apkVersion = installedVersion(params);
+
   const lang = params.get('lang');
   if (lang && ['en', 'fr', 'ar'].includes(lang)) {
     app.lang = lang;
@@ -696,6 +714,22 @@ function onDocumentClick(event) {
     return;
   }
   if (action === 'check-updates') {
+    // The web bundle and the APK are two different things: check both.
+    if (app.apkVersion) {
+      checkForApkUpdate(app, { force: true })
+        .then((result) => {
+          app.apkUpdate = result.available ? result : null;
+          showToast(
+            result.available
+              ? i18n.t('update.apkAvailable', { version: result.version })
+              : i18n.t('update.apkUpToDate'),
+          );
+          render({ preserveScroll: true });
+        })
+        .catch(() => showToast(i18n.t('update.apkFailed')));
+      return;
+    }
+
     checkForUpdate().then((result) => {
       if (!result.checked) {
         showToast(i18n.t('update.unavailable'));
@@ -703,6 +737,14 @@ function onDocumentClick(event) {
       }
       if (!result.found) showToast(i18n.t('update.upToDate'));
     });
+    return;
+  }
+
+  if (action === 'install-apk') {
+    const url = app.apkUpdate?.apkUrl;
+    if (!url) return;
+    showToast(i18n.t('update.apkDownloading'));
+    installUpdate(url);
     return;
   }
   if (action === 'close-sheet' || action === 'scrim-close') {

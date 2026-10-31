@@ -440,3 +440,35 @@ the page publishes three strings to a JavaScript bridge — so adding the widget
 five files plus one define in the csproj, then a rebuild.
 
 Full instructions: [`widget/README.md`](widget/README.md).
+
+---
+
+## 14. Updating from inside the app
+
+The web app cannot install anything: only the shell can. The flow is:
+
+1. The shell loads the site with its own version attached:
+   `…/app/?apk=0.14.0` (read from `AppInfo.Current.VersionString`).
+2. Settings → About → **Check for updates** asks the GitHub API for the latest
+   release and compares the two versions. The same check runs quietly once a day
+   on launch.
+3. When a newer release exists, the button becomes **Download and install**. It
+   opens `qadaprayer://install?url=…`, which `MainPage.xaml.cs` intercepts.
+4. `ApkInstaller.cs` downloads the APK straight into a `PackageInstaller`
+   session and hands it to the system installer. Android shows its own
+   confirmation — an app can never replace itself silently.
+
+**Requirements**
+
+- `android.permission.REQUEST_INSTALL_PACKAGES` in
+  `Platforms/Android/AndroidManifest.xml` (already in `overrides/AndroidManifest.xml`).
+- The GitHub release **must carry the `.apk` asset**, otherwise the check finds a
+  version but has nothing to download.
+- The first time, Android asks the user to allow installs from this source
+  (*Install unknown apps*). That is expected and only happens once.
+- Updates are only accepted if signed with the same key, which the system
+  enforces.
+
+**If the install does not start:** check `adb logcat -s Qada` — the installer logs
+`apk install refused: untrusted url`, `apk install failed: …` or
+`apk install: handed to the system installer`.

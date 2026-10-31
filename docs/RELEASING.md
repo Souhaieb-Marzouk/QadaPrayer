@@ -202,3 +202,9 @@ The phrase names the thing the release is *about*, not a mood.
 
 What does not: half-finished screens, assets that were never used, or a version
 bump on its own.
+
+## The APK asset is not optional any more
+
+Installed apps look for a `.apk` asset on the latest release. If the release has
+only the web zip, "Check for updates" answers *the app is up to date* because
+there is nothing to download. Attach `dist/qada-<version>.apk` every time.

@@ -1,6 +1,6 @@
 /* Qada service worker — offline shell, no network dependency at runtime. */
 
-const VERSION = 'qada-v21';
+const VERSION = 'qada-v22';
 const SHELL = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const SHELL = [
   './js/updater.js',
   './js/exporter.js',
   './js/native.js',
+  './js/apk.js',
   './js/merge.js',
   './js/profiles.js',
   './js/sync/code.js',
