@@ -59,44 +59,87 @@ version lives in `app/sw.js` (`qada-vN`). Bump both when releasing.
 
 ## Release checklist
 
-1. `npm test` — all green.
-2. Update `VERSION` (`app/js/config.js` and `package.json`) and the
-   service-worker cache name in `app/sw.js` (`qada-v2` → `qada-v3`).
-3. `npm run package` — writes `dist/qada-<version>-web.zip` and its `.sha256`.
-4. Build the Android package if this release ships one (see below).
-5. Create the GitHub release:
-   - **Tag:** `v0.2.0`
-   - **Title:** `Qada 0.2.0 — <short human phrase>`
+One command builds everything. The rest is GitHub's UI.
+
+### 1. Build
+
+```powershell
+# first time: tell it where the MAUI project lives (remembered afterwards)
+.\tools\release.ps1 -Version 0.2.1 -ProjectDir C:\Users\Mercenary\Documents\QadaPrayer\QadaPrayer
+
+# every release after that
+.\tools\release.ps1 -Version 0.2.2
+```
+
+It does **all** of the following, in order, and stops on the first problem:
+
+1. bumps the version in `package.json`, `app/js/config.js`, the service worker
+   cache name (`qada-v2` → `qada-v3`, what makes installed copies notice the
+   update) and `QadaPrayer.csproj` (`ApplicationDisplayVersion` +
+   `ApplicationVersion` = `MAJOR*10000 + MINOR*100 + PATCH`);
+2. checks that the three JavaScript versions agree;
+3. runs the test suite;
+4. builds `dist/qada-<version>-web.zip`;
+5. publishes the signed APK and copies it to `dist/qada-<version>.apk`;
+6. writes the `.sha256` files and `dist/SHA256SUMS.txt`.
+
+If no password is supplied the script **asks for it** (hidden input, kept in
+memory only — nothing is written to disk). For unattended runs, pass
+`-StorePass` or set `$env:QADA_STORE_PASS` for that terminal:
+
+```powershell
+$env:QADA_STORE_PASS = 'your keystore password'
+```
+
+`.NET` reads it through `env:`, so characters like `$`, `&`, `!` or `"` are safe.
+
+Add `-SkipApk` to build only the web bundle, `-SkipTests` to skip the suite.
+
+Output in `dist/`:
+
+| File | What it is |
+| --- | --- |
+| `qada-<version>-web.zip` | deployable copy of the site and app (`index.html`, `site.css`, `app/`, `LICENSE`) |
+| `qada-<version>-web.zip.sha256` | SHA-256 of the archive |
+| `qada-<version>.apk` | the signed Android package |
+| `qada-<version>.apk.sha256` | SHA-256 of the APK |
+| `SHA256SUMS.txt` | both hashes in one file |
+
+### 2. Publish
+
+1. Commit and push the version bump.
+2. **Releases → Draft a new release**
+   - **Tag:** `v0.2.1`
+   - **Title:** `Qada 0.2.1 — <short human phrase>`
    - **Body:** the description below.
-6. Attach the assets produced in step 3 (and the `.apk` from step 4).
-7. Verify the landing page download link resolves to the new release.
+3. Drag the four files from `dist/` into the release. (`SHA256SUMS.txt` is
+   optional but nice.)
+4. Publish.
+
+### 4. Verify
+
+- The landing page's download link resolves to the new release.
+- The site still loads: <https://souhaieb-marzouk.github.io/Qada-App/app/>
+- On a phone with the previous version installed: open the app, wait a moment,
+  and it should offer **Reload** for the new version.
 
 ---
 
 ## Release assets
 
-`npm run package` produces a deterministic archive — the same sources always
-yield the same bytes, so the checksum is meaningful:
-
-| File | What it is |
-| --- | --- |
-| `qada-<version>-web.zip` | deployable copy of the site and app (`index.html`, `site.css`, `app/`, `LICENSE`) |
-| `qada-<version>-web.zip.sha256` | SHA-256 of the archive, for a download check |
-
-Attach both to the release. The zip is also what you would hand to anyone who
-wants to self-host.
+The web archive is deterministic — the same sources always yield the same bytes,
+so the checksum is meaningful.
 
 ### The Android `.apk`
 
-An APK cannot be produced from this repository alone — it needs the Android
-toolchain (or a signing service). The full walkthrough lives in
+Only APKs are shipped for now; the `.aab` is for the Play Store and can wait
+until the app is stable. The full walkthrough of the MAUI project lives in
 [`android/README.md`](../android/README.md); in short:
 
 **Visual Studio + .NET MAUI.** Install the *.NET Multi-platform App UI
-development* workload, create a MAUI project named `Qada`, drop in the two files
-from `android/overrides/`, set the package id and version, then **Publish →
-Archive → Distribute → Ad Hoc** — Visual Studio creates the keystore and the
-signed `.apk`; **Distribute → Google Play** produces the `.aab`.
+development* workload, create a MAUI project named `QadaPrayer`, drop in the two
+files from `android/overrides/`, set the package id and version, then publish
+with `dotnet publish` — there is no Archive Manager in MAUI.
 
 **PWABuilder (no install, ~3 minutes).** Deploy the site first, then go to
 <https://www.pwabuilder.com/>, paste

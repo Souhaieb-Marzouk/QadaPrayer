@@ -27,6 +27,9 @@ _ffprof/
 # Release artefacts (attached to a GitHub release, not committed)
 dist/
 
+# Local release settings (project path, alias) — machine specific
+release.local.json
+
 # Signing material — never commit a keystore
 *.keystore
 *.jks
