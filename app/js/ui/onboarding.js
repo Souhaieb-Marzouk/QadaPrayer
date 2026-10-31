@@ -5,6 +5,9 @@ import { addYears, todayISO } from '../core/dates.js';
 import { Qada, DEFAULT_PROFILE } from '../core/engine.js';
 import { esc } from './dom.js';
 import { icon } from './icons.js';
+import { LINKS } from '../config.js';
+import { normalizeCode } from '../sync/code.js';
+import { fetchRemote } from '../sync/sync.js';
 import { searchCities, guessTimezone } from '../../data/cities.js';
 
 const STEPS = 8;
@@ -64,6 +67,25 @@ function footer(app, { next = true, nextLabel = null, finish = false } = {}) {
           : ''
       }
     </div>`;
+}
+
+/** "Do you already use Qada?" — asked once, before anything else. */
+function stepSyncIntro(state) {
+  return `
+    <h1 class="onb__title">${esc(t('onboarding.syncTitle'))}</h1>
+    <p class="onb__lead">${esc(t('onboarding.syncBody'))}</p>
+    <div class="field">
+      <label class="field__label">${esc(t('sync.join'))}</label>
+      <input class="input" data-live="onb-sync-code" value="${esc(state.syncInput || '')}"
+        placeholder="XXXX-XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+    </div>
+    <button class="btn btn--primary btn--block" data-action="onb-sync-restore">${esc(
+      t('onboarding.syncRestore'),
+    )}</button>
+    <button class="btn btn--ghost btn--block" data-action="onb-sync-skip">${esc(
+      t('onboarding.syncSkip'),
+    )}</button>
+  `;
 }
 
 function stepWelcome() {
@@ -262,6 +284,17 @@ function stepSummary(app, state) {
 export function render(app) {
   const state = draft(app);
   const step = state.step;
+
+  // The very first screen: bring the history from another phone, or start fresh.
+  if (step === 0 && !state.asked) {
+    return `
+      <div class="onb" dir="${state.draft.language === 'ar' ? 'rtl' : 'ltr'}">
+        <div class="onb__dots">${dots(0)}</div>
+        <div class="onb__body">${stepSyncIntro(state)}</div>
+      </div>
+    `;
+  }
+
   const bodies = [
     () => stepWelcome(),
     () => stepLanguage(state),
@@ -297,6 +330,66 @@ function go(app, step) {
 }
 
 export const handlers = {
+  'onb-sync-skip': (app) => {
+    app.onb.asked = true;
+    app.render();
+  },
+
+  'onb-sync-restore': async (app) => {
+    const code = normalizeCode(app.onb?.syncInput || '');
+    if (!code) {
+      app.showToast(t('sync.badCode'));
+      return;
+    }
+
+    const endpoint = LINKS.syncEndpoint || app.store?.meta?.syncEndpoint || '';
+    if (!endpoint) {
+      app.showToast(t('sync.server'));
+      return;
+    }
+
+    app.showToast(t('sync.working'));
+
+    try {
+      const remote = await fetchRemote({ endpoint, code });
+      if (!remote) {
+        app.showToast(t('onboarding.syncEmpty'));
+        return;
+      }
+
+      const tz = remote?.profile?.location?.tz || 'UTC';
+      const model = Qada.fromJSON(remote, todayISO(tz));
+      app.store.writeMeta({
+        syncCode: code,
+        syncEndpoint: endpoint,
+        lastSyncAt: new Date().toISOString(),
+        lastSyncError: '',
+        lang: model.profile.language || app.lang,
+      });
+      app.store.save(model, { immediate: true });
+
+      app.model = model;
+      app.lang = model.profile.language || app.lang;
+      app.onb = null;
+      setI18nLanguage(app.lang);
+      app.applyVisualPreferences();
+      app.refreshClock();
+      app.cal.year = Number(app.today.slice(0, 4));
+      location.hash = '#/today';
+      app.render();
+      app.showToast(t('sync.done'));
+    } catch (error) {
+      const reason = String(error?.message || error || '');
+      app.showToast(
+        reason === 'bad-code'
+          ? t('sync.badCode')
+          : reason === 'no-crypto'
+            ? t('sync.noCrypto')
+            : `${t('sync.error')} (${reason})`,
+      );
+    }
+  },
+
   'onb-next': (app) => go(app, app.onb.step + 1),
   'onb-back': (app) => go(app, app.onb.step - 1),
   'onb-lang': (app, el) => {
@@ -427,6 +520,9 @@ export const changes = {
 };
 
 export const live = {
+  'onb-sync-code': (app, el) => {
+    if (app.onb) app.onb.syncInput = el.value;
+  },
   'onb-city-search': (app, el) => {
     app.onb.draft.cityQuery = el.value;
     app.render();

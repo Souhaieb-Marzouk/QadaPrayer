@@ -13,7 +13,7 @@ import { Qada } from '../app/js/core/engine.js';
 import { generateCode, hashCode, isCode, normalizeCode } from '../app/js/sync/code.js';
 import { seal, unseal } from '../app/js/sync/crypto.js';
 import { makeClient } from '../app/js/sync/client.js';
-import { forgetRemote, syncOnce } from '../app/js/sync/sync.js';
+import { forgetRemote, syncOnce, fetchRemote } from '../app/js/sync/sync.js';
 
 const TODAY = '2026-10-29';
 const START = '2026-10-01';
@@ -166,7 +166,7 @@ test('a second device pulls what the first pushed', async () => {
   const tablet = model();
   const result = await syncOnce({ endpoint: ENDPOINT, code, model: tablet, fetchImpl });
 
-  assert.equal(result.status, 'merged');
+  assert.equal(result.status, 'pulled');
   assert.equal(result.changed, true);
   assert.equal(result.model.stats().done, 2);
   assert.equal(result.model.profile.location.name, 'Tunis', 'the local profile is kept');
@@ -232,6 +232,38 @@ test('an HTTP failure surfaces instead of losing data', async () => {
 
 test('a missing endpoint is refused', () => {
   assert.throws(() => makeClient({ endpoint: '' }), /no-endpoint/);
+});
+
+test('marks made after the first sync are pushed, not only pulled', async () => {
+  const { fetchImpl } = fakeServer();
+  const code = generateCode();
+
+  const phone = model();
+  await syncOnce({ endpoint: ENDPOINT, code, model: phone, fetchImpl });
+
+  // A month is marked on this phone, then it syncs again.
+  phone.markRange('2026-10-05', '2026-10-06', 1);
+  const result = await syncOnce({ endpoint: ENDPOINT, code, model: phone, fetchImpl });
+  assert.equal(result.status, 'pushed', 'the server copy must be refreshed');
+
+  const tablet = model();
+  const second = await syncOnce({ endpoint: ENDPOINT, code, model: tablet, fetchImpl });
+  assert.equal(second.changed, true);
+  assert.equal(second.model.stats().done, phone.stats().done);
+});
+
+test('fetchRemote returns the stored ledger, or null when there is none', async () => {
+  const { fetchImpl } = fakeServer();
+  const code = generateCode();
+
+  assert.equal(await fetchRemote({ endpoint: ENDPOINT, code, fetchImpl }), null);
+
+  await syncOnce({ endpoint: ENDPOINT, code, model: model({ '2026-10-10': ['subh'] }), fetchImpl });
+  const remote = await fetchRemote({ endpoint: ENDPOINT, code, fetchImpl });
+
+  assert.ok(remote);
+  assert.equal(remote.profile.location.name, 'Tunis');
+  assert.equal(remote.profile.pubertyDate, START);
 });
 
 test('the remote copy can be deleted', async () => {

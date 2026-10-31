@@ -21,7 +21,15 @@ import { MARK_DONE, MARK_EXEMPT, Qada } from './core/engine.js';
  * @returns {Qada} a new model; neither input is modified
  */
 export function mergeModels(local, incoming, today = local.today) {
-  const result = Qada.fromJSON(local.toJSON(), today);
+  // Keep this device's settings, but never hide history: if either side says the
+  // obligation began earlier, the merged ledger uses the earlier date.
+  const data = local.toJSON();
+  const dates = [local.profile.pubertyDate, incoming.profile.pubertyDate]
+    .filter((value) => typeof value === 'string' && value)
+    .sort();
+  if (dates.length) data.profile.pubertyDate = dates[0];
+
+  const result = Qada.fromJSON(data, today);
 
   const size = Math.max(local.ledger.length, incoming.ledger.length);
   const merged = new Uint8Array(size);

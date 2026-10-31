@@ -64,7 +64,7 @@ test('a prayer prayed on either side wins over exempt', () => {
   assert.equal(merged.get(slotIndex('2026-10-12', 'dhuhr')), MARK_DONE);
 });
 
-test('the local profile is kept, not the incoming one', () => {
+test('the local settings are kept, but never at the cost of history', () => {
   const local = model();
   const incoming = Qada.create(
     {
@@ -75,8 +75,10 @@ test('the local profile is kept, not the incoming one', () => {
   );
 
   const merged = mergeModels(local, incoming);
-  assert.equal(merged.profile.pubertyDate, START);
+  // The phone keeps its own city…
   assert.equal(merged.profile.location.name, 'Tunis');
+  // …but the earlier obligation date wins, so no owed prayer is hidden.
+  assert.equal(merged.profile.pubertyDate, '2015-03-03');
 });
 
 test('deferrals are dropped, history is kept', () => {
