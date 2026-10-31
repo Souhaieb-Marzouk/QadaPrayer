@@ -1,6 +1,6 @@
 {
-    "name": "Qada — Prayer make-up tracker",
-  "short_name": "Qada",
+    "name": "QadaPrayer — Prayer make-up tracker",
+  "short_name": "QadaPrayer",
   "description": "Offline tracker for missed prayers with a steady daily make-up plan. No account, no servers.",
   "start_url": "./",
   "scope": "./",

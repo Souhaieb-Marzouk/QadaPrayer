@@ -5,7 +5,7 @@ A small widget showing what is left, how today is going, and the next prayer.
 The app is a WebView, so the widget cannot read the ledger itself — the page
 pushes three already-formatted strings (in the app's language) through a
 JavaScript bridge, and the widget just displays them. If the app has never run,
-the widget shows `Qada` and a dash.
+the widget shows `QadaPrayer` and a dash.
 
 > **Status:** the web side is shipped and tested. The native side below has
 > **not been compiled** — it needs the MAUI build on your machine. If
@@ -49,7 +49,7 @@ dotnet publish -f net10.0-android -c Release `
 ```
 
 Install the APK, open the app once (so it can push its first snapshot), then
-long-press the home screen → **Widgets** → **Qada**.
+long-press the home screen → **Widgets** → **QadaPrayer**.
 
 ## 4. How it behaves
 
@@ -67,5 +67,5 @@ long-press the home screen → **Widgets** → **Qada**.
 | --- | --- |
 | `QadaNativeBridge could not be found` | The two `.cs` files are not in `Platforms/Android/`, or `QADA_WIDGET` is defined without them |
 | `qada_widget_info` not found | The `Resources/xml/` folder is missing or the file is not named exactly that |
-| Widget shows `Qada` and `—` | The app has not run yet since the widget was added — open it once |
+| Widget shows `QadaPrayer` and `—` | The app has not run yet since the widget was added — open it once |
 | Widget in the list but empty | `AddJavascriptInterface` failed; check the `try/catch` in `MainPage.xaml.cs` was kept |

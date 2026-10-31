@@ -77,7 +77,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, host, () => {
   const shown = host === '0.0.0.0' ? '127.0.0.1' : host;
-  console.log(`Qada dev server → http://${shown}:${port}/`);
+  console.log(`QadaPrayer dev server → http://${shown}:${port}/`);
   console.log(`App            → http://${shown}:${port}/app/`);
   console.log(`Demo           → http://${shown}:${port}/app/?demo=1`);
   if (host === '0.0.0.0') {

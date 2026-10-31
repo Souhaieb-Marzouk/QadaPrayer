@@ -222,7 +222,7 @@ try {
   Write-Host ''
   Write-Host "  Next: GitHub -> Releases -> Draft a new release"
   Write-Host "        tag   v$version"
-  Write-Host "        title Qada $version - <short phrase>"
+  Write-Host "        title QadaPrayer $version - <short phrase>"
   Write-Host '        drag the files from dist\ into the release, then publish.'
 } finally {
   Pop-Location

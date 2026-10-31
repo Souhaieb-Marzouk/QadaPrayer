@@ -1,4 +1,4 @@
-# The religious model behind Qada
+# The religious model behind QadaPrayer
 
 This app is a tracker, not a fatwa. What follows is the reasoning it encodes, so
 that you can check it, disagree with it, and adjust the settings accordingly.
@@ -80,7 +80,7 @@ When the number of missed prayers becomes very large, the obligation of strict
 order is widely held to be lifted, because it would make the current prayers
 impossible to perform on time.
 
-Qada's default behaviour — a continuous chronological stream folded into today's
+QadaPrayer's default behaviour — a continuous chronological stream folded into today's
 five prayers — is therefore both a legal convenience and a motivational device.
 It is **not** a condition for validity. If you make up a specific prayer out of
 order, the ledger simply records it; nothing breaks.

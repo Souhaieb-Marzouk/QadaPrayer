@@ -7,7 +7,7 @@
 
 const DICTIONARIES = {
   en: {
-    'app.name': 'Qada',
+    'app.name': 'QadaPrayer',
     'app.tagline': 'Make up what is owed',
     'app.short': 'Catch up, one prayer at a time',
 
@@ -74,7 +74,7 @@ const DICTIONARIES = {
     'onboarding.welcomePoint2': 'Arabic, English and French.',
     'onboarding.welcomePoint3': 'Your data stays on your phone, with an encrypted backup you control.',
     'onboarding.start': 'Get started',
-    'onboarding.syncTitle': 'Do you already use Qada?',
+    'onboarding.syncTitle': 'Do you already use QadaPrayer?',
     'onboarding.syncBody':
       'If another phone already has your history, bring it here: paste the sync code and everything arrives, set up and ready.',
     'onboarding.syncRestore': 'Restore with this code',
@@ -224,7 +224,7 @@ const DICTIONARIES = {
     'settings.privacy': 'Privacy',
     'settings.privacyHint': 'No account, no servers, no analytics. Everything stays on this device.',
     'settings.install': 'Install app',
-    'settings.installHint': 'Add Qada to your home screen for offline use.',
+    'settings.installHint': 'Add QadaPrayer to your home screen for offline use.',
     'settings.installed': 'Already installed',
     'settings.advanced': 'Advanced',
     'settings.strictOrder': 'Strict order',
@@ -247,7 +247,7 @@ const DICTIONARIES = {
     'backup.needPassphrase': 'This backup is encrypted. Enter its passphrase.',
     'backup.importButton': 'Restore backup',
     'backup.wrongPassphrase': 'Wrong passphrase or damaged file.',
-    'backup.invalid': 'This file is not a Qada backup.',
+    'backup.invalid': 'This file is not a QadaPrayer backup.',
     'backup.newer': 'This backup comes from a newer version of the app.',
     'backup.exported': 'Backup downloaded.',
     'backup.restored': 'Backup restored.',
@@ -274,7 +274,7 @@ const DICTIONARIES = {
     'reminders.sound': 'Chime',
     'reminders.vibrate': 'Vibration',
     'reminders.test': 'Send a test',
-    'reminders.limits': 'Reminders arrive while Qada is running. Installed on your home screen it works in the background far more reliably.',
+    'reminders.limits': 'Reminders arrive while QadaPrayer is running. Installed on your home screen it works in the background far more reliably.',
     'reminders.permissionDenied': 'Notifications are blocked for this site. Allow them in your browser settings, then try again.',
     'reminders.permissionNeeded': 'Your browser needs permission before reminders can be shown.',
     'reminders.next': 'Next: {time}',
@@ -285,7 +285,7 @@ const DICTIONARIES = {
     'notify.testTitle': 'Reminders are on',
     'notify.testBody': 'This is what a reminder will look like.',
 
-    'update.available': 'A new version of Qada is ready.',
+    'update.available': 'A new version of QadaPrayer is ready.',
     'update.reload': 'Reload',
     'update.check': 'Check for updates',
     'update.upToDate': 'You are on the latest version.',
@@ -357,7 +357,7 @@ const DICTIONARIES = {
     'csv.failed': 'Could not build the file.',
 
     'print.title': 'Make-up plan',
-    'print.subtitle': 'Qada — a personal tracker, not a fatwa.',
+    'print.subtitle': 'QadaPrayer — a personal tracker, not a fatwa.',
     'print.generated': 'Generated on {date}',
     'print.from': 'Obligation from {date}',
     'print.summary': 'Summary',
@@ -427,7 +427,7 @@ const DICTIONARIES = {
   },
 
   fr: {
-    'app.name': 'Qada',
+    'app.name': 'QadaPrayer',
     'app.tagline': 'Rattraper ce qui est dû',
     'app.short': 'Rattraper, une prière à la fois',
 
@@ -494,7 +494,7 @@ const DICTIONARIES = {
     'onboarding.welcomePoint2': 'Arabe, anglais et français.',
     'onboarding.welcomePoint3': 'Vos données restent sur votre téléphone, avec une sauvegarde chiffrée.',
     'onboarding.start': 'Commencer',
-    'onboarding.syncTitle': 'Vous utilisez déjà Qada ?',
+    'onboarding.syncTitle': 'Vous utilisez déjà QadaPrayer ?',
     'onboarding.syncBody':
       'Si un autre téléphone a déjà votre historique, amenez-le ici : collez le code de synchro et tout arrive, déjà configuré.',
     'onboarding.syncRestore': 'Restaurer avec ce code',
@@ -644,7 +644,7 @@ const DICTIONARIES = {
     'settings.privacy': 'Confidentialité',
     'settings.privacyHint': 'Aucun compte, aucun serveur, aucune statistique. Tout reste ici.',
     'settings.install': 'Installer l\u2019application',
-    'settings.installHint': 'Ajoutez Qada à l\u2019écran d\u2019accueil pour un usage hors ligne.',
+    'settings.installHint': 'Ajoutez QadaPrayer à l\u2019écran d\u2019accueil pour un usage hors ligne.',
     'settings.installed': 'Déjà installée',
     'settings.advanced': 'Avancé',
     'settings.strictOrder': 'Ordre strict',
@@ -667,7 +667,7 @@ const DICTIONARIES = {
     'backup.needPassphrase': 'Cette sauvegarde est chiffrée. Saisissez la phrase secrète.',
     'backup.importButton': 'Restaurer',
     'backup.wrongPassphrase': 'Phrase secrète incorrecte ou fichier endommagé.',
-    'backup.invalid': 'Ce fichier n\u2019est pas une sauvegarde Qada.',
+    'backup.invalid': 'Ce fichier n\u2019est pas une sauvegarde QadaPrayer.',
     'backup.newer': 'Cette sauvegarde vient d\u2019une version plus récente.',
     'backup.exported': 'Sauvegarde téléchargée.',
     'backup.restored': 'Sauvegarde restaurée.',
@@ -694,7 +694,7 @@ const DICTIONARIES = {
     'reminders.sound': 'Carillon',
     'reminders.vibrate': 'Vibration',
     'reminders.test': 'Envoyer un test',
-    'reminders.limits': "Les rappels arrivent pendant que Qada tourne. Installée sur l\u2019écran d\u2019accueil, elle fonctionne bien mieux en arrière-plan.",
+    'reminders.limits': "Les rappels arrivent pendant que QadaPrayer tourne. Installée sur l\u2019écran d\u2019accueil, elle fonctionne bien mieux en arrière-plan.",
     'reminders.permissionDenied': 'Les notifications sont bloquées pour ce site. Autorisez-les dans les réglages du navigateur, puis réessayez.',
     'reminders.permissionNeeded': 'Le navigateur doit autoriser les notifications avant de pouvoir les afficher.',
     'reminders.next': 'Prochain : {time}',
@@ -705,7 +705,7 @@ const DICTIONARIES = {
     'notify.testTitle': 'Les rappels sont activés',
     'notify.testBody': 'Voici à quoi ressemblera un rappel.',
 
-    'update.available': 'Une nouvelle version de Qada est prête.',
+    'update.available': 'Une nouvelle version de QadaPrayer est prête.',
     'update.reload': 'Recharger',
     'update.check': 'Vérifier les mises à jour',
     'update.upToDate': 'Vous avez la dernière version.',
@@ -777,7 +777,7 @@ const DICTIONARIES = {
     'csv.failed': 'Impossible de créer le fichier.',
 
     'print.title': 'Plan de rattrapage',
-    'print.subtitle': 'Qada — un suivi personnel, pas une fatwa.',
+    'print.subtitle': 'QadaPrayer — un suivi personnel, pas une fatwa.',
     'print.generated': 'Généré le {date}',
     'print.from': 'Obligation depuis le {date}',
     'print.summary': 'Résumé',
@@ -847,7 +847,7 @@ const DICTIONARIES = {
   },
 
   ar: {
-    'app.name': 'قضاء',
+    'app.name': 'QadaPrayer',
     'app.tagline': 'أدِّ ما بقي عليك',
     'app.short': 'اقضِ صلاةً في كل مرة',
 

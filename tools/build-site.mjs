@@ -54,7 +54,7 @@ function nav(lang, c) {
   return `    <header class="nav">
       <a class="nav__brand" href="./${lang.file}">
         <img src="./app/assets/icon-192.png" alt="" width="34" height="34" />
-        <span>Qada</span>
+        <span>QadaPrayer</span>
       </a>
       <nav class="nav__links" aria-label="${esc(c.nav.features)}">
         <a href="#features">${esc(c.nav.features)}</a>
@@ -96,7 +96,7 @@ function hero(lang, c) {
             <div class="device__screen">
               <iframe
                 src="./app/?demo=1&amp;lang=${lang.code}"
-                title="Qada demo"
+                title="QadaPrayer demo"
                 loading="lazy"
                 referrerpolicy="no-referrer"
               ></iframe>
@@ -296,7 +296,7 @@ function footer(c) {
   return `    <footer class="footer">
       <div class="footer__brand">
         <img src="./app/assets/icon-192.png" alt="" width="28" height="28" />
-        <span>Qada</span>
+        <span>QadaPrayer</span>
       </div>
       <p class="footer__note">${esc(c.footer.note)}</p>
       <nav class="footer__links" aria-label="Footer">

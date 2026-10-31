@@ -66,5 +66,5 @@ test('the app entry point loads the updater', async () => {
 test('the landing page points at the real repository', async () => {
   const html = await read('index.html');
   assert.equal(html.includes('github.com/REPLACE_ME'), false, 'placeholder repository link left in the site');
-  assert.match(html, /github\.com\/Souhaieb-Marzouk\/Qada-App/);
+  assert.match(html, /github\.com\/Souhaieb-Marzouk\/QadaPrayer/);
 });

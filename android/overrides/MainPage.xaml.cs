@@ -7,7 +7,7 @@ using Microsoft.Maui.Dispatching;
 namespace QadaPrayer;
 
 /// <summary>
-/// Full-screen host for the Qada web app.
+/// Full-screen host for the QadaPrayer web app.
 ///
 /// The app itself is the live site, so a deploy to GitHub Pages reaches every
 /// installed copy on its next launch — the APK only changes when the shell does
@@ -21,7 +21,7 @@ namespace QadaPrayer;
 public partial class MainPage : ContentPage
 {
     // Must match the deployed path, including the trailing slash.
-    private const string AppUrl = "https://souhaieb-marzouk.github.io/Qada-App/app/";
+    private const string AppUrl = "https://souhaieb-marzouk.github.io/QadaPrayer/app/";
 
     private bool bridgeAttached;
     private bool navigationStarted;
@@ -87,11 +87,11 @@ public partial class MainPage : ContentPage
                 new QadaNativeBridge(Android.App.Application.Context),
                 "QadaNative");
             bridgeAttached = true;
-            Android.Util.Log.Info("Qada", "widget bridge attached");
+            Android.Util.Log.Info("QadaPrayer", "widget bridge attached");
         }
         catch (Exception error)
         {
-            Android.Util.Log.Warn("Qada", "widget bridge failed: " + error.Message);
+            Android.Util.Log.Warn("QadaPrayer", "widget bridge failed: " + error.Message);
         }
 #else
         bridgeAttached = true;
@@ -121,7 +121,7 @@ public partial class MainPage : ContentPage
         }
         catch (Exception error)
         {
-            Android.Util.Log.Warn("Qada", "widget pull failed: " + error.Message);
+            Android.Util.Log.Warn("QadaPrayer", "widget pull failed: " + error.Message);
         }
 #else
         await Task.CompletedTask;
@@ -173,7 +173,7 @@ public partial class MainPage : ContentPage
         }
         catch (Exception error)
         {
-            Android.Util.Log.Warn("Qada", "widget payload rejected: " + error.Message);
+            Android.Util.Log.Warn("QadaPrayer", "widget payload rejected: " + error.Message);
         }
     }
 

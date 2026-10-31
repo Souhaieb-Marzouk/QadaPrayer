@@ -80,7 +80,7 @@ you skip it, the `Shell.NavBarIsVisible="False"` already set in `MainPage.xaml`
 covers the same thing.
 
 What the files do: a full-screen WebView pointed at
-`https://souhaieb-marzouk.github.io/Qada-App/app/`, with local storage enabled
+`https://souhaieb-marzouk.github.io/QadaPrayer/app/`, with local storage enabled
 (the PWA needs it), external links opened in the system browser, and the Android
 back button navigating inside the app.
 
@@ -163,7 +163,7 @@ Inside the first `<PropertyGroup>`, set these:
 <ApplicationVersion>200</ApplicationVersion>
 ```
 
-`ApplicationTitle` is the label under the icon on the home screen — write `Qada`
+`ApplicationTitle` is the label under the icon on the home screen — write `QadaPrayer`
 there instead if you prefer the short brand. `ApplicationId` is permanent once
 published; pick it now and never change it.
 
@@ -401,7 +401,7 @@ launches work without a connection. Two things to know:
 ## PWABuilder (the three-minute alternative)
 
 1. Make sure the site is live at
-   `https://souhaieb-marzouk.github.io/Qada-App/app/`.
+   `https://souhaieb-marzouk.github.io/QadaPrayer/app/`.
 2. Go to <https://www.pwabuilder.com/>, paste that URL, **Start**.
 3. **Package for stores → Android** → **Download**.
 4. The zip contains `*.apk`, `*.aab`, `assetlinks.json` and

@@ -15,7 +15,7 @@ namespace QadaPrayer;
 /// already-formatted snapshot, which is stored in SharedPreferences; this widget
 /// only displays it.
 /// </summary>
-[BroadcastReceiver(Exported = true, Label = "Qada")]
+[BroadcastReceiver(Exported = true, Label = "QadaPrayer")]
 [IntentFilter(new[] { "android.appwidget.action.APPWIDGET_UPDATE" })]
 [MetaData("android.appwidget.provider", Resource = "@xml/qada_widget_info")]
 public class QadaWidgetProvider : AppWidgetProvider
@@ -56,7 +56,7 @@ public class QadaWidgetProvider : AppWidgetProvider
     {
         var prefs = context.GetSharedPreferences(PrefsName, FileCreationMode.Private);
 
-        var headline = prefs?.GetString(KeyHeadline, "Qada") ?? "Qada";
+        var headline = prefs?.GetString(KeyHeadline, "QadaPrayer") ?? "QadaPrayer";
         var big = prefs?.GetString(KeyBig, "—") ?? "—";
         var next = prefs?.GetString(KeyNext, string.Empty) ?? string.Empty;
 

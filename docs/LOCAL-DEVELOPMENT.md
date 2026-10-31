@@ -60,7 +60,7 @@ node tools/serve.mjs
 You will see:
 
 ```
-Qada dev server → http://127.0.0.1:5173/
+QadaPrayer dev server → http://127.0.0.1:5173/
 App            → http://127.0.0.1:5173/app/
 Demo           → http://127.0.0.1:5173/app/?demo=1
 ```
@@ -187,7 +187,7 @@ bubblewrap build
 ```powershell
 npm init -y
 npm i @capacitor/core @capacitor/cli @capacitor/android
-npx cap init Qada app.qada.tracker --web-dir=app
+npx cap init QadaPrayer app.qada.tracker --web-dir=app
 npx cap add android
 npx cap sync
 ```
@@ -203,9 +203,9 @@ you lose them you can never update the app under the same identity.
 
 This repository is already wired for it:
 
-- **Website** — <https://souhaieb-marzouk.github.io/Qada-App/>
-- **App** — <https://souhaieb-marzouk.github.io/Qada-App/app/>
-- **Repository** — <https://github.com/Souhaieb-Marzouk/Qada-App>
+- **Website** — <https://souhaieb-marzouk.github.io/QadaPrayer/>
+- **App** — <https://souhaieb-marzouk.github.io/QadaPrayer/app/>
+- **Repository** — <https://github.com/Souhaieb-Marzouk/QadaPrayer>
 
 1. **Settings → Pages → Source: Deploy from a branch**, branch `main`, folder
    `/ (root)`. Save.

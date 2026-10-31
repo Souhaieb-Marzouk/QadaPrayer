@@ -8,9 +8,9 @@
 export const DONATE = {
   kofi: 'https://ko-fi.com/cyberpulseacademy',
   paypal: 'https://www.paypal.com/donate/?hosted_button_id=KNUSPQTVR9WCU',
-  repo: 'https://github.com/Souhaieb-Marzouk/Qada-App',
-  site: 'https://souhaieb-marzouk.github.io/Qada-App/',
-  app: 'https://souhaieb-marzouk.github.io/Qada-App/app/',
+  repo: 'https://github.com/Souhaieb-Marzouk/QadaPrayer',
+  site: 'https://souhaieb-marzouk.github.io/QadaPrayer/',
+  app: 'https://souhaieb-marzouk.github.io/QadaPrayer/app/',
 };
 
 export const LANGS = [
@@ -22,9 +22,9 @@ export const LANGS = [
 export const CONTENT = {
   en: {
     meta: {
-      title: 'Qada — catch up on missed prayers, one at a time',
+      title: 'QadaPrayer — catch up on missed prayers, one at a time',
       description:
-        'Qada counts the prayers you still owe and gives you a calm, steady plan to make them up. Offline on Android and iPhone. Free, open source, no account.',
+        'QadaPrayer counts the prayers you still owe and gives you a calm, steady plan to make them up. Offline on Android and iPhone. Free, open source, no account.',
     },
     nav: {
       features: 'Features',
@@ -40,7 +40,7 @@ export const CONTENT = {
       h1a: 'Catch up on what you owe,',
       h1b: 'one prayer at a time.',
       lead:
-        'Qada counts the prayers left from your whole life, then folds a small, steady number of make-ups into the five prayers you are praying today. No guilt, no guesswork — just a number that goes down.',
+        'QadaPrayer counts the prayers left from your whole life, then folds a small, steady number of make-ups into the five prayers you are praying today. No guilt, no guesswork — just a number that goes down.',
       ctaPrimary: 'Get the app',
       ctaSecondary: 'Try it in your browser',
       fact1: 'Works fully offline',
@@ -58,7 +58,7 @@ export const CONTENT = {
         },
         {
           t: 'Make-ups woven into today',
-          b: 'Choose how many days to make up per day. Qada spreads them across your five prayers, in order, so catching up never feels like a second job.',
+          b: 'Choose how many days to make up per day. QadaPrayer spreads them across your five prayers, in order, so catching up never feels like a second job.',
         },
         {
           t: 'Change your pace, keep your history',
@@ -110,7 +110,7 @@ export const CONTENT = {
     install: {
       title: 'Android in a minute, iPhone in two.',
       lead:
-        'Qada is a progressive web app: it installs from the browser, works offline, and needs no store account. The Android package is published on the releases page.',
+        'QadaPrayer is a progressive web app: it installs from the browser, works offline, and needs no store account. The Android package is published on the releases page.',
       android: {
         title: 'Android',
         sub: 'No Play Store needed.',
@@ -128,7 +128,7 @@ export const CONTENT = {
         steps: [
           { t: 'Open the app in Safari', b: 'Tap “Try it in your browser” above, or the link below.' },
           { t: 'Tap Share, then “Add to Home Screen”', b: 'The glyph is the square with an arrow, at the bottom of the screen.' },
-          { t: 'Tap “Add”', b: 'Qada now opens full-screen from your home screen and keeps working offline.' },
+          { t: 'Tap “Add”', b: 'QadaPrayer now opens full-screen from your home screen and keeps working offline.' },
         ],
         cta: 'Open the web app',
         note: 'A packaged iOS build is possible too, but it needs a Mac and an Apple developer account to sign. The home-screen install above needs neither.',
@@ -138,7 +138,7 @@ export const CONTENT = {
       eyebrow: 'Support',
       title: 'It is free, and it stays free.',
       lead:
-        'Qada is open source and collects nothing — there is no ads slot to sell. If it earned a place in your day, a tip keeps the updates coming.',
+        'QadaPrayer is open source and collects nothing — there is no ads slot to sell. If it earned a place in your day, a tip keeps the updates coming.',
       funny:
         'No ads, no subscription, no guilt-trip. A coffee if you are feeling generous — and a duʿāʾ if you are not. Both count.',
       kofi: 'Buy me a coffee',
@@ -148,7 +148,7 @@ export const CONTENT = {
     faq: {
       title: 'Short answers.',
       items: [
-        { q: 'Is this a fatwa?', a: 'No. Qada is a personal tracker built on the Maliki position that missed prayers must be made up. For your own situation, ask a qualified scholar.' },
+        { q: 'Is this a fatwa?', a: 'No. QadaPrayer is a personal tracker built on the Maliki position that missed prayers must be made up. For your own situation, ask a qualified scholar.' },
         { q: 'Where is my data stored?', a: 'In your browser’s local storage, on your device. There is no server and no account. Export an encrypted backup from Settings.' },
         { q: 'What happens if I change my pace?', a: 'Only the future changes. Every prayer you already marked stays exactly as it was, and the remaining make-ups are redistributed from that point on.' },
         { q: 'Does it work without internet?', a: 'Yes. Prayer times are computed on the device and everything else is local. After the first load the app runs fully offline.' },
@@ -165,9 +165,9 @@ export const CONTENT = {
 
   fr: {
     meta: {
-      title: 'Qada — rattraper les prières manquées, une à la fois',
+      title: 'QadaPrayer — rattraper les prières manquées, une à la fois',
       description:
-        'Qada compte les prières qu’il vous reste à rattraper et propose un plan calme et régulier pour les faire. Hors ligne sur Android et iPhone. Gratuit, open source, sans compte.',
+        'QadaPrayer compte les prières qu’il vous reste à rattraper et propose un plan calme et régulier pour les faire. Hors ligne sur Android et iPhone. Gratuit, open source, sans compte.',
     },
     nav: {
       features: 'Fonctions',
@@ -183,7 +183,7 @@ export const CONTENT = {
       h1a: 'Rattrapez ce qui vous est dû,',
       h1b: 'une prière à la fois.',
       lead:
-        'Qada compte les prières restantes de toute une vie, puis glisse un petit nombre régulier de rattrapages dans les cinq prières du jour. Sans culpabilité, sans approximation — juste un chiffre qui baisse.',
+        'QadaPrayer compte les prières restantes de toute une vie, puis glisse un petit nombre régulier de rattrapages dans les cinq prières du jour. Sans culpabilité, sans approximation — juste un chiffre qui baisse.',
       ctaPrimary: 'Obtenir l’app',
       ctaSecondary: 'Essayer dans le navigateur',
       fact1: 'Fonctionne hors ligne',
@@ -196,7 +196,7 @@ export const CONTENT = {
       lead: '',
       items: [
         { t: 'Un registre de toute une vie', b: 'Du jour de la puberté à aujourd’hui, chaque prière a sa place. Marquez des jours, des mois ou des années entières — le compte reste honnête.' },
-        { t: 'Des rattrapages dans la journée', b: 'Choisissez combien de journées rattraper par jour. Qada les répartit sur vos cinq prières, dans l’ordre, sans que cela devienne un second travail.' },
+        { t: 'Des rattrapages dans la journée', b: 'Choisissez combien de journées rattraper par jour. QadaPrayer les répartit sur vos cinq prières, dans l’ordre, sans que cela devienne un second travail.' },
         { t: 'Changez de rythme, gardez l’historique', b: 'Commencez ambitieux, ralentissez ensuite. Baisser le rythme ne réécrit jamais une prière déjà rattrapée.' },
         { t: 'Des horaires qui vous ressemblent', b: 'Calculés sur votre téléphone pour votre ville, avec la méthode, l’ombre du Asr et des décalages par prière pour coller à votre mosquée.' },
         { t: 'Pour toutes et tous', b: 'Les jours d’exemption sont pris en compte : le compte suit ce que vous devez réellement.' },
@@ -226,7 +226,7 @@ export const CONTENT = {
     install: {
       title: 'Android en une minute, iPhone en deux.',
       lead:
-        'Qada est une app web progressive : elle s’installe depuis le navigateur, fonctionne hors ligne et n’exige aucun compte de store. Le paquet Android est publié dans les releases.',
+        'QadaPrayer est une app web progressive : elle s’installe depuis le navigateur, fonctionne hors ligne et n’exige aucun compte de store. Le paquet Android est publié dans les releases.',
       android: {
         title: 'Android',
         sub: 'Sans Play Store.',
@@ -244,7 +244,7 @@ export const CONTENT = {
         steps: [
           { t: 'Ouvrez l’app dans Safari', b: 'Touchez « Essayer dans le navigateur » ci-dessus, ou le lien ci-dessous.' },
           { t: 'Touchez Partager puis « Sur l’écran d’accueil »', b: 'L’icône est le carré avec une flèche, en bas de l’écran.' },
-          { t: 'Touchez « Ajouter »', b: 'Qada s’ouvre alors en plein écran et continue de fonctionner hors ligne.' },
+          { t: 'Touchez « Ajouter »', b: 'QadaPrayer s’ouvre alors en plein écran et continue de fonctionner hors ligne.' },
         ],
         cta: 'Ouvrir l’app web',
         note: 'Une version iOS empaquetée est possible, mais il faut un Mac et un compte Apple payant. L’installation ci-dessus n’exige ni l’un ni l’autre.',
@@ -254,7 +254,7 @@ export const CONTENT = {
       eyebrow: 'Soutenir',
       title: 'C’est gratuit, et ça le reste.',
       lead:
-        'Qada est open source et ne collecte rien — il n’y a pas d’emplacement publicitaire à vendre. S’il a trouvé sa place dans vos journées, un pourboire fait vivre les mises à jour.',
+        'QadaPrayer est open source et ne collecte rien — il n’y a pas d’emplacement publicitaire à vendre. S’il a trouvé sa place dans vos journées, un pourboire fait vivre les mises à jour.',
       funny:
         'Pas de pub, pas d’abonnement, pas de culpabilisation. Un café si le cœur vous en dit — et une duʿāʾ sinon. Les deux comptent.',
       kofi: 'Offrir un café',
@@ -264,7 +264,7 @@ export const CONTENT = {
     faq: {
       title: 'Réponses courtes.',
       items: [
-        { q: 'Est-ce une fatwa ?', a: 'Non. Qada est un suivi personnel fondé sur la position malikite : les prières manquées doivent être rattrapées. Pour votre cas, consultez un savant.' },
+        { q: 'Est-ce une fatwa ?', a: 'Non. QadaPrayer est un suivi personnel fondé sur la position malikite : les prières manquées doivent être rattrapées. Pour votre cas, consultez un savant.' },
         { q: 'Où sont mes données ?', a: 'Dans le stockage local de votre navigateur, sur votre appareil. Aucun serveur, aucun compte. Exportez une sauvegarde chiffrée depuis les réglages.' },
         { q: 'Et si je change de rythme ?', a: 'Seul l’avenir change. Chaque prière déjà marquée reste intacte, et le reste est redistribué à partir de ce point.' },
         { q: 'Sans internet ?', a: 'Oui. Les horaires sont calculés sur l’appareil et tout le reste est local. Après le premier chargement, l’app fonctionne hors ligne.' },
@@ -281,9 +281,9 @@ export const CONTENT = {
 
   ar: {
     meta: {
-      title: 'قضاء — اقضِ ما فاتك من الصلوات، واحدةً في كل مرة',
+      title: 'QadaPrayer — اقضِ ما فاتك من الصلوات، واحدةً في كل مرة',
       description:
-        'يحصي «قضاء» الصلوات الباقية عليك، ويعطيك خطة هادئة ومنتظمة لقضائها. يعمل بلا إنترنت على أندرويد وآيفون. مجاني ومفتوح المصدر وبلا حساب.',
+        'يحصي QadaPrayer الصلوات الباقية عليك، ويعطيك خطة هادئة ومنتظمة لقضائها. يعمل بلا إنترنت على أندرويد وآيفون. مجاني ومفتوح المصدر وبلا حساب.',
     },
     nav: {
       features: 'المزايا',
@@ -299,7 +299,7 @@ export const CONTENT = {
       h1a: 'اقضِ ما بقي عليك،',
       h1b: 'صلاةً في كل مرة.',
       lead:
-        'يحصي «قضاء» الصلوات الباقية من عمرك كله، ثم يوزّع عددًا صغيرًا وثابتًا من الفوائت على صلواتك الخمس اليومية. بلا لوم ولا تخمين — فقط رقم ينقص.',
+        'يحصي QadaPrayer الصلوات الباقية من عمرك كله، ثم يوزّع عددًا صغيرًا وثابتًا من الفوائت على صلواتك الخمس اليومية. بلا لوم ولا تخمين — فقط رقم ينقص.',
       ctaPrimary: 'حمّل التطبيق',
       ctaSecondary: 'جرّبه في المتصفح',
       fact1: 'يعمل بلا إنترنت',
@@ -342,7 +342,7 @@ export const CONTENT = {
     install: {
       title: 'أندرويد في دقيقة، وآيفون في دقيقتين.',
       lead:
-        '«قضاء» تطبيق ويب تقدّمي: يُثبَّت من المتصفح، يعمل بلا إنترنت، ولا يحتاج حساب متجر. حزمة أندرويد منشورة في صفحة الإصدارات.',
+        'QadaPrayer تطبيق ويب تقدّمي: يُثبَّت من المتصفح، يعمل بلا إنترنت، ولا يحتاج حساب متجر. حزمة أندرويد منشورة في صفحة الإصدارات.',
       android: {
         title: 'أندرويد',
         sub: 'بلا حاجة إلى متجر Play.',
@@ -360,7 +360,7 @@ export const CONTENT = {
         steps: [
           { t: 'افتح التطبيق في Safari', b: 'اضغط «جرّبه في المتصفح» أعلاه أو الرابط أدناه.' },
           { t: 'اضغط مشاركة ثم «إضافة إلى الشاشة الرئيسية»', b: 'الرمز مربّع بسهم في أسفل الشاشة.' },
-          { t: 'اضغط «إضافة»', b: 'يفتح «قضاء» بملء الشاشة ويواصل العمل بلا إنترنت.' },
+          { t: 'اضغط «إضافة»', b: 'يفتح QadaPrayer بملء الشاشة ويواصل العمل بلا إنترنت.' },
         ],
         cta: 'افتح التطبيق',
         note: 'يمكن بناء نسخة iOS مستقلة، لكنها تحتاج جهاز Mac وحساب مطوّر مدفوعًا. الطريقة أعلاه لا تحتاج شيئًا من ذلك.',
@@ -370,7 +370,7 @@ export const CONTENT = {
       eyebrow: 'الدعم',
       title: 'مجاني، وسيبقى مجانيًا.',
       lead:
-        '«قضاء» مفتوح المصدر ولا يجمع شيئًا — لا يوجد مكان إعلاني يُباع. إن وجد مكانًا في يومك، فإكرامية صغيرة تُبقي التحديثات مستمرة.',
+        'QadaPrayer مفتوح المصدر ولا يجمع شيئًا — لا يوجد مكان إعلاني يُباع. إن وجد مكانًا في يومك، فإكرامية صغيرة تُبقي التحديثات مستمرة.',
       funny: 'لا إعلانات، لا اشتراكات، ولا لوم على أحد. فنجان قهوة إن أردت — ودعاء صادق إن لم تُرد. الاثنان يُحتسبان.',
       kofi: 'قهوة على Ko-fi',
       paypal: 'تبرّع عبر PayPal',
@@ -379,7 +379,7 @@ export const CONTENT = {
     faq: {
       title: 'أجوبة قصيرة.',
       items: [
-        { q: 'هل هذا فتوى؟', a: 'لا. «قضاء» أداة متابعة شخصية مبنية على مذهب المالكية في وجوب قضاء الفوائت. لحالتك الخاصة اسأل عالمًا.' },
+        { q: 'هل هذا فتوى؟', a: 'لا. QadaPrayer أداة متابعة شخصية مبنية على مذهب المالكية في وجوب قضاء الفوائت. لحالتك الخاصة اسأل عالمًا.' },
         { q: 'أين تُحفظ بياناتي؟', a: 'في التخزين المحلي لمتصفحك، على جهازك. لا خادم ولا حساب. صدّر نسخة مشفّرة من الإعدادات.' },
         { q: 'ماذا لو غيّرت وتيرتي؟', a: 'المستقبل فقط يتغيّر. كل صلاة سجّلتها تبقى كما هي، ويُعاد توزيع الباقي من تلك النقطة.' },
         { q: 'هل يعمل بلا إنترنت؟', a: 'نعم. تُحسب الأوقات في الجهاز وكل ما عداه محلي. بعد التحميل الأول يعمل التطبيق بلا اتصال.' },

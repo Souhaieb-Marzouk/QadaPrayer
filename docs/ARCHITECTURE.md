@@ -54,7 +54,7 @@ One byte per slot:
 Stored as run-length-encoded pairs `[value, length]`, which keeps a forty-year
 backlog in a couple of kilobytes: almost every run is long and uniform.
 
-`Qada.toJSON()` is the only serialisation format. Backups, undo snapshots, the
+`QadaPrayer.toJSON()` is the only serialisation format. Backups, undo snapshots, the
 local store and the future sync layer all use it unchanged.
 
 ---
@@ -77,7 +77,7 @@ morning".
 
 ## The daily plan
 
-`Qada.plan(dateISO)` is a pure function of `(marks, profile, date)`:
+`QadaPrayer.plan(dateISO)` is a pure function of `(marks, profile, date)`:
 
 1. `quota` = make-ups per day (a multiple of five by default).
 2. `capacities` = quota split across the five prayers, earliest first

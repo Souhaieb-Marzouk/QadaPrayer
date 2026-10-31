@@ -110,7 +110,7 @@ Output in `dist/`:
 1. Commit and push the version bump.
 2. **Releases → Draft a new release**
    - **Tag:** `v0.2.1`
-   - **Title:** `Qada 0.2.1 — <short human phrase>`
+   - **Title:** `QadaPrayer 0.2.1 — <short human phrase>`
    - **Body:** the description below.
 3. Drag the four files from `dist/` into the release. (`SHA256SUMS.txt` is
    optional but nice.)
@@ -119,7 +119,7 @@ Output in `dist/`:
 ### 4. Verify
 
 - The landing page's download link resolves to the new release.
-- The site still loads: <https://souhaieb-marzouk.github.io/Qada-App/app/>
+- The site still loads: <https://souhaieb-marzouk.github.io/QadaPrayer/app/>
 - On a phone with the previous version installed: open the app, wait a moment,
   and it should offer **Reload** for the new version.
 
@@ -143,7 +143,7 @@ with `dotnet publish` — there is no Archive Manager in MAUI.
 
 **PWABuilder (no install, ~3 minutes).** Deploy the site first, then go to
 <https://www.pwabuilder.com/>, paste
-`https://souhaieb-marzouk.github.io/Qada-App/app/`, choose Android and download
+`https://souhaieb-marzouk.github.io/QadaPrayer/app/`, choose Android and download
 the package. It contains a signed `.apk`, an `.aab`, and the signing key it
 generated — **keep that key**, updates need it.
 
@@ -184,10 +184,10 @@ Keep it short, factual, and free of marketing. The same rule as the README.
 ## Release naming
 
 ```
-Qada 0.1.0 — First release
-Qada 0.2.0 — Reminders
-Qada 0.3.0 — Home-screen widget
-Qada 1.0.0 — Stable
+QadaPrayer 0.1.0 — First release
+QadaPrayer 0.2.0 — Reminders
+QadaPrayer 0.3.0 — Home-screen widget
+QadaPrayer 1.0.0 — Stable
 ```
 
 The phrase names the thing the release is *about*, not a mood.

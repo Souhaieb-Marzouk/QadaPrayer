@@ -1,8 +1,8 @@
-# Qada — قضاء
+# QadaPrayer — قضاء
 
 **[العربية](#العربية)** · **[English](#english)** · **[Français](#français)** ·
-**[Website](https://souhaieb-marzouk.github.io/Qada-App/)** ·
-**[Open the app](https://souhaieb-marzouk.github.io/Qada-App/app/)**
+**[Website](https://souhaieb-marzouk.github.io/QadaPrayer/)** ·
+**[Open the app](https://souhaieb-marzouk.github.io/QadaPrayer/app/)**
 
 ---
 
@@ -25,9 +25,9 @@
 
 ### التثبيت
 
-- **أندرويد** — حمّل أحدث ملف `APK` من [صفحة الإصدارات](https://github.com/Souhaieb-Marzouk/Qada-App/releases/latest) وثبّته (بلا حاجة إلى متجر Play).
-- **آيفون وآيباد** — افتح [التطبيق](https://souhaieb-marzouk.github.io/Qada-App/app/) في Safari، ثم «مشاركة» ← «إضافة إلى الشاشة الرئيسية».
-- **تجربة سريعة** — [افتح النسخة التجريبية](https://souhaieb-marzouk.github.io/Qada-App/app/?demo=1) في المتصفح، بلا تثبيت.
+- **أندرويد** — حمّل أحدث ملف `APK` من [صفحة الإصدارات](https://github.com/Souhaieb-Marzouk/QadaPrayer/releases/latest) وثبّته (بلا حاجة إلى متجر Play).
+- **آيفون وآيباد** — افتح [التطبيق](https://souhaieb-marzouk.github.io/QadaPrayer/app/) في Safari، ثم «مشاركة» ← «إضافة إلى الشاشة الرئيسية».
+- **تجربة سريعة** — [افتح النسخة التجريبية](https://souhaieb-marzouk.github.io/QadaPrayer/app/?demo=1) في المتصفح، بلا تثبيت.
 
 ### الدعم
 
@@ -53,7 +53,7 @@
 
 ## English
 
-Qada counts the prayers you missed from the day your obligation began until today, then folds a
+QadaPrayer counts the prayers you missed from the day your obligation began until today, then folds a
 small, steady number of make-ups into the five prayers you are praying today.
 
 Free, open source, no account, no ads. Works fully offline, and your data never leaves your phone.
@@ -76,16 +76,16 @@ Free, open source, no account, no ads. Works fully offline, and your data never 
 ### Install
 
 - **Android** — download the latest `APK` from the
-  [releases page](https://github.com/Souhaieb-Marzouk/Qada-App/releases/latest) and install it. No
+  [releases page](https://github.com/Souhaieb-Marzouk/QadaPrayer/releases/latest) and install it. No
   Play Store needed.
-- **iPhone / iPad** — open [the app](https://souhaieb-marzouk.github.io/Qada-App/app/) in Safari,
+- **iPhone / iPad** — open [the app](https://souhaieb-marzouk.github.io/QadaPrayer/app/) in Safari,
   tap *Share* → *Add to Home Screen*.
-- **Quick look** — [open the demo](https://souhaieb-marzouk.github.io/Qada-App/app/?demo=1) in your
+- **Quick look** — [open the demo](https://souhaieb-marzouk.github.io/QadaPrayer/app/?demo=1) in your
   browser, nothing to install.
 
 ### Support
 
-Qada is free and collects nothing — there is no ad slot to sell. If it earned a place in your day,
+QadaPrayer is free and collects nothing — there is no ad slot to sell. If it earned a place in your day,
 a tip keeps the updates coming. A duʿāʾ counts too.
 
 - ☕ [Ko-fi](https://ko-fi.com/cyberpulseacademy)
@@ -100,13 +100,13 @@ a tip keeps the updates coming. A duʿāʾ counts too.
 
 GNU General Public License v3.0 — see [LICENSE](LICENSE).
 
-Qada is a personal tracker, not a fatwa. For your own situation, ask a qualified scholar.
+QadaPrayer is a personal tracker, not a fatwa. For your own situation, ask a qualified scholar.
 
 ---
 
 ## Français
 
-Qada compte les prières manquées depuis le début de votre obligation jusqu’à aujourd’hui, puis
+QadaPrayer compte les prières manquées depuis le début de votre obligation jusqu’à aujourd’hui, puis
 glisse un petit nombre régulier de rattrapages dans les cinq prières du jour.
 
 Gratuit, open source, sans compte et sans publicité. Fonctionne entièrement hors ligne, et vos
@@ -130,16 +130,16 @@ données ne quittent jamais votre téléphone.
 ### Installer
 
 - **Android** — téléchargez le dernier `APK` sur la
-  [page des versions](https://github.com/Souhaieb-Marzouk/Qada-App/releases/latest) et installez-le.
+  [page des versions](https://github.com/Souhaieb-Marzouk/QadaPrayer/releases/latest) et installez-le.
   Pas besoin du Play Store.
-- **iPhone / iPad** — ouvrez [l’app](https://souhaieb-marzouk.github.io/Qada-App/app/) dans Safari,
+- **iPhone / iPad** — ouvrez [l’app](https://souhaieb-marzouk.github.io/QadaPrayer/app/) dans Safari,
   touchez *Partager* → *Sur l’écran d’accueil*.
-- **Coup d’œil** — [ouvrez la démo](https://souhaieb-marzouk.github.io/Qada-App/app/?demo=1) dans
+- **Coup d’œil** — [ouvrez la démo](https://souhaieb-marzouk.github.io/QadaPrayer/app/?demo=1) dans
   votre navigateur, rien à installer.
 
 ### Soutenir
 
-Qada est gratuit et ne collecte rien — il n’y a pas d’emplacement publicitaire à vendre. S’il a
+QadaPrayer est gratuit et ne collecte rien — il n’y a pas d’emplacement publicitaire à vendre. S’il a
 trouvé sa place dans vos journées, un pourboire fait vivre les mises à jour. Une duʿāʾ compte aussi.
 
 - ☕ [Ko-fi](https://ko-fi.com/cyberpulseacademy)
@@ -154,5 +154,5 @@ trouvé sa place dans vos journées, un pourboire fait vivre les mises à jour. 
 
 GNU General Public License v3.0 — voir [LICENSE](LICENSE).
 
-Qada est un outil de suivi personnel, pas une fatwa. Pour votre situation, consultez un savant
+QadaPrayer est un outil de suivi personnel, pas une fatwa. Pour votre situation, consultez un savant
 qualifié.
