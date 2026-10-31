@@ -214,6 +214,45 @@ export function render(app) {
     </div>`,
   );
 
+  const profileList = app.store?.listProfiles ? app.store.listProfiles() : [];
+  const people = card(
+    t('people.title'),
+    `<div class="list">
+      ${profileList
+        .map(
+          (entry) => `
+        <div class="list__row" style="align-items:center">
+          <button class="list__label" data-action="switch-profile" data-id="${entry.id}"
+            style="background:none;border:0;padding:0;text-align:start;cursor:pointer">
+            ${esc(entry.name)}
+            ${
+              entry.active
+                ? `<span class="field__hint" style="display:block">${esc(t('people.active'))}</span>`
+                : ''
+            }
+          </button>
+          ${
+            entry.active
+              ? icon('check')
+              : `<button class="icon-btn" data-action="delete-profile" data-id="${entry.id}"
+                   aria-label="${esc(t('common.delete'))}">${icon('trash')}</button>`
+          }
+        </div>`,
+        )
+        .join('')}
+      <div class="card--pad" style="display:flex;flex-direction:column;gap:.5rem">
+        ${
+          profileList.length < 8
+            ? `<button class="btn btn--ghost btn--sm btn--block" data-action="add-person">${icon(
+                'plus',
+              )} ${esc(t('people.add'))}</button>`
+            : `<p class="field__hint">${esc(t('people.limit', { n: 8 }))}</p>`
+        }
+        <p class="field__hint">${esc(t('people.ownBackup'))}</p>
+      </div>
+    </div>`,
+  );
+
   const data = card(
     t('settings.data'),
     `<div class="list">
@@ -407,7 +446,18 @@ export function render(app) {
     </div>`,
   );
 
-  return [language, appearance, prayer, obligation, pace, reminders, data, install, about].join('');
+  return [
+    language,
+    appearance,
+    prayer,
+    obligation,
+    pace,
+    reminders,
+    people,
+    data,
+    install,
+    about,
+  ].join('');
 }
 
 export const handlers = {
@@ -509,6 +559,57 @@ export const handlers = {
     app.commit((model) => model.setQuota(next), { silent: true });
   },
   'open-city': (app) => app.openSheet('city', { query: '' }),
+  'add-person': (app) => {
+    if ((app.store.listProfiles?.() || []).length >= 8) {
+      app.showToast(t('people.limit', { n: 8 }));
+      return;
+    }
+    app.openSheet('name', { mode: 'add', value: '' });
+  },
+
+  'switch-profile': (app, el) => {
+    const id = el.dataset.id;
+    if (!id || id === app.store.activeId) return;
+
+    const model = app.store.switchTo(id, app.model);
+    if (!model) return;
+
+    app.model = model;
+    app.route = 'today';
+    app.cal.year = Number(app.today.slice(0, 4));
+    app.refreshClock();
+    app.store.save(model, { immediate: true });
+    window.scrollTo({ top: 0 });
+    app.render();
+
+    const name = (app.store.listProfiles() || []).find((entry) => entry.active)?.name || '';
+    app.showToast(t('people.switched', { name }));
+  },
+
+  'delete-profile': (app, el) => {
+    const id = el.dataset.id;
+    const entry = (app.store.listProfiles() || []).find((profile) => profile.id === id);
+    app.openSheet('confirm', {
+      title: t('common.delete'),
+      body: t('people.deleteHint', { name: entry ? entry.name : '' }),
+      confirmLabel: t('common.delete'),
+      action: 'do-delete-profile',
+      danger: true,
+      payload: { id },
+    });
+  },
+
+  'do-delete-profile': (app) => {
+    const id = app.sheet?.payload?.id;
+    app.sheet = null;
+    if (!id) return;
+
+    const model = app.store.removeProfile(id, app.model);
+    if (model) app.model = model;
+    app.refreshClock();
+    app.render();
+  },
+
   'open-backup': (app) => app.openSheet('backup', { passphrase: '' }),
 
   'export-csv': (app) => {

@@ -295,6 +295,18 @@ const DICTIONARIES = {
     'settings.printHint': 'A clean page to keep, or to show a scholar.',
     'settings.nativeLink': 'Home-screen widget',
 
+    'people.title': 'People',
+    'people.add': 'Add a person',
+    'people.name': 'Name',
+    'people.nameHint': 'Only shown on this phone.',
+    'people.nameTitle': 'Who is this?',
+    'people.active': 'Active',
+    'people.switched': 'Switched to {name}.',
+    'people.deleteHint': 'The ledger of {name} will be deleted from this phone. Export a backup first.',
+    'people.lastOne': 'Keep at least one person.',
+    'people.ownBackup': 'Each person has their own ledger and their own backup.',
+    'people.limit': 'Up to {n} people.',
+
     'csv.exported': 'CSV downloaded.',
     'csv.failed': 'Could not build the file.',
 
@@ -657,6 +669,18 @@ const DICTIONARIES = {
     'settings.printHint': 'Une page propre à garder, ou à montrer à un savant.',
     'settings.nativeLink': 'Widget de l’écran d’accueil',
 
+    'people.title': 'Personnes',
+    'people.add': 'Ajouter une personne',
+    'people.name': 'Nom',
+    'people.nameHint': 'Affiché seulement sur ce téléphone.',
+    'people.nameTitle': 'Qui est-ce ?',
+    'people.active': 'Active',
+    'people.switched': 'Passage à {name}.',
+    'people.deleteHint': 'Le registre de {name} sera supprimé de ce téléphone. Exportez une sauvegarde d’abord.',
+    'people.lastOne': 'Gardez au moins une personne.',
+    'people.ownBackup': 'Chaque personne a son propre registre et sa propre sauvegarde.',
+    'people.limit': 'Jusqu’à {n} personnes.',
+
     'csv.exported': 'Fichier CSV téléchargé.',
     'csv.failed': 'Impossible de créer le fichier.',
 
@@ -1017,6 +1041,18 @@ const DICTIONARIES = {
     'settings.print': 'خطة للطباعة',
     'settings.printHint': 'صفحة نظيفة تحتفظ بها أو تعرضها على عالم.',
     'settings.nativeLink': 'ودجت الشاشة الرئيسية',
+
+    'people.title': 'الأشخاص',
+    'people.add': 'إضافة شخص',
+    'people.name': 'الاسم',
+    'people.nameHint': 'يظهر في هذا الهاتف فقط.',
+    'people.nameTitle': 'من هذا؟',
+    'people.active': 'الحالي',
+    'people.switched': 'تم الانتقال إلى {name}.',
+    'people.deleteHint': 'سيُحذف سجل {name} من هذا الهاتف. صدّر نسخة احتياطية أولًا.',
+    'people.lastOne': 'أبقِ شخصًا واحدًا على الأقل.',
+    'people.ownBackup': 'لكل شخص سجله ونسخته الاحتياطية الخاصة.',
+    'people.limit': 'حتى {n} أشخاص.',
 
     'csv.exported': 'تم تنزيل الملف.',
     'csv.failed': 'تعذّر إنشاء الملف.',

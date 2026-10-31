@@ -7,10 +7,10 @@ Qada counts every prayer from the day your obligation began until today, then
 folds a small, steady number of make-ups into the five prayers you are praying
 today. It is built on the Maliki position that missed prayers must be made up.
 
-**[Website](https://souhaieb-marzouk.github.io/Qada-App/)** ·
-**[Open the app](https://souhaieb-marzouk.github.io/Qada-App/app/)** ·
-**[Releases](https://github.com/Souhaieb-Marzouk/Qada-App/releases)** ·
-**[Local setup](docs/LOCAL-DEVELOPMENT.md)** ·
+**[Website](https://souhaieb-marzouk.github.io/Qada-App/)** Â·
+**[Open the app](https://souhaieb-marzouk.github.io/Qada-App/app/)** Â·
+**[Releases](https://github.com/Souhaieb-Marzouk/Qada-App/releases)** Â·
+**[Local setup](docs/LOCAL-DEVELOPMENT.md)** Â·
 **[How it works](docs/ARCHITECTURE.md)**
 
 ---
@@ -29,14 +29,16 @@ today. It is built on the Maliki position that missed prayers must be made up.
 - **Exemptions** — days that were not due are excluded from what you owe.
 - **Reminders** — a notification at each prayer and one evening nudge with the
   make-ups still waiting, with a lead time, quiet hours, chime and vibration.
-- **Mark from the notification** — on Android, “I prayed” records the prayer
-  without opening the app.
+- **Mark from the notification** — on Android, the reminder has an "I prayed"
+  button that records the prayer without opening the app.
 - **Hijri date** — the Umm al-Qura date under today’s header, in your language.
 - **Exports** — the whole ledger as CSV, and a printable plan of the make-ups
   still owed.
 - **Momentum** — a daily streak, the best one you have had, and this week's and
   this month's completion at a glance.
-- **“I prayed extra”** — recorded a batch of make-ups in one tap; it comes off
+- **Several people, one phone** — each person has their own ledger, their own
+  backup and their own settings; switch in Settings → People.
+- **"I prayed extra"** — record a batch of make-ups in one tap; it comes off
   the oldest ones you still owe.
 - **Progress you can feel** — remaining count, completion, projected finish
   date, seven-day activity and milestones.
@@ -83,11 +85,8 @@ leave a tip:
 
 ## Roadmap
 
-- **Home-screen widget** — the web side and the native add-on are ready in
-  `android/widget/`; it needs one APK rebuild and is not part of the current
-  release.
 - Encrypted cloud sync between devices (end-to-end, no server-side plaintext).
-- Profiles for more than one person on the same phone.
+- A weekly and monthly review screen with streaks.
 
 ## Licence
 
@@ -95,3 +94,4 @@ GNU General Public License v3.0 — see [LICENSE](LICENSE).
 
 Qada is a personal tracker, not a fatwa. For your own situation, ask a qualified
 scholar.
+

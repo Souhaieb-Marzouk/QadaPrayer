@@ -391,6 +391,23 @@ function confirmSheet(app) {
   });
 }
 
+function nameSheet(app) {
+  const sheet = app.sheet;
+  return sheetShell({
+    title: esc(sheet.mode === 'rename' ? t('people.name') : t('people.nameTitle')),
+    body: `
+      <div class="field">
+        <label class="field__label">${esc(t('people.name'))}</label>
+        <input class="input" data-live="name-input" data-autofocus maxlength="40"
+          autocomplete="off" value="${esc(sheet.value || '')}">
+        <p class="field__hint">${esc(t('people.nameHint'))}</p>
+      </div>
+    `,
+    foot: `<button class="btn" data-action="close-sheet">${esc(t('common.cancel'))}</button>
+           <button class="btn btn--primary" data-action="name-save">${esc(t('common.save'))}</button>`,
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* PIN                                                                 */
 /* ------------------------------------------------------------------ */
@@ -510,6 +527,8 @@ export function renderSheet(app) {
       return pinSheet(app);
     case 'extra':
       return extraSheet(app);
+    case 'name':
+      return nameSheet(app);
     case 'support':
       return supportSheet();
     default:
@@ -704,6 +723,25 @@ export const handlers = {
     }
   },
 
+  'name-save': (app) => {
+    const sheet = app.sheet;
+    const value = String(sheet.value || '').trim();
+    if (!value) return;
+
+    if (sheet.mode === 'rename' && sheet.id) {
+      app.store.renameProfile(sheet.id, value);
+      app.sheet = null;
+      app.render({ preserveScroll: true });
+      return;
+    }
+
+    // A new person: collect their own obligation through the onboarding.
+    app.sheet = null;
+    app.addingProfile = true;
+    app.onb = { step: 0, draft: null, newName: value };
+    app.render();
+  },
+
   'noop': () => {},
 
   'extra-open': (app) => {
@@ -836,6 +874,9 @@ export const changes = {
 };
 
 export const live = {
+  'name-input': (app, el) => {
+    if (app.sheet) app.sheet.value = el.value;
+  },
   'city-query': (app, el) => {
     app.sheet.query = el.value;
     app.render({ preserveScroll: true });

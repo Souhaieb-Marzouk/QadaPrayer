@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Application shell: boot, routing, clock, rendering and event dispatch.
  *
  * Rendering is a full re-render of a template string on every state change.
@@ -42,6 +42,7 @@ export const app = {
   lang: 'en',
   installPrompt: null,
   demo: false,
+  addingProfile: false,
   onb: null,
   lockPin: '',
 };
@@ -452,7 +453,7 @@ export function render({ preserveScroll = false } = {}) {
   if (!root) return;
   const scrollY = window.scrollY;
 
-  if (!app.model) {
+  if (!app.model || app.addingProfile) {
     root.innerHTML = onboarding.render(app);
     return;
   }
@@ -699,3 +700,4 @@ if (typeof window !== 'undefined') {
     boot();
   }
 }
+

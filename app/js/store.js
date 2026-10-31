@@ -8,8 +8,22 @@
 
 import { Qada } from './core/engine.js';
 import { todayISO } from './core/dates.js';
+import {
+  DOC_VERSION,
+  activeData,
+  addProfile as pushProfile,
+  defaultName,
+  normalizeDoc,
+  removeProfile as dropProfile,
+  renameProfile as setProfileName,
+  setActiveData,
+  switchTo as selectProfile,
+  wrapState,
+} from './profiles.js';
 
+const DOC_KEY = 'qada.state.v2';
 const STATE_KEY = 'qada.state.v1';
+const MIGRATED_KEY = 'qada.state.v1.migrated';
 const META_KEY = 'qada.meta.v1';
 const UNDO_LIMIT = 12;
 const PBKDF2_ITERATIONS = 310000;
@@ -234,40 +248,139 @@ export class Store {
   readRaw() {
     if (!this.storage) return this.memory;
     try {
-      return this.storage.getItem(STATE_KEY);
+      return this.storage.getItem(DOC_KEY) || this.storage.getItem(STATE_KEY);
     } catch {
       return null;
     }
   }
 
-  /** Load the saved model, or return null when the app was never set up. */
+  /**
+   * Load the saved document and return the active profile's model.
+   * A v1 payload is migrated once, with a safety copy kept under
+   * `qada.state.v1.migrated`.
+   */
   load() {
     const raw = this.readRaw();
     if (!raw) return null;
+
     try {
       const parsed = JSON.parse(raw);
-      const model = Qada.fromJSON(parsed, todayISO(parsed?.profile?.location?.tz || 'UTC'));
-      return model;
+      const legacy =
+        !(parsed.v === DOC_VERSION && Array.isArray(parsed.profiles) && parsed.profiles.length);
+
+      this.doc = normalizeDoc(parsed, defaultName(parsed?.profile?.language));
+      if (!this.doc) return null;
+
+      if (legacy) {
+        try {
+          this.storage?.setItem(MIGRATED_KEY, raw);
+        } catch {
+          /* best effort */
+        }
+        // Only drop the old key once the new one is safely written.
+        if (this.persistNow()) {
+          try {
+            this.storage?.removeItem(STATE_KEY);
+          } catch {
+            /* best effort */
+          }
+        }
+      }
+
+      return this.buildModel();
     } catch (error) {
       console.error('[qada] could not read the saved state', error);
       return null;
     }
   }
 
+  /** The model of the active profile, built from the document. */
+  buildModel() {
+    const data = activeData(this.doc);
+    if (!data) return null;
+    return Qada.fromJSON(data, todayISO(data?.profile?.location?.tz || 'UTC'));
+  }
+
+  persistNow() {
+    if (!this.doc) return false;
+    const payload = JSON.stringify(this.doc);
+    try {
+      if (this.storage) this.storage.setItem(DOC_KEY, payload);
+      else this.memory = payload;
+      return true;
+    } catch (error) {
+      console.error('[qada] could not persist state', error);
+      return false;
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* Profiles                                                          */
+  /* ---------------------------------------------------------------- */
+
+  listProfiles() {
+    if (!this.doc) return [];
+    return this.doc.profiles.map((entry) => ({
+      id: entry.id,
+      name: entry.name,
+      active: entry.id === this.doc.activeId,
+      createdAt: entry.createdAt,
+    }));
+  }
+
+  get activeId() {
+    return this.doc?.activeId ?? null;
+  }
+
+  switchTo(id, currentModel) {
+    if (!this.doc) return null;
+    if (currentModel) setActiveData(this.doc, currentModel.toJSON());
+    selectProfile(this.doc, id);
+    this.persistNow();
+    return this.buildModel();
+  }
+
+  /** Register a brand-new ledger (already built by the onboarding). */
+  addProfile(name, model, currentModel) {
+    const data = model.toJSON();
+    if (!this.doc) {
+      this.doc = wrapState(data, name);
+    } else {
+      if (currentModel) setActiveData(this.doc, currentModel.toJSON());
+      pushProfile(this.doc, name, data);
+    }
+    this.persistNow();
+    return model;
+  }
+
+  removeProfile(id, currentModel) {
+    if (!this.doc) return null;
+    if (currentModel) setActiveData(this.doc, currentModel.toJSON());
+    dropProfile(this.doc, id);
+    this.persistNow();
+    return this.buildModel();
+  }
+
+  renameProfile(id, name) {
+    if (!this.doc) return;
+    setProfileName(this.doc, id, name);
+    this.persistNow();
+  }
+
   save(model, { immediate = false } = {}) {
-    const payload = JSON.stringify(model.toJSON());
+    if (model) {
+      if (!this.doc) {
+        this.doc = wrapState(model.toJSON(), defaultName(model.profile?.language));
+      } else {
+        setActiveData(this.doc, model.toJSON());
+      }
+    }
+
     if (this.saveTimer) {
       clearTimeout(this.saveTimer);
       this.saveTimer = null;
     }
-    const write = () => {
-      try {
-        if (this.storage) this.storage.setItem(STATE_KEY, payload);
-        else this.memory = payload;
-      } catch (error) {
-        console.error('[qada] could not persist state', error);
-      }
-    };
+    const write = () => this.persistNow();
     if (immediate) write();
     else this.saveTimer = setTimeout(write, 180);
   }
@@ -300,8 +413,11 @@ export class Store {
 
   clear() {
     this.undoStack = [];
+    this.doc = null;
     try {
+      this.storage?.removeItem(DOC_KEY);
       this.storage?.removeItem(STATE_KEY);
+      this.storage?.removeItem(MIGRATED_KEY);
     } catch {
       /* ignore */
     }

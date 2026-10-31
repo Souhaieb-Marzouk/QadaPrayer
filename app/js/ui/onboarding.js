@@ -12,8 +12,10 @@ const STEPS = 8;
 function draft(app) {
   if (!app.onb || !app.onb.draft) {
     const requestedStep = app.onb?.step ?? 0;
+    const newName = app.onb?.newName ?? null;
     app.onb = {
       step: requestedStep,
+      newName,
       draft: {
         language: app.lang || 'en',
         gender: 'male',
@@ -50,7 +52,9 @@ function footer(app, { next = true, nextLabel = null, finish = false } = {}) {
       ${
         state.step > 0
           ? `<button class="btn" data-action="onb-back">${esc(t('onboarding.back'))}</button>`
-          : ''
+          : app.addingProfile
+            ? `<button class="btn" data-action="onb-cancel">${esc(t('common.cancel'))}</button>`
+            : ''
       }
       ${
         next
@@ -380,16 +384,32 @@ export const handlers = {
     );
     if (d.regularSince) model.applyRegularSince(d.regularSince);
 
+    const addingPerson = Boolean(app.addingProfile);
+    const personName = app.onb?.newName || '';
+
+    if (addingPerson) {
+      app.store.addProfile(personName, model, app.model);
+    } else {
+      app.store.save(model, { immediate: true });
+    }
+
     app.model = model;
+    app.addingProfile = false;
     app.lang = d.language;
     app.store.writeMeta({ lang: d.language });
-    app.store.save(model, { immediate: true });
     app.onb = null;
     setI18nLanguage(d.language);
     app.applyVisualPreferences();
     app.refreshClock();
     app.cal.year = Number(app.today.slice(0, 4));
     location.hash = '#/today';
+    app.render();
+  },
+
+  'onb-cancel': (app) => {
+    if (!app.addingProfile) return;
+    app.addingProfile = false;
+    app.onb = null;
     app.render();
   },
 };
