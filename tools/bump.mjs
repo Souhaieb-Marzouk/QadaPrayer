@@ -25,6 +25,17 @@ if (!requested || !/^\d+\.\d+\.\d+$/.test(requested)) {
 const ROOT = path.resolve('.');
 const [major, minor, patch] = requested.split('.').map(Number);
 
+// Never go backwards. A release built for an older version (say an APK rebuild
+// of 0.5.0) used to silently downgrade the whole web app.
+const current = JSON.parse(await readFile(path.join(ROOT, 'package.json'), 'utf8')).version;
+const asNumber = (value) => value.split('.').reduce((total, part) => total * 1000 + Number(part), 0);
+
+if (asNumber(requested) < asNumber(current) && !process.argv.includes('--force')) {
+  console.error(`Refusing to go backwards: package.json is ${current}, asked for ${requested}.`);
+  console.error('Pass --force only if you really mean it.');
+  process.exit(1);
+}
+
 async function patchFile(file, replacer) {
   const full = path.join(ROOT, file);
   const before = await readFile(full, 'utf8');

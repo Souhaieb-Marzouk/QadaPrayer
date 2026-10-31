@@ -36,3 +36,6 @@ release.local.json
 *.aab
 *.apk
 *.signing.props
+
+# Wrangler local state (account cache, KV preview data)
+infra/.wrangler/

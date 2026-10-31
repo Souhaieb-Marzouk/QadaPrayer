@@ -13,12 +13,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Same major as the developer machine: --test-isolation needs >= 22.
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Unit tests
-        run: node --test --test-isolation=none "tests/*.test.js"
+        run: npm test
 
       - name: Local links and manifest
         run: python3 tools/check-links.py
@@ -37,7 +38,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
 
       - name: Tag matches package.json
         run: |
