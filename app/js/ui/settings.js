@@ -370,7 +370,7 @@ export function render(app) {
     t('settings.about'),
     `<div class="card--pad" style="display:flex;flex-direction:column;gap:.7rem">
       <div style="display:flex;gap:.6rem;align-items:flex-start">
-        ${icon('shield')}
+        ${icon('shield', 'about-icon')}
         <div>
           <strong style="font-size:.9rem">${esc(t('settings.privacy'))}</strong>
           <p class="field__hint">${esc(t('settings.privacyHint'))}</p>

@@ -1663,6 +1663,35 @@ body[dir='rtl'] .list__row--nav .list__value::after {
   color: var(--gold-soft);
 }
 
+/* ------------------------------------------------------------------ */
+/* Inline icons: follow the text, never the viewport default           */
+/* ------------------------------------------------------------------ */
+
+.list__row > svg,
+.btn > svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+}
+
+.list__row > svg {
+  color: var(--muted);
+  opacity: 0.85;
+}
+
+.milestone__dot svg {
+  width: 0.78rem;
+  height: 0.78rem;
+}
+
+.about-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+  margin-top: 0.1rem;
+  color: var(--gold-soft);
+}
+
 .toast {
   position: fixed;
   z-index: 60;

@@ -25,6 +25,7 @@ import { renderLock } from './ui/lock.js';
 import { resetShown, scheduleReminders } from './notify.js';
 import { applyUpdate, checkForUpdate, initUpdater } from './updater.js';
 import { buildSnapshot, publishSnapshot } from './native.js';
+import { mergeModels } from './merge.js';
 
 export const app = {
   store: new Store(),
@@ -364,12 +365,34 @@ export function markFromNotification(dateISO, prayer) {
 export function restoreBackup(data) {
   app.openSheet('confirm', {
     title: i18n.t('backup.importTitle'),
-    body: i18n.t('backup.confirmReplace'),
+    body: i18n.t('backup.choose'),
     confirmLabel: i18n.t('backup.importButton'),
     action: 'do-restore',
+    secondaryAction: 'do-merge',
+    secondaryLabel: i18n.t('backup.merge'),
     danger: true,
     payload: data,
   });
+}
+
+/** Take the union of this device and the backup, never dropping a mark. */
+function performMerge(data) {
+  try {
+    const incoming = Qada.fromJSON(data, app.today || todayISO('UTC'));
+    const merged = mergeModels(app.model, incoming, app.today);
+    app.store.snapshot(app.model);
+    app.model = merged;
+    app.store.save(merged, { immediate: true });
+    refreshClock();
+    app.cal.year = Number(app.today.slice(0, 4));
+    app.sheet = null;
+    render();
+    showToast(i18n.t('backup.merged'));
+  } catch (error) {
+    app.sheet = null;
+    render({ preserveScroll: true });
+    showToast(error.message === 'newer' ? i18n.t('backup.newer') : i18n.t('backup.invalid'));
+  }
 }
 
 function performRestore(data) {
@@ -595,6 +618,11 @@ function onDocumentClick(event) {
   if (action === 'do-restore') {
     const payload = app.sheet?.payload;
     if (payload) performRestore(payload);
+    return;
+  }
+  if (action === 'do-merge') {
+    const payload = app.sheet?.payload;
+    if (payload) performMerge(payload);
     return;
   }
   if (action === 'reload') {

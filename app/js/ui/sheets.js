@@ -378,6 +378,13 @@ function confirmSheet(app) {
     body: '',
     foot: `
       <button class="btn" data-action="close-sheet">${esc(t('common.cancel'))}</button>
+      ${
+        sheet.secondaryAction
+          ? `<button class="btn" data-action="${sheet.secondaryAction}">${esc(
+              sheet.secondaryLabel || t('common.confirm'),
+            )}</button>`
+          : ''
+      }
       <button class="btn ${sheet.danger ? 'btn--danger' : 'btn--primary'}" data-action="${
         sheet.action || 'noop'
       }">${esc(sheet.confirmLabel || t('common.confirm'))}</button>`,

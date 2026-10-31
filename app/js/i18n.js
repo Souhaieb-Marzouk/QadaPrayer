@@ -248,6 +248,9 @@ const DICTIONARIES = {
     'backup.encrypted': 'Encrypted',
     'backup.plain': 'Not encrypted',
     'backup.confirmReplace': 'Replace all current data from this backup?',
+    'backup.choose': 'Replace everything, or merge this backup into what you already have?',
+    'backup.merge': 'Merge with my data',
+    'backup.merged': 'Backup merged.',
     'backup.includeLog': 'Include activity log',
 
     'settings.reminders': 'Reminders',
@@ -607,6 +610,9 @@ const DICTIONARIES = {
     'backup.encrypted': 'Chiffrée',
     'backup.plain': 'Non chiffrée',
     'backup.confirmReplace': 'Remplacer toutes les données actuelles par cette sauvegarde ?',
+    'backup.choose': 'Tout remplacer, ou fusionner cette sauvegarde avec ce que vous avez déjà ?',
+    'backup.merge': 'Fusionner avec mes données',
+    'backup.merged': 'Sauvegarde fusionnée.',
     'backup.includeLog': 'Inclure le journal d\u2019activité',
 
     'settings.reminders': 'Rappels',
@@ -965,6 +971,9 @@ const DICTIONARIES = {
     'backup.encrypted': 'مشفّرة',
     'backup.plain': 'غير مشفّرة',
     'backup.confirmReplace': 'استبدال كل البيانات الحالية بهذه النسخة؟',
+    'backup.choose': 'استبدال كل شيء، أم دمج هذه النسخة مع ما لديك؟',
+    'backup.merge': 'دمج مع بياناتي',
+    'backup.merged': 'تم دمج النسخة.',
     'backup.includeLog': 'تضمين سجل النشاط',
 
     'settings.reminders': 'التذكيرات',
