@@ -66,7 +66,7 @@ public static class ApkInstaller
 
         try
         {
-            var context = Application.Context;
+            var context = Android.App.Application.Context;
             var installer = context.PackageManager?.PackageInstaller;
             if (installer is null) throw new InvalidOperationException("no package installer");
 
