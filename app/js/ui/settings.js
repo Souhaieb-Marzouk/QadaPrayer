@@ -9,6 +9,7 @@ import { METHOD_IDS } from '../core/prayerTimes.js';
 import { normalizeReminders } from '../core/reminders.js';
 import { nextEvents, permission, primeAudio, requestPermission, sendTest } from '../notify.js';
 import { exportName, ledgerCsv } from '../exporter.js';
+import { hasNativeBridge } from '../native.js';
 
 function card(title, body) {
   return `
@@ -379,6 +380,12 @@ export function render(app) {
       <div style="display:flex;justify-content:space-between;align-items:center">
         <span class="field__hint">${esc(t('settings.version', { version: VERSION }))}</span>
         <span class="dim" style="font-size:.72rem" data-count="${number(projection.remaining)}"></span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="field__hint">${esc(t('settings.nativeLink'))}</span>
+        <span class="dim" style="font-size:.72rem">${esc(
+          hasNativeBridge() ? t('common.on') : t('common.off'),
+        )}</span>
       </div>
       <button class="btn btn--ghost btn--sm btn--block" data-action="check-updates">${icon(
         'download',

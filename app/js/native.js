@@ -42,6 +42,15 @@ export function buildSnapshot({ today, day, model, now }) {
 /** Send the snapshot to the native side, if there is one. */
 export function publishSnapshot(snapshot) {
   if (!snapshot) return false;
+
+  // Always expose it on `window` first: the Android shell reads it with
+  // EvaluateJavascript, which works even when the JS interface is unavailable.
+  try {
+    if (typeof window !== 'undefined') window.QadaWidgetData = snapshot;
+  } catch {
+    /* ignore */
+  }
+
   try {
     const bridge = typeof window !== 'undefined' ? window.QadaNative : null;
     if (!bridge || typeof bridge.publish !== 'function') return false;

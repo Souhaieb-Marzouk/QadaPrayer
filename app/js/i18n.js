@@ -290,6 +290,7 @@ const DICTIONARIES = {
     'settings.csvHint': 'One row per prayer, for Excel or a spreadsheet.',
     'settings.print': 'Printable plan',
     'settings.printHint': 'A clean page to keep, or to show a scholar.',
+    'settings.nativeLink': 'Home-screen widget',
 
     'csv.exported': 'CSV downloaded.',
     'csv.failed': 'Could not build the file.',
@@ -648,6 +649,7 @@ const DICTIONARIES = {
     'settings.csvHint': 'Une ligne par prière, pour Excel ou un tableur.',
     'settings.print': 'Plan imprimable',
     'settings.printHint': 'Une page propre à garder, ou à montrer à un savant.',
+    'settings.nativeLink': 'Widget de l’écran d’accueil',
 
     'csv.exported': 'Fichier CSV téléchargé.',
     'csv.failed': 'Impossible de créer le fichier.',
@@ -1005,6 +1007,7 @@ const DICTIONARIES = {
     'settings.csvHint': 'سطر لكل صلاة، لإكسل أو أي جدول.',
     'settings.print': 'خطة للطباعة',
     'settings.printHint': 'صفحة نظيفة تحتفظ بها أو تعرضها على عالم.',
+    'settings.nativeLink': 'ودجت الشاشة الرئيسية',
 
     'csv.exported': 'تم تنزيل الملف.',
     'csv.failed': 'تعذّر إنشاء الملف.',

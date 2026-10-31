@@ -28,16 +28,12 @@ Into the `QadaPrayer` project:
 The `Resources/…` folders may not exist yet — create them; MAUI picks them up
 automatically.
 
-## 2. Turn it on in the project file
+## 2. Nothing to enable
 
-In `QadaPrayer.csproj`, inside the first `<PropertyGroup>`:
-
-```xml
-<DefineConstants>$(DefineConstants);QADA_WIDGET</DefineConstants>
-```
-
-Without that define the app compiles and runs exactly as before, just without
-the widget — so you can always remove the line to get back to a known-good build.
+The widget is wired in `MainPage.xaml.cs`, which already creates the JavaScript
+bridge before the page loads. If you replaced that file with an older copy, copy
+`android/overrides/MainPage.xaml.cs` over it — the bridge must be attached
+*before* the first navigation, or the page never sees it.
 
 ## 3. Rebuild
 
