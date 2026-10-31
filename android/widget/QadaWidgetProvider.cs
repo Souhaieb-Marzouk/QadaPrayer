@@ -71,7 +71,7 @@ public class QadaWidgetProvider : AppWidgetProvider
 
         // FLAG_IMMUTABLE only exists from Android 6 (API 23); this app runs on 21+.
         var flags = PendingIntentFlags.UpdateCurrent;
-        if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
+        if (OperatingSystem.IsAndroidVersionAtLeast(23))
         {
             flags |= PendingIntentFlags.Immutable;
         }
