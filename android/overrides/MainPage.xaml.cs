@@ -219,6 +219,9 @@ public partial class MainPage : ContentPage
         settings.SetSupportMultipleWindows(false);
         settings.MediaPlaybackRequiresUserGesture = false;
 
+        // A WebView cannot download on its own: files come as data: URLs.
+        webView.SetDownloadListener(new QadaDownloadListener());
+
         // Paint the native view the same colour as the app: without it Android
         // shows its own background for a frame, which reads as a black flash.
         webView.SetBackgroundColor(Android.Graphics.Color.ParseColor("#06100F"));
@@ -267,6 +270,13 @@ public partial class MainPage : ContentPage
             if (uri.Host.Equals("notify-permission", StringComparison.OrdinalIgnoreCase))
             {
                 Reminders.RequestPermission(Platform.CurrentActivity);
+                return;
+            }
+
+            if (uri.Host.Equals("remind-test", StringComparison.OrdinalIgnoreCase))
+            {
+                var seconds = int.TryParse(QueryValue(uri, "in"), out var parsed) ? parsed : 30;
+                Reminders.ScheduleTest(Android.App.Application.Context, seconds);
                 return;
             }
 

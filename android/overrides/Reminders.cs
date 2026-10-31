@@ -131,6 +131,36 @@ public static class Reminders
         }
     }
 
+    /// <summary>A real alarm, thirty seconds out: proves the whole chain.</summary>
+    public static void ScheduleTest(Context context, int seconds)
+    {
+        try
+        {
+            EnsureChannel(context);
+
+            var alarms = (AlarmManager?)context.GetSystemService(Context.AlarmService);
+            var pending = Build(context, MaxAlarms - 1, "QadaPrayer", "The reminder channel works.");
+            if (alarms is null || pending is null) return;
+
+            var at = DateTimeOffset.UtcNow.AddSeconds(Math.Max(5, seconds)).ToUnixTimeMilliseconds();
+
+            if (OperatingSystem.IsAndroidVersionAtLeast(23))
+            {
+                alarms.SetExactAndAllowWhileIdle(AlarmType.RtcWakeup, at, pending);
+            }
+            else
+            {
+                alarms.SetExact(AlarmType.RtcWakeup, at, pending);
+            }
+
+            Log.Info("Qada", $"test reminder in {seconds}s");
+        }
+        catch (Exception error)
+        {
+            Log.Warn("Qada", "test reminder failed: " + error.Message);
+        }
+    }
+
     public static void Post(Context context, string title, string body, int id)
     {
         try

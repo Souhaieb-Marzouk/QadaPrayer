@@ -14,6 +14,7 @@ import { generateCode, normalizeCode } from '../sync/code.js';
 import { makeClient } from '../sync/client.js';
 import { forgetRemote, syncOnce } from '../sync/sync.js';
 import { attachCompass } from './sheets.js';
+import { saveFile } from '../download.js';
 import { checkForApkUpdate, installUpdate } from '../apk.js';
 
 
@@ -968,14 +969,11 @@ export const handlers = {
     try {
       const csv = ledgerCsv(app.model, { today: app.today });
       // The BOM keeps Excel from mangling the file.
-      const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${exportName(app.model, 'ledger', app.today)}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      saveFile({
+        name: `${exportName(app.model, 'ledger', app.today)}.csv`,
+        mime: 'text/csv;charset=utf-8',
+        text: `\ufeff${csv}`,
+      });
       setTimeout(() => URL.revokeObjectURL(url), 2000);
       app.showToast(t('csv.exported'));
     } catch {

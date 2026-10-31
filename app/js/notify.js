@@ -333,6 +333,14 @@ export function scheduleReminders(app) {
 /** Fire a sample notification right now, from a user gesture. */
 export async function sendTest(app) {
   const settings = normalizeReminders(app?.model?.profile?.notifications);
+
+  // In the shell a web notification would go nowhere: fire a real alarm instead,
+  // thirty seconds out, through the same path the prayer reminders use.
+  if (inShell()) {
+    shellLink('remind-test', { in: 30 });
+    return true;
+  }
+
   if (settings.sound) chime();
   if (settings.vibrate) vibrate([120, 60, 120]);
   return show({

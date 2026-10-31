@@ -10,8 +10,9 @@ import { clock, esc } from './dom.js';
 import { icon, PRAYER_ARABIC } from './icons.js';
 import { createBackup, readBackup, isEncryptedBackup, hashPin, verifyPin, cryptoAvailable } from '../store.js';
 import { LINKS } from '../config.js';
-import { guidance, headingFrom, qiblaBearing, smoothHeading } from '../core/qibla.js';
+import { angleDelta, guidance, headingFrom, qiblaBearing, smoothHeading } from '../core/qibla.js';
 import { searchCities } from '../../data/cities.js';
+import { saveFile } from '../download.js';
 
 /** A lifetime ledger is a few KB; 4 MB is already generous. */
 const MAX_BACKUP_BYTES = 4 * 1024 * 1024;
@@ -614,7 +615,12 @@ export function attachCompass() {
     if (next === null) return;
 
     seen = true;
-    heading = smoothHeading(heading, next, 0.22);
+
+    // Ignore micro-movements: a magnetometer jitters by a degree or two even
+    // when the phone is still.
+    if (heading !== null && Math.abs(angleDelta(heading, next)) < 1.5) return;
+
+    heading = smoothHeading(heading, next, 0.18);
     rose.style.transform = `rotate(${-heading}deg)`;
 
     const guide = guidance(bearing, heading);
@@ -632,9 +638,22 @@ export function attachCompass() {
     }
   };
 
+  // One source only: absolute when the device offers it, otherwise the plain
+  // event. Listening to both makes the needle fight itself and spin.
+  let usingAbsolute = false;
+  const absoluteOnly = (event) => {
+    usingAbsolute = true;
+    update(event);
+  };
+  const relativeOnly = (event) => {
+    if (usingAbsolute) return;
+    update(event);
+  };
+
   compassHandler = update;
-  window.addEventListener('deviceorientationabsolute', update, true);
-  window.addEventListener('deviceorientation', update, true);
+  compassSource = { absolute: absoluteOnly, relative: relativeOnly };
+  window.addEventListener('deviceorientationabsolute', absoluteOnly, true);
+  window.addEventListener('deviceorientation', relativeOnly, true);
 
   // No reading after two seconds: say so rather than showing a frozen dial.
   setTimeout(() => {
@@ -646,12 +665,14 @@ export function attachCompass() {
 }
 
 let compassHandler = null;
+let compassSource = null;
 
 export function stopCompass() {
-  if (!compassHandler || typeof window === 'undefined') return;
-  window.removeEventListener('deviceorientationabsolute', compassHandler, true);
-  window.removeEventListener('deviceorientation', compassHandler, true);
+  if (!compassSource || typeof window === 'undefined') return;
+  window.removeEventListener('deviceorientationabsolute', compassSource.absolute, true);
+  window.removeEventListener('deviceorientation', compassSource.relative, true);
   compassHandler = null;
+  compassSource = null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -998,16 +1019,12 @@ export const handlers = {
     const passphrase = app.sheet?.passphrase || '';
     try {
       const text = await createBackup(app.model.toJSON(), { passphrase });
-      const blob = new Blob([text], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
       const stamp = new Date().toISOString().slice(0, 10);
-      link.href = url;
-      link.download = `qada-backup-${stamp}.json`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      saveFile({
+        name: `qada-backup-${stamp}.json`,
+        mime: 'application/json',
+        text,
+      });
       app.store.writeMeta({ lastBackupAt: new Date().toISOString() });
       app.showToast(t('backup.exported'));
       app.closeSheet();
