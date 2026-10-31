@@ -64,7 +64,8 @@ def check_html(path):
             problems.append(f"{os.path.relpath(path, ROOT)} -> missing {ref}")
 
 
-check_html(os.path.join(ROOT, "index.html"))
+for name in ("index.html", "index-ar.html", "index-fr.html"):
+    check_html(os.path.join(ROOT, name))
 check_html(os.path.join(ROOT, "app", "index.html"))
 
 manifest_path = os.path.join(ROOT, "app", "manifest.webmanifest")

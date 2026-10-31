@@ -121,6 +121,12 @@ try {
     Ok 'all tests pass'
   }
 
+  # --------------------------------------------------------------- landing site
+  Step 'Landing pages'
+  node tools/build-site.mjs | Out-Null
+  if ($LASTEXITCODE -ne 0) { Fail 'tools/build-site.mjs failed' }
+  Ok 'index.html, index-ar.html, index-fr.html'
+
   # ---------------------------------------------------------------------- web
   Step 'Web bundle'
   node tools/package.mjs | Out-Null

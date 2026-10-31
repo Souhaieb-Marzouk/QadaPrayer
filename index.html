@@ -1,52 +1,49 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Qada — catch up on missed prayers, one at a time</title>
-    <meta
-      name="description"
-      content="Qada counts the prayers you still owe and gives you a calm, steady plan to make them up. Works offline on Android and iPhone. Free and open source."
-    />
+    <meta name="description" content="Qada counts the prayers you still owe and gives you a calm, steady plan to make them up. Offline on Android and iPhone. Free, open source, no account." />
     <meta name="theme-color" content="#06100f" />
     <link rel="icon" href="./app/assets/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./app/assets/icon-180.png" />
-    <meta property="og:title" content="Qada — catch up on missed prayers" />
-    <meta
-      property="og:description"
-      content="Counts the prayers you still owe and gives you a steady plan to make them up. Offline, private, open source."
-    />
+    <meta property="og:title" content="Qada — catch up on missed prayers, one at a time" />
+    <meta property="og:description" content="Qada counts the prayers you still owe and gives you a calm, steady plan to make them up. Offline on Android and iPhone. Free, open source, no account." />
     <meta property="og:image" content="./app/assets/icon-512.png" />
+    <meta property="og:locale" content="en" />
+    <link rel="alternate" hreflang="ar" href="./index-ar.html" />
+    <link rel="alternate" hreflang="fr" href="./index-fr.html" />
+    <link rel="alternate" hreflang="en" href="./index.html" />
     <link rel="stylesheet" href="./site.css" />
   </head>
   <body>
     <header class="nav">
-      <a class="nav__brand" href="./">
+      <a class="nav__brand" href="./index.html">
         <img src="./app/assets/icon-192.png" alt="" width="34" height="34" />
         <span>Qada</span>
       </a>
-      <nav class="nav__links" aria-label="Sections">
+      <nav class="nav__links" aria-label="Features">
         <a href="#features">Features</a>
         <a href="#screens">Screens</a>
         <a href="#how">How it works</a>
         <a href="#install">Install</a>
         <a href="#support">Support</a>
       </nav>
-      <a class="btn btn--sm btn--primary" href="#install">Download</a>
+      <div class="nav__end">
+        <div class="lang" aria-label="Language"><a href="./index-ar.html" lang="ar">العربية</a><a href="./index-fr.html" lang="fr">Français</a><a href="./index.html" aria-current="page" lang="en">English</a></div>
+        <a class="btn btn--sm btn--tip" href="#support">♥ Tip</a>
+        <a class="btn btn--sm btn--primary" href="#install">Download</a>
+      </div>
     </header>
 
     <main>
-      <!-- ───────────────────────────── hero ───────────────────────────── -->
       <section class="hero">
         <div class="hero__glow" aria-hidden="true"></div>
         <div class="hero__text">
           <span class="eyebrow">Free · Open source · No account</span>
           <h1>Catch up on what you owe,<br /><em>one prayer at a time.</em></h1>
-          <p class="lead">
-            Qada counts the prayers left from your whole life, then folds a small, steady number of
-            make-ups into the five prayers you are praying today. No guilt, no guesswork — just a
-            number that goes down.
-          </p>
+          <p class="lead">Qada counts the prayers left from your whole life, then folds a small, steady number of make-ups into the five prayers you are praying today. No guilt, no guesswork — just a number that goes down.</p>
           <div class="hero__actions">
             <a class="btn btn--primary" href="#install">Get the app</a>
             <a class="btn btn--ghost" href="./app/?demo=1">Try it in your browser</a>
@@ -62,8 +59,8 @@
           <div class="device">
             <div class="device__screen">
               <iframe
-                src="./app/?demo=1"
-                title="Qada app demo"
+                src="./app/?demo=1&amp;lang=en"
+                title="Qada demo"
                 loading="lazy"
                 referrerpolicy="no-referrer"
               ></iframe>
@@ -73,78 +70,52 @@
         </div>
       </section>
 
-      <!-- ─────────────────────────── features ─────────────────────────── -->
       <section id="features" class="section">
         <header class="section__head">
-          <span class="eyebrow">What it does</span>
+          <span class="eyebrow">Features</span>
           <h2>Built around one question: what do I still owe?</h2>
+
         </header>
 
         <div class="grid">
           <article class="card">
-            <span class="card__icon" aria-hidden="true">∞</span>
+            <span class="card__icon" aria-hidden="true">▦</span>
             <h3>A lifetime ledger</h3>
-            <p>
-              From the day you reached puberty until today, every prayer has a place. Mark whole
-              days, months or years as done — the count always stays honest.
-            </p>
+            <p>From the day you reached puberty until today, every prayer has a place. Mark whole days, months or years as done — the count always stays honest.</p>
           </article>
-
           <article class="card">
-            <span class="card__icon" aria-hidden="true">²</span>
+            <span class="card__icon" aria-hidden="true">☾</span>
             <h3>Make-ups woven into today</h3>
-            <p>
-              Choose how many days to make up per day. Qada spreads them across your five prayers,
-              in order, so catching up never feels like a second job.
-            </p>
+            <p>Choose how many days to make up per day. Qada spreads them across your five prayers, in order, so catching up never feels like a second job.</p>
           </article>
-
           <article class="card">
-            <span class="card__icon" aria-hidden="true">↺</span>
+            <span class="card__icon" aria-hidden="true">↻</span>
             <h3>Change your pace, keep your history</h3>
-            <p>
-              Start ambitious, slow down later. Lowering your daily pace never rewrites a single
-              prayer you already made up.
-            </p>
+            <p>Start ambitious, slow down later. Lowering your daily pace never rewrites a single prayer you already made up.</p>
           </article>
-
           <article class="card">
-            <span class="card__icon" aria-hidden="true">◎</span>
+            <span class="card__icon" aria-hidden="true">☀</span>
             <h3>Prayer times that fit you</h3>
-            <p>
-              Calculated on your phone for your city, with the calculation method, Asr shadow and
-              per-prayer minute offsets you can adjust to match your mosque.
-            </p>
+            <p>Calculated on your phone for your city, with the calculation method, Asr shadow and per-prayer minute offsets you can adjust to match your mosque.</p>
           </article>
-
           <article class="card">
-            <span class="card__icon" aria-hidden="true">⬤</span>
+            <span class="card__icon" aria-hidden="true">✓</span>
             <h3>For everyone who prays</h3>
-            <p>
-              Exemption days are supported, so the count follows what you actually owe — not a
-              generic calendar.
-            </p>
+            <p>Exemption days are supported, so the count follows what you actually owe — not a generic calendar.</p>
           </article>
-
           <article class="card">
             <span class="card__icon" aria-hidden="true">⛨</span>
             <h3>Private by construction</h3>
-            <p>
-              No accounts, no servers, no analytics. Backups are files you own, optionally encrypted
-              with your own passphrase.
-            </p>
+            <p>No accounts, no servers, no analytics. Backups are files you own, optionally encrypted with your own passphrase.</p>
           </article>
         </div>
       </section>
 
-      <!-- ──────────────────────────── screens ─────────────────────────── -->
       <section id="screens" class="section section--alt">
         <header class="section__head">
           <span class="eyebrow">Screens</span>
           <h2>The whole app, nothing hidden.</h2>
-          <p class="section__lead">
-            These are the real screens, rendered live by your browser — not mock-ups.
-          </p>
+          <p class="section__lead">These are the real screens, rendered live by your browser — not mock-ups.</p>
         </header>
 
         <div class="previews">
@@ -154,39 +125,27 @@
             </div>
             <figcaption>Today — five prayers with their make-ups</figcaption>
           </figure>
-
           <figure class="preview">
             <div class="preview__frame">
-              <iframe
-                src="./app/?demo=1&amp;route=calendar&amp;year=2010&amp;calmonth=4"
-                title="Calendar screen"
-                loading="lazy"
-              ></iframe>
+              <iframe src="./app/?demo=1&amp;route=calendar&amp;year=2010&amp;calmonth=4" title="Calendar screen" loading="lazy"></iframe>
             </div>
             <figcaption>Calendar — a whole lifetime, month by month</figcaption>
           </figure>
-
           <figure class="preview">
             <div class="preview__frame">
               <iframe src="./app/?demo=1&amp;route=stats" title="Progress screen" loading="lazy"></iframe>
             </div>
             <figcaption>Progress — remaining, pace and finish date</figcaption>
           </figure>
-
           <figure class="preview">
             <div class="preview__frame">
-              <iframe
-                src="./app/?demo=1&amp;lang=ar&amp;route=today"
-                title="Arabic interface"
-                loading="lazy"
-              ></iframe>
+              <iframe src="./app/?demo=1&amp;lang=ar&amp;route=today" title="Arabic interface" loading="lazy"></iframe>
             </div>
             <figcaption>Arabic, right to left, same app</figcaption>
           </figure>
         </div>
       </section>
 
-      <!-- ───────────────────────────── how ────────────────────────────── -->
       <section id="how" class="section">
         <header class="section__head">
           <span class="eyebrow">How it works</span>
@@ -197,47 +156,31 @@
           <li class="step">
             <span class="step__num">1</span>
             <h3>Tell it when your obligation began</h3>
-            <p>
-              Puberty, not a fixed age. If you are unsure, pick the earliest plausible date — the app
-              explains why over-counting is the safer mistake.
-            </p>
+            <p>Puberty, not a fixed age. If you are unsure, pick the earliest plausible date — the app explains why over-counting is the safer mistake.</p>
           </li>
           <li class="step">
             <span class="step__num">2</span>
             <h3>Mark what you already prayed</h3>
-            <p>
-              If you have been praying regularly for years, say since when. Everything after that
-              date is marked as done in one go.
-            </p>
+            <p>If you have been praying regularly for years, say since when. Everything after that date is marked as done in one go.</p>
           </li>
           <li class="step">
             <span class="step__num">3</span>
             <h3>Pick a pace you can actually keep</h3>
-            <p>
-              One day of make-ups per day means one extra prayer with each prayer. Change it whenever
-              you like.
-            </p>
+            <p>One day of make-ups per day means one extra prayer with each prayer. Change it whenever you like.</p>
           </li>
           <li class="step">
             <span class="step__num">4</span>
             <h3>Pray, tap, repeat</h3>
-            <p>
-              Under each prayer you will see the make-ups that belong to it — with the exact dates.
-              Confirm, and the number drops.
-            </p>
+            <p>Under each prayer you see the make-ups that belong to it — with the exact dates. Confirm, and the number drops.</p>
           </li>
         </ol>
       </section>
 
-      <!-- ──────────────────────────── install ─────────────────────────── -->
       <section id="install" class="section">
         <header class="section__head">
           <span class="eyebrow">Install</span>
           <h2>Android in a minute, iPhone in two.</h2>
-          <p class="section__lead">
-            Qada is a progressive web app: it installs from the browser, works offline, and needs no
-            store account. The Android package is published on the releases page.
-          </p>
+          <p class="section__lead">Qada is a progressive web app: it installs from the browser, works offline, and needs no store account. The Android package is published on the releases page.</p>
         </header>
 
         <div class="install">
@@ -250,17 +193,14 @@
                 <span class="mini-icon">↓</span>
                 <div>
                   <strong>Download the latest APK</strong>
-                  <p>Open the releases page and tap the newest <code>.apk</code> file.</p>
+                  <p>Open the releases page and tap the newest .apk file.</p>
                 </div>
               </li>
               <li>
                 <span class="mini-icon">⚙</span>
                 <div>
                   <strong>Allow install from this source</strong>
-                  <p>
-                    Android will ask once: <em>Settings → Allow from this source</em>. This is the
-                    normal warning for any app installed outside a store.
-                  </p>
+                  <p>Android asks once: Settings → Allow from this source. Normal for any app outside a store.</p>
                 </div>
               </li>
               <li>
@@ -272,14 +212,8 @@
               </li>
             </ol>
 
-            <a class="btn btn--primary btn--block" href="https://github.com/Souhaieb-Marzouk/Qada-App/releases/latest">
-              Open releases
-            </a>
-            <p class="install__note">
-              Prefer automatic updates? Add the repository URL in
-              <a href="https://obtainium.imranr.dev/" target="_blank" rel="noopener noreferrer">Obtainium</a>
-              and it will install each new release for you.
-            </p>
+            <a class="btn btn--primary btn--block" href="https://github.com/Souhaieb-Marzouk/Qada-App/releases/latest">Open releases</a>
+            <p class="install__note">Prefer automatic updates? Add the repository URL in Obtainium and it installs each new release for you.</p>
           </article>
 
           <article class="install__card">
@@ -288,14 +222,14 @@
 
             <ol class="install__steps">
               <li>
-                <span class="mini-icon">↗</span>
+                <span class="mini-icon">↓</span>
                 <div>
                   <strong>Open the app in Safari</strong>
-                  <p>Tap <em>Try it in your browser</em> above, or the link below.</p>
+                  <p>Tap “Try it in your browser” above, or the link below.</p>
                 </div>
               </li>
               <li>
-                <span class="mini-icon">＋</span>
+                <span class="mini-icon">⚙</span>
                 <div>
                   <strong>Tap Share, then “Add to Home Screen”</strong>
                   <p>The glyph is the square with an arrow, at the bottom of the screen.</p>
@@ -305,86 +239,58 @@
                 <span class="mini-icon">✓</span>
                 <div>
                   <strong>Tap “Add”</strong>
-                  <p>
-                    Qada now opens full-screen from your home screen and keeps working without a
-                    connection.
-                  </p>
+                  <p>Qada now opens full-screen from your home screen and keeps working offline.</p>
                 </div>
               </li>
             </ol>
 
             <a class="btn btn--ghost btn--block" href="./app/">Open the web app</a>
-            <p class="install__note">
-              A packaged iOS build is possible too, but it needs a Mac and an Apple developer account
-              to sign. The home-screen install above needs neither.
-            </p>
+            <p class="install__note">A packaged iOS build is possible too, but it needs a Mac and an Apple developer account to sign. The home-screen install above needs neither.</p>
           </article>
         </div>
       </section>
 
-      <!-- ──────────────────────────── support ─────────────────────────── -->
       <section id="support" class="section section--alt">
         <div class="support">
           <div>
             <span class="eyebrow">Support</span>
             <h2>It is free, and it stays free.</h2>
-            <p class="lead">
-              No ads, no subscription, no data sold — there is nothing to sell. If Qada helped you,
-              a tip covers the time it took to build and keeps it maintained.
-            </p>
+            <p class="lead">Qada is open source and collects nothing — there is no ads slot to sell. If it earned a place in your day, a tip keeps the updates coming.</p>
+            <p class="support__funny">No ads, no subscription, no guilt-trip. A coffee if you are feeling generous — and a duʿāʾ if you are not. Both count.</p>
           </div>
           <div class="support__actions">
-            <a class="btn btn--primary" href="https://ko-fi.com/REPLACE_ME" target="_blank" rel="noopener noreferrer">
-              Leave a tip on Ko-fi
+            <a class="btn btn--tip btn--lg" href="https://ko-fi.com/cyberpulseacademy" target="_blank" rel="noopener noreferrer">
+              ♥ Buy me a coffee
             </a>
-            <a class="btn btn--ghost" href="https://paypal.me/REPLACE_ME" target="_blank" rel="noopener noreferrer">
-              PayPal
+            <a class="btn btn--ghost btn--lg" href="https://www.paypal.com/donate/?hosted_button_id=KNUSPQTVR9WCU" target="_blank" rel="noopener noreferrer">
+              Give with PayPal
             </a>
+            <p class="support__note">Ko-fi and PayPal. One-time, no account required on your side.</p>
           </div>
         </div>
       </section>
 
-      <!-- ───────────────────────────── faq ────────────────────────────── -->
       <section class="section">
         <header class="section__head">
-          <span class="eyebrow">Questions</span>
+          <span class="eyebrow">FAQ</span>
           <h2>Short answers.</h2>
         </header>
         <div class="faq">
           <details>
             <summary>Is this a fatwa?</summary>
-            <p>
-              No. Qada is a personal tracker built on the Maliki position that missed prayers must be
-              made up. For your own situation, ask a qualified scholar.
-            </p>
+            <p>No. Qada is a personal tracker built on the Maliki position that missed prayers must be made up. For your own situation, ask a qualified scholar.</p>
           </details>
           <details>
             <summary>Where is my data stored?</summary>
-            <p>
-              In your browser's local storage, on your device. There is no server and no account.
-              Export an encrypted backup from Settings and keep it somewhere safe.
-            </p>
+            <p>In your browser’s local storage, on your device. There is no server and no account. Export an encrypted backup from Settings.</p>
           </details>
           <details>
             <summary>What happens if I change my pace?</summary>
-            <p>
-              Only the future changes. Every prayer you already marked as made up stays exactly as it
-              was, and the remaining make-ups are redistributed from that point on.
-            </p>
-          </details>
-          <details>
-            <summary>What if I do not know my puberty date?</summary>
-            <p>
-              Choose the earliest date that could be right. Counting a few extra prayers is safer
-              than leaving some out, and you can correct the date later without losing your history.
-            </p>
+            <p>Only the future changes. Every prayer you already marked stays exactly as it was, and the remaining make-ups are redistributed from that point on.</p>
           </details>
           <details>
             <summary>Does it work without internet?</summary>
-            <p>
-              Yes. Prayer times are computed on the device and everything else is local. After the
-              first load the app runs fully offline.
-            </p>
+            <p>Yes. Prayer times are computed on the device and everything else is local. After the first load the app runs fully offline.</p>
           </details>
         </div>
       </section>
@@ -400,7 +306,18 @@
         <a href="./app/">Open the app</a>
         <a href="https://github.com/Souhaieb-Marzouk/Qada-App">Source code</a>
         <a href="https://github.com/Souhaieb-Marzouk/Qada-App/blob/main/LICENSE">Licence</a>
+        <a class="footer__tip" href="https://ko-fi.com/cyberpulseacademy" target="_blank" rel="noopener noreferrer">
+          ♥ Leave a tip
+        </a>
       </nav>
+      <div class="footer__donate">
+        <a class="btn btn--sm btn--tip" href="https://ko-fi.com/cyberpulseacademy" target="_blank" rel="noopener noreferrer">
+          ♥ Ko-fi
+        </a>
+        <a class="btn btn--sm btn--ghost" href="https://www.paypal.com/donate/?hosted_button_id=KNUSPQTVR9WCU" target="_blank" rel="noopener noreferrer">
+          PayPal
+        </a>
+      </div>
     </footer>
   </body>
 </html>
