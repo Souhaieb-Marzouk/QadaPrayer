@@ -17,6 +17,7 @@ import { forgetRemote, syncOnce } from '../sync/sync.js';
 function syncCard(app) {
   const code = app.store?.meta?.syncCode || '';
   const last = app.store?.meta?.lastSyncAt || '';
+  const status = app.store?.meta?.lastSyncError || '';
   const endpoint = app.store?.meta?.syncEndpoint || LINKS.syncEndpoint || '';
 
   const body = !endpoint
@@ -31,6 +32,13 @@ function syncCard(app) {
         <p class="field__hint">${esc(t('sync.hint'))}</p>
         <code class="sync-code">${esc(code)}</code>
         <div class="stat__hint">${esc(t('sync.last'))}: ${esc(last ? last.slice(0, 10) : t('sync.never'))}</div>
+        ${
+          status
+            ? `<div class="stat__hint" style="color:var(--danger)">${esc(
+                t('sync.lastError'),
+              )}: ${esc(status.slice(0, 90))}</div>`
+            : ''
+        }
         <button class="btn btn--primary btn--sm btn--block" data-action="sync-now">${icon('upload')} ${esc(
           t('sync.now'),
         )}</button>
@@ -55,7 +63,13 @@ function syncCard(app) {
 async function performSync(app, { quiet = false } = {}) {
   const code = app.store?.meta?.syncCode;
   const endpoint = app.store?.meta?.syncEndpoint || LINKS.syncEndpoint;
-  if (!code || !endpoint) return;
+
+  if (!code || !endpoint) {
+    app.store?.writeMeta({ lastSyncError: !code ? 'no-code' : 'no-endpoint' });
+    app.render({ preserveScroll: true });
+    if (!quiet) app.showToast(!code ? t('sync.badCode') : t('sync.server'));
+    return;
+  }
 
   if (!quiet) app.showToast(t('sync.working'));
 
@@ -66,13 +80,16 @@ async function performSync(app, { quiet = false } = {}) {
       app.store.save(app.model, { immediate: true });
       app.refreshClock();
     }
-    app.store.writeMeta({ lastSyncAt: new Date().toISOString() });
+    app.store.writeMeta({ lastSyncAt: new Date().toISOString(), lastSyncError: '' });
     app.sheet = null;
     app.render({ preserveScroll: true });
     if (!quiet) app.showToast(t('sync.done'));
   } catch (error) {
+    const reason = String(error?.message || error || 'unknown');
+    // Kept on the card, so a failure is still readable once the toast is gone.
+    app.store?.writeMeta({ lastSyncError: reason });
     app.render({ preserveScroll: true });
-    const reason = String(error?.message || '');
+
     const key =
       reason === 'bad-code' ? 'sync.badCode' : reason === 'no-crypto' ? 'sync.noCrypto' : 'sync.error';
     const detail = reason && !['bad-code', 'no-crypto'].includes(reason) ? ` (${reason})` : '';
@@ -651,9 +668,13 @@ export const handlers = {
   },
 
   'sync-create': (app) => {
-    const endpoint = String(app.sheet?.endpointValue || '').trim();
+    const endpoint =
+      String(app.sheet?.endpointValue || '').trim() ||
+      app.store?.meta?.syncEndpoint ||
+      LINKS.syncEndpoint ||
+      '';
     if (!/^https?:\/\//.test(endpoint)) {
-      app.showToast(t('sync.error'));
+      app.showToast(t('sync.server'));
       return;
     }
     const code = generateCode();
@@ -669,9 +690,13 @@ export const handlers = {
       app.showToast(t('sync.badCode'));
       return;
     }
-    const endpoint = String(app.sheet?.endpointValue || '').trim();
+    const endpoint =
+      String(app.sheet?.endpointValue || '').trim() ||
+      app.store?.meta?.syncEndpoint ||
+      LINKS.syncEndpoint ||
+      '';
     if (!/^https?:\/\//.test(endpoint)) {
-      app.showToast(t('sync.error'));
+      app.showToast(t('sync.server'));
       return;
     }
     app.store.writeMeta({ syncCode: code, syncEndpoint: endpoint });
