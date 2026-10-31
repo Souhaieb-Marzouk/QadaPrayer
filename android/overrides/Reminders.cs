@@ -77,8 +77,10 @@ public static class Reminders
         for (var index = 0; index < MaxAlarms; index += 1)
         {
             var pending = Build(context, index, string.Empty, string.Empty);
+            if (pending is null) continue;
+
             alarms.Cancel(pending);
-            pending?.Cancel();
+            pending.Cancel();
         }
     }
 

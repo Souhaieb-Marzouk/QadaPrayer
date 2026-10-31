@@ -2,7 +2,6 @@ using System.Net.Http;
 using Android.App;
 using Android.Content;
 using Android.Util;
-using AndroidX.Core.Content;
 
 namespace QadaPrayer;
 
@@ -101,7 +100,7 @@ public static class ApkInstaller
 
     private static void LaunchInstaller(Context context, Java.IO.File file)
     {
-        var uri = FileProvider.GetUriForFile(context, context.PackageName + ".fileprovider", file);
+        var uri = AndroidX.Core.Content.FileProvider.GetUriForFile(context, context.PackageName + ".fileprovider", file);
 
         var intent = new Intent(Intent.ActionView);
         intent.SetDataAndType(uri, "application/vnd.android.package-archive");
