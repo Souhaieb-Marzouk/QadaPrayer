@@ -239,8 +239,21 @@ public partial class MainPage : ContentPage
         }
     }
 
+
+    /// <summary>One value out of a qadaprayer:// query string.</summary>
+    private static string? QueryValue(Uri uri, string name)
+    {
+        return (uri.Query ?? string.Empty)
+            .TrimStart('?')
+            .Split('&', StringSplitOptions.RemoveEmptyEntries)
+            .Select((part) => part.Split('=', 2))
+            .Where((pair) => pair.Length == 2 && pair[0].Equals(name, StringComparison.OrdinalIgnoreCase))
+            .Select((pair) => Uri.UnescapeDataString(pair[1]))
+            .FirstOrDefault();
+    }
+
     /// <summary>
-    /// qadaprayer://install?url=... is how the page asks the shell to update:
+    /// qadaprayer:// links are how the page asks the shell for native work:
     /// a scheme interception is far more reliable than a JavaScript interface.
     /// </summary>
     private void HandleAppLink(string url)
@@ -251,15 +264,22 @@ public partial class MainPage : ContentPage
             var uri = new Uri(url);
             if (!uri.Scheme.Equals(InstallScheme, StringComparison.OrdinalIgnoreCase)) return;
 
+            if (uri.Host.Equals("notify-permission", StringComparison.OrdinalIgnoreCase))
+            {
+                Reminders.RequestPermission(Platform.CurrentActivity);
+                return;
+            }
+
+            if (uri.Host.Equals("remind", StringComparison.OrdinalIgnoreCase))
+            {
+                var payload = QueryValue(uri, "data");
+                if (!string.IsNullOrWhiteSpace(payload)) Reminders.Schedule(Android.App.Application.Context, payload!);
+                return;
+            }
+
             if (!uri.Host.Equals("install", StringComparison.OrdinalIgnoreCase)) return;
 
-            var target = (uri.Query ?? string.Empty)
-                .TrimStart('?')
-                .Split('&', StringSplitOptions.RemoveEmptyEntries)
-                .Select((part) => part.Split('=', 2))
-                .Where((pair) => pair.Length == 2 && pair[0].Equals("url", StringComparison.OrdinalIgnoreCase))
-                .Select((pair) => Uri.UnescapeDataString(pair[1]))
-                .FirstOrDefault();
+            var target = QueryValue(uri, "url");
 
             if (!ApkInstaller.IsTrusted(target))
             {

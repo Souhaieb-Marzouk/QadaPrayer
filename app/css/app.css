@@ -2282,54 +2282,108 @@ html {
 .qibla {
   display: flex;
   justify-content: center;
-  margin: 0.4rem 0 0.2rem;
+  margin: 0.2rem 0 0.1rem;
 }
 
 .qibla__dial {
   position: relative;
-  width: 210px;
-  height: 210px;
+  width: 230px;
+  height: 230px;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: radial-gradient(circle at 50% 40%, rgba(212, 162, 76, 0.12), transparent 70%);
-  display: grid;
-  place-items: center;
+  background: radial-gradient(circle at 50% 45%, rgba(212, 162, 76, 0.1), transparent 72%);
 }
 
-.qibla__n {
+.qibla__rose {
   position: absolute;
-  top: 6px;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
+  inset: 0;
+  transition: transform 0.18s linear;
+  will-change: transform;
+}
+
+.qibla__north,
+.qibla__east,
+.qibla__south,
+.qibla__west {
+  position: absolute;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
   color: var(--muted);
 }
 
-.qibla__needle {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: start center;
-  transition: transform 0.12s linear;
-}
-
-.qibla__needle span {
-  display: block;
-  width: 2px;
-  height: 45%;
-  margin-top: 12%;
-  border-radius: 2px;
-  background: linear-gradient(180deg, var(--gold-soft), transparent);
-  box-shadow: 0 0 18px rgba(240, 205, 138, 0.55);
-}
-
-.qibla__needle span::before {
-  content: '';
-  position: absolute;
-  top: 6%;
+.qibla__north {
+  top: 8px;
   left: 50%;
-  width: 14px;
-  height: 14px;
   transform: translateX(-50%);
-  border-radius: 50%;
-  background: var(--gold-soft);
+  color: var(--gold-soft);
+  font-weight: 700;
+}
+
+.qibla__south {
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.qibla__east {
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.qibla__west {
+  left: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.qibla__kaaba {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  color: var(--gold);
+  transition: transform 0.18s linear;
+  filter: drop-shadow(0 0 10px rgba(212, 162, 76, 0.45));
+}
+
+.qibla__kaaba svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* The direction the phone is facing: always straight up. */
+.qibla__pointer {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid var(--mint);
+  opacity: 0.85;
+}
+
+.qibla__state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.qibla__state[data-aligned='1'] {
+  color: var(--ok);
+  font-weight: 600;
+}
+
+.qibla__deg {
+  font-weight: 700;
+  color: var(--gold-soft);
 }

@@ -21,16 +21,102 @@ const dayCache = new Map();
 /* Capability                                                          */
 /* ------------------------------------------------------------------ */
 
+
+/* ------------------------------------------------------------------ */
+/* Android shell                                                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Inside the apk the page cannot post notifications: the WebView has no
+ * notification permission and no way to ask for one. The shell owns them, so
+ * the page hands it the schedule instead.
+ */
+function inShell() {
+  try {
+    return new URLSearchParams(window.location.search).has('apk');
+  } catch {
+    return false;
+  }
+}
+
+function shellLink(path, params = {}) {
+  const query = Object.entries(params)
+    .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+    .join('&');
+  try {
+    window.location.href = `qadaprayer://${path}${query ? `?${query}` : ''}`;
+  } catch {
+    /* ignore */
+  }
+}
+
+let lastNativePayload = '';
+
+/** Send the upcoming reminders to the shell, at most when the list changes. */
+function scheduleNative(app) {
+  if (!app?.model || !app.day) return null;
+
+  const settings = normalizeReminders(app.model.profile.notifications);
+  if (!settings.enabled) {
+    if (lastNativePayload !== '[]') {
+      lastNativePayload = '[]';
+      shellLink('remind', { data: encodeBase64('[]') });
+    }
+    return null;
+  }
+
+  const events = nextEvents(app, 12).map((event) => {
+    const at = Date.now() + Math.max(0, event.delayMinutes) * 60000;
+    const title =
+      event.kind === 'qada'
+        ? t('notify.qadaTitle')
+        : t('notify.prayerTitle', {
+            prayer: t(`prayer.${event.prayer}`),
+            time: formatClock(event.time),
+          });
+    const body =
+      event.kind === 'qada'
+        ? t('notify.qadaBody', { count: event.remaining })
+        : t('notify.prayerBody', { prayer: t(`prayer.${event.prayer}`) });
+
+    return { at, title, body };
+  });
+
+  const payload = encodeBase64(JSON.stringify(events));
+  if (payload === lastNativePayload) return events[0] || null;
+  lastNativePayload = payload;
+  shellLink('remind', { data: payload });
+  return events[0] || null;
+}
+
+function encodeBase64(value) {
+  try {
+    const bytes = new TextEncoder().encode(value);
+    let binary = '';
+    for (const byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary);
+  } catch {
+    return '';
+  }
+}
+
 export function supported() {
+  if (inShell()) return true;
   return typeof window !== 'undefined' && 'Notification' in window;
 }
 
 export function permission() {
+  if (inShell()) return 'granted';
   if (!supported()) return 'unsupported';
   return Notification.permission;
 }
 
 export async function requestPermission() {
+  if (inShell()) {
+    // The system dialog belongs to Android, not to the page.
+    shellLink('notify-permission');
+    return 'granted';
+  }
   if (!supported()) return 'unsupported';
   if (Notification.permission === 'granted') return 'granted';
   try {
@@ -233,6 +319,7 @@ function fire(app, event) {
 
 /** Re-arm the timer for the next due reminder. Safe to call as often as needed. */
 export function scheduleReminders(app) {
+  if (inShell()) return scheduleNative(app);
   cancelReminders();
   const events = nextEvents(app);
   if (!events.length) return null;

@@ -10,7 +10,7 @@ import { clock, esc } from './dom.js';
 import { icon, PRAYER_ARABIC } from './icons.js';
 import { createBackup, readBackup, isEncryptedBackup, hashPin, verifyPin, cryptoAvailable } from '../store.js';
 import { LINKS } from '../config.js';
-import { qiblaBearing } from '../core/qibla.js';
+import { guidance, headingFrom, qiblaBearing, smoothHeading } from '../core/qibla.js';
 import { searchCities } from '../../data/cities.js';
 
 /* ------------------------------------------------------------------ */
@@ -533,7 +533,14 @@ function snapshotsSheet(app) {
   });
 }
 
-/** The qibla dial: a bearing, plus a live needle when the phone has a compass. */
+/**
+ * The qibla dial.
+ *
+ * The rose turns with the phone, so "up" on screen is the way you are facing,
+ * and the Kaaba marker sits at the bearing. When the marker reaches the top,
+ * you are facing the qibla. Readings are smoothed: a raw magnetometer jitters
+ * by several degrees.
+ */
 function qiblaSheet(app) {
   const location = app.model.profile.location;
   const bearing = qiblaBearing(location.lat, location.lon);
@@ -545,19 +552,39 @@ function qiblaSheet(app) {
     body: `
       <div class="qibla">
         <div class="qibla__dial">
-          <span class="qibla__n">N</span>
-          <div class="qibla__needle" id="qibla-needle" data-bearing="${bearing}"
-            style="transform:rotate(${bearing}deg)"><span></span></div>
+          <div class="qibla__rose" id="qibla-rose" data-bearing="${bearing}">
+            <span class="qibla__north">N</span>
+            <span class="qibla__east">E</span>
+            <span class="qibla__south">S</span>
+            <span class="qibla__west">W</span>
+            <div class="qibla__kaaba" id="qibla-kaaba" style="transform:translate(-50%,-50%) rotate(${bearing}deg) translateY(-88px) rotate(${-bearing}deg)">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 2.8 20.4 7v10L12 21.2 3.6 17V7z" fill="currentColor" opacity=".22"/>
+                <path d="M12 2.8 20.4 7v10L12 21.2 3.6 17V7z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <path d="M3.6 9.6 12 13.6l8.4-4" fill="none" stroke="currentColor" stroke-width="1.3"/>
+                <path d="M3.6 9.6V13l8.4 4 8.4-4V9.6" fill="none" stroke="currentColor" stroke-width="1.3" opacity=".7"/>
+              </svg>
+            </div>
+          </div>
+          <div class="qibla__pointer" aria-hidden="true"></div>
         </div>
       </div>
-      <div class="stat" style="margin-top:.6rem">
+
+      <div class="qibla__state" id="qibla-state" data-aligned="0">
+        <span class="qibla__deg">${esc(`${Math.round(bearing)}°`)}</span>
+        <span id="qibla-hint">${esc(t('qibla.hint'))}</span>
+      </div>
+
+      <div class="stat" style="margin-top:.4rem">
         <div class="stat__label">${esc(t('qibla.bearing'))}</div>
         <div class="stat__value">${esc(`${Math.round(bearing)}°`)}</div>
       </div>
-      <p class="field__hint">${esc(t('qibla.hint'))}</p>
+
       ${
         hasCompass
-          ? ''
+          ? `<button class="btn btn--ghost btn--sm btn--block" data-action="qibla-permission">${esc(
+              t('qibla.enable'),
+            )}</button>`
           : `<div class="notice">${icon('info')}<span>${esc(t('qibla.unavailable'))}</span></div>`
       }
     `,
@@ -568,24 +595,51 @@ function qiblaSheet(app) {
 /** Follow the magnetometer while the dial is open; stop when it closes. */
 export function attachCompass() {
   stopCompass();
-  const needle = document.getElementById('qibla-needle');
-  if (!needle || typeof window === 'undefined') return;
+  if (typeof window === 'undefined') return;
 
-  const bearing = Number(needle.dataset.bearing) || 0;
+  const rose = document.getElementById('qibla-rose');
+  const state = document.getElementById('qibla-state');
+  const hint = document.getElementById('qibla-hint');
+  if (!rose) return;
+
+  const bearing = Number(rose.dataset.bearing) || 0;
+  let heading = null;
+  let seen = false;
+
   const update = (event) => {
-    const heading =
-      typeof event.webkitCompassHeading === 'number'
-        ? event.webkitCompassHeading
-        : typeof event.alpha === 'number'
-          ? 360 - event.alpha
-          : null;
-    if (heading === null) return;
-    needle.style.transform = `rotate(${bearing - heading}deg)`;
+    const next = headingFrom(event);
+    if (next === null) return;
+
+    seen = true;
+    heading = smoothHeading(heading, next, 0.22);
+    rose.style.transform = `rotate(${-heading}deg)`;
+
+    const guide = guidance(bearing, heading);
+    if (state) {
+      state.dataset.aligned = guide.aligned ? '1' : '0';
+      state.style.setProperty('--bearing', `${bearing}deg`);
+    }
+    if (hint && Number.isFinite(guide.relative)) {
+      if (guide.aligned) hint.textContent = t('qibla.align');
+      else {
+        hint.textContent = `${Math.round(Math.abs(guide.relative))}° ${
+          guide.side === 'right' ? '→' : '←'
+        }`;
+      }
+    }
   };
 
   compassHandler = update;
   window.addEventListener('deviceorientationabsolute', update, true);
   window.addEventListener('deviceorientation', update, true);
+
+  // No reading after two seconds: say so rather than showing a frozen dial.
+  setTimeout(() => {
+    if (!seen && hint && state) {
+      state.dataset.aligned = '0';
+      hint.textContent = t('qibla.unavailable');
+    }
+  }, 2000);
 }
 
 let compassHandler = null;
