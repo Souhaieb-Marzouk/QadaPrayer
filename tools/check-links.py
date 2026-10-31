@@ -64,7 +64,17 @@ def check_html(path):
             problems.append(f"{os.path.relpath(path, ROOT)} -> missing {ref}")
 
 
-for name in ("index.html", "index-ar.html", "index-fr.html"):
+for name in (
+    "index.html",
+    "index-ar.html",
+    "index-fr.html",
+    "guide.html",
+    "guide-ar.html",
+    "guide-fr.html",
+    "privacy.html",
+    "privacy-ar.html",
+    "privacy-fr.html",
+):
     check_html(os.path.join(ROOT, name))
 check_html(os.path.join(ROOT, "app", "index.html"))
 

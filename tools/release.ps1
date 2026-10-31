@@ -125,7 +125,9 @@ try {
   Step 'Landing pages'
   node tools/build-site.mjs | Out-Null
   if ($LASTEXITCODE -ne 0) { Fail 'tools/build-site.mjs failed' }
-  Ok 'index.html, index-ar.html, index-fr.html'
+  node tools/build-pages.mjs | Out-Null
+  if ($LASTEXITCODE -ne 0) { Fail 'tools/build-pages.mjs failed' }
+  Ok 'index, guide and privacy pages, three languages'
 
   # ---------------------------------------------------------------------- web
   Step 'Web bundle'

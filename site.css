@@ -805,3 +805,59 @@ code {
     font-size: 0.72rem;
   }
 }
+
+/* Guide */
+.guide {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.6rem;
+}
+
+.guide__step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 0.9rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: var(--radius-lg, 20px);
+  border: 1px solid var(--line-soft);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.guide__num {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(140deg, var(--gold-soft), var(--gold));
+  color: #241703;
+  font-weight: 700;
+}
+
+.guide__step h2 {
+  margin: 0 0 0.3rem;
+  font-size: 1.02rem;
+}
+
+.guide__step p {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.privacy__list {
+  margin: 0;
+  padding-inline-start: 1.1rem;
+  display: grid;
+  gap: 0.55rem;
+  color: var(--text-dim);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+@media (min-width: 860px) {
+  .guide {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy — QadaPrayer</title>
+    <meta name="description" content="Short version: your ledger never leaves your phone unless you send it." />
+    <meta name="theme-color" content="#06100f" />
+    <link rel="icon" href="./app/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./app/assets/icon-180.png" />
+    <link rel="alternate" hreflang="ar" href="./guide-ar.html" />
+    <link rel="alternate" hreflang="fr" href="./guide-fr.html" />
+    <link rel="alternate" hreflang="en" href="./guide.html" />
+    <link rel="stylesheet" href="./site.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <a class="nav__brand" href="./index.html">
+        <img src="./app/assets/icon-192.png" alt="" width="34" height="34" />
+        <span>QadaPrayer</span>
+      </a>
+      <nav class="nav__links" aria-label="Sections">
+        <a href="./index.html#features">Features</a>
+        <a href="./guide.html">Guide</a>
+        <a href="./privacy.html" aria-current="page">Privacy</a>
+      </nav>
+      <div class="nav__end">
+        <div class="lang" aria-label="Language"><a href="./privacy-ar.html" lang="ar">العربية</a><a href="./privacy-fr.html" lang="fr">Français</a><a href="./privacy.html" aria-current="page" lang="en">English</a></div>
+        <a class="btn btn--sm btn--primary" href="https://souhaieb-marzouk.github.io/QadaPrayer/app/">Open the app</a>
+      </div>
+    </header>
+
+    <main class="section">
+      <header class="section__head">
+        <span class="eyebrow">QadaPrayer</span>
+        <h1 style="font-size:clamp(1.8rem,4vw,2.6rem)">Privacy</h1>
+        <p class="section__lead">Short version: your ledger never leaves your phone unless you send it.</p>
+      </header>
+
+      <div class="card card--pad">
+        <ul class="privacy__list">
+          <li>There is no account, no sign-up and no analytics. The app does not identify you.</li>
+          <li>Everything you record is stored in your browser on your device, and works fully offline.</li>
+          <li>The app talks to two places only: GitHub, to check for a new version, and — if you turn sync on — the small server you configured yourself. Both receive nothing but a request.</li>
+          <li>Sync is end-to-end encrypted. The server stores a blob it cannot read, under a key derived from your code.</li>
+          <li>Backups are files you create and keep. Encrypt them with a passphrase if you like.</li>
+          <li>Clearing the app data, or uninstalling, deletes the ledger. Export a backup first — the app reminds you after a month without one.</li>
+          <li>The Android build asks for network access, notifications, and permission to hand a downloaded update to the system installer. Nothing else.</li>
+        </ul>
+      </div>
+
+      <p class="section__lead" style="margin-top:1.2rem">Questions about privacy: open an issue on GitHub.</p>
+      <a class="btn btn--ghost" href="https://github.com/Souhaieb-Marzouk/QadaPrayer/issues">GitHub issues</a>
+      <a class="btn btn--primary" style="margin-inline-start:.6rem" href="./index.html">Back to the website</a>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__brand">
+        <img src="./app/assets/icon-192.png" alt="" width="28" height="28" />
+        <span>QadaPrayer</span>
+      </div>
+      <p class="footer__note">Short version: your ledger never leaves your phone unless you send it.</p>
+    </footer>
+  </body>
+</html>

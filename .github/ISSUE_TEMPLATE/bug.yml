@@ -1,0 +1,50 @@
+name: Bug report
+description: Something is wrong in the app
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report this. The app keeps everything on
+        your phone, so the more detail you give, the easier it is to reproduce.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Settings → About, the two numbers you see there.
+      placeholder: "App 1.0.0 · Web 1.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Where
+      options:
+        - Android app (APK)
+        - iPhone / iPad (home-screen app)
+        - Browser
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what you saw.
+      placeholder: |
+        1. Opened the calendar
+        2. Marked January 2015 with "Mark a range"
+        3. Expected the ring to move; it stayed the same
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else
+      description: Screenshots help. Do not attach a backup file unless asked — it contains your whole ledger.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Before sending
+      options:
+        - label: I removed anything personal from the screenshots
+          required: true

@@ -292,7 +292,7 @@ ${items}
       </section>`;
 }
 
-function footer(c) {
+function footer(c, lang) {
   return `    <footer class="footer">
       <div class="footer__brand">
         <img src="./app/assets/icon-192.png" alt="" width="28" height="28" />
@@ -300,6 +300,12 @@ function footer(c) {
       </div>
       <p class="footer__note">${esc(c.footer.note)}</p>
       <nav class="footer__links" aria-label="Footer">
+        <a href="./${lang.code === 'en' ? 'guide.html' : `guide-${lang.code}.html`}">${esc(
+          lang.code === 'fr' ? 'Guide' : lang.code === 'ar' ? 'الدليل' : 'User guide',
+        )}</a>
+        <a href="./${lang.code === 'en' ? 'privacy.html' : `privacy-${lang.code}.html`}">${esc(
+          lang.code === 'fr' ? 'Confidentialité' : lang.code === 'ar' ? 'الخصوصية' : 'Privacy',
+        )}</a>
         <a href="./app/">${esc(c.footer.app)}</a>
         <a href="${DONATE.repo}">${esc(c.footer.source)}</a>
         <a href="${DONATE.repo}/blob/main/LICENSE">${esc(c.footer.licence)}</a>
@@ -341,7 +347,7 @@ function page(lang) {
     faq(c),
     '    </main>',
     '',
-    footer(c),
+    footer(c, lang),
     '  </body>',
     '</html>',
     '',

@@ -1,0 +1,28 @@
+name: Feature request
+description: Something the app should do
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome. Please say what problem it solves, not only the
+        solution — the problem usually has more than one answer.
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      placeholder: When I travel the prayer times are for my home city…
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What you would like
+  - type: dropdown
+    id: scope
+    attributes:
+      label: How big do you think it is?
+      options:
+        - Small (a screen or a setting)
+        - Medium (a new flow)
+        - Large (a new part of the app)

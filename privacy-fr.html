@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Confidentialité — QadaPrayer</title>
+    <meta name="description" content="En bref : votre registre ne quitte jamais votre téléphone, sauf si vous l’envoyez." />
+    <meta name="theme-color" content="#06100f" />
+    <link rel="icon" href="./app/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./app/assets/icon-180.png" />
+    <link rel="alternate" hreflang="ar" href="./guide-ar.html" />
+    <link rel="alternate" hreflang="fr" href="./guide-fr.html" />
+    <link rel="alternate" hreflang="en" href="./guide.html" />
+    <link rel="stylesheet" href="./site.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <a class="nav__brand" href="./index-fr.html">
+        <img src="./app/assets/icon-192.png" alt="" width="34" height="34" />
+        <span>QadaPrayer</span>
+      </a>
+      <nav class="nav__links" aria-label="Sections">
+        <a href="./index-fr.html#features">Fonctions</a>
+        <a href="./guide-fr.html">Guide</a>
+        <a href="./privacy-fr.html" aria-current="page">Confidentialité</a>
+      </nav>
+      <div class="nav__end">
+        <div class="lang" aria-label="Language"><a href="./privacy-ar.html" lang="ar">العربية</a><a href="./privacy-fr.html" aria-current="page" lang="fr">Français</a><a href="./privacy.html" lang="en">English</a></div>
+        <a class="btn btn--sm btn--primary" href="https://souhaieb-marzouk.github.io/QadaPrayer/app/">Ouvrir l’app</a>
+      </div>
+    </header>
+
+    <main class="section">
+      <header class="section__head">
+        <span class="eyebrow">QadaPrayer</span>
+        <h1 style="font-size:clamp(1.8rem,4vw,2.6rem)">Confidentialité</h1>
+        <p class="section__lead">En bref : votre registre ne quitte jamais votre téléphone, sauf si vous l’envoyez.</p>
+      </header>
+
+      <div class="card card--pad">
+        <ul class="privacy__list">
+          <li>Aucun compte, aucune inscription, aucune statistique. L’app ne vous identifie pas.</li>
+          <li>Tout est stocké dans votre navigateur, sur votre appareil, et fonctionne hors ligne.</li>
+          <li>L’app ne parle qu’à deux endroits : GitHub, pour vérifier les mises à jour, et — si vous activez la synchro — le petit serveur que vous avez configuré. Les deux ne reçoivent qu’une requête.</li>
+          <li>La synchro est chiffrée de bout en bout. Le serveur stocke un bloc qu’il ne peut pas lire, sous une clé dérivée de votre code.</li>
+          <li>Les sauvegardes sont des fichiers que vous créez et gardez. Chiffrez-les avec une phrase secrète si vous voulez.</li>
+          <li>Effacer les données de l’app, ou la désinstaller, supprime le registre. Exportez une sauvegarde avant — l’app vous le rappelle après un mois.</li>
+          <li>La version Android demande l’accès réseau, les notifications, et la permission de confier une mise à jour au programme d’installation. Rien d’autre.</li>
+        </ul>
+      </div>
+
+      <p class="section__lead" style="margin-top:1.2rem">Une question sur la confidentialité ? Ouvrez un ticket sur GitHub.</p>
+      <a class="btn btn--ghost" href="https://github.com/Souhaieb-Marzouk/QadaPrayer/issues">GitHub issues</a>
+      <a class="btn btn--primary" style="margin-inline-start:.6rem" href="./guide-fr.html">Retour au site</a>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__brand">
+        <img src="./app/assets/icon-192.png" alt="" width="28" height="28" />
+        <span>QadaPrayer</span>
+      </div>
+      <p class="footer__note">En bref : votre registre ne quitte jamais votre téléphone, sauf si vous l’envoyez.</p>
+    </footer>
+  </body>
+</html>
