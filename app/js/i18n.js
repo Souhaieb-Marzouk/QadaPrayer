@@ -186,6 +186,23 @@ const DICTIONARIES = {
     'settings.themeDark': 'Dark',
     'settings.themeLight': 'Light',
     'settings.themeAuto': 'System',
+    'settings.themeSepia': 'Sepia',
+    'settings.themeNight': 'Midnight',
+    'settings.numerals': 'Digits',
+    'settings.numeralsAuto': 'As the language',
+    'settings.numeralsArabic': '٠١٢٣',
+    'reminders.sound': 'Sound',
+    'reminders.soundChime': 'Chime',
+    'reminders.soundBell': 'Bell',
+    'reminders.soundNone': 'Silent',
+    'qibla.title': 'Qibla direction',
+    'qibla.hint': 'Hold the phone flat and turn until the needle points up.',
+    'qibla.bearing': 'From north',
+    'qibla.align': 'Aligned',
+    'qibla.unavailable': 'The compass needs a phone with a magnetometer.',
+    'review.share': 'Share a progress card',
+    'review.shareDone': 'Card created.',
+    'review.shareFailed': 'Could not create the card.',
     'settings.textSize': 'Text size',
     'settings.textSizeHint': 'Make everything bigger if reading is hard.',
     'settings.prayer': 'Prayer times',
@@ -635,6 +652,23 @@ const DICTIONARIES = {
     'settings.themeDark': 'Sombre',
     'settings.themeLight': 'Clair',
     'settings.themeAuto': 'Système',
+    'settings.themeSepia': 'Sépia',
+    'settings.themeNight': 'Minuit',
+    'settings.numerals': 'Chiffres',
+    'settings.numeralsAuto': 'Selon la langue',
+    'settings.numeralsArabic': '٠١٢٣',
+    'reminders.sound': 'Son',
+    'reminders.soundChime': 'Carillon',
+    'reminders.soundBell': 'Cloche',
+    'reminders.soundNone': 'Silencieux',
+    'qibla.title': 'Direction de la qibla',
+    'qibla.hint': 'Tenez le téléphone à plat et tournez jusqu’à ce que l’aiguille pointe en haut.',
+    'qibla.bearing': 'Depuis le nord',
+    'qibla.align': 'Aligné',
+    'qibla.unavailable': 'La boussole demande un téléphone avec magnétomètre.',
+    'review.share': 'Partager une carte de progrès',
+    'review.shareDone': 'Carte créée.',
+    'review.shareFailed': 'Impossible de créer la carte.',
     'settings.textSize': 'Taille du texte',
     'settings.textSizeHint': 'Agrandissez tout si la lecture est difficile.',
     'settings.prayer': 'Horaires de prière',
@@ -1083,6 +1117,23 @@ const DICTIONARIES = {
     'settings.themeDark': 'داكن',
     'settings.themeLight': 'فاتح',
     'settings.themeAuto': 'النظام',
+    'settings.themeSepia': 'بني فاتح',
+    'settings.themeNight': 'ليلي',
+    'settings.numerals': 'الأرقام',
+    'settings.numeralsAuto': 'حسب اللغة',
+    'settings.numeralsArabic': '٠١٢٣',
+    'reminders.sound': 'الصوت',
+    'reminders.soundChime': 'رنين',
+    'reminders.soundBell': 'جرس',
+    'reminders.soundNone': 'صامت',
+    'qibla.title': 'اتجاه القبلة',
+    'qibla.hint': 'أمسك الهاتف أفقيًا وأدره حتى يشير المؤشر إلى الأعلى.',
+    'qibla.bearing': 'من الشمال',
+    'qibla.align': 'على القبلة',
+    'qibla.unavailable': 'البوصلة تحتاج هاتفًا فيه مقياس مغناطيسي.',
+    'review.share': 'شارك بطاقة تقدّمك',
+    'review.shareDone': 'أُنشئت البطاقة.',
+    'review.shareFailed': 'تعذّر إنشاء البطاقة.',
     'settings.textSize': 'حجم الخط',
     'settings.textSizeHint': 'كبّر كل شيء إن كانت القراءة صعبة.',
     'settings.prayer': 'أوقات الصلاة',
@@ -1401,7 +1452,28 @@ export function hasKey(key) {
 
 const numberFormatCache = new Map();
 
+let arabicDigits = false;
+
+/** Show ٠١٢٣ everywhere a number is formatted, regardless of the language. */
+export function setArabicDigits(on) {
+  const next = Boolean(on);
+  if (next === arabicDigits) return;
+  arabicDigits = next;
+  numberFormatCache.clear();
+}
+
 export function number(value, options) {
+  const digits = arabicDigits ? 'ar-EG' : null;
+  const key = `${digits || current}:${JSON.stringify(options || {})}`;
+  let fmt = numberFormatCache.get(key);
+  if (!fmt) {
+    fmt = new Intl.NumberFormat(digits || locale(), options);
+    numberFormatCache.set(key, fmt);
+  }
+  return fmt.format(value);
+}
+
+function numberLegacy(value, options) {
   const key = `${current}:${JSON.stringify(options || {})}`;
   let fmt = numberFormatCache.get(key);
   if (!fmt) {

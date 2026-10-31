@@ -1,6 +1,15 @@
 /** Calendar: year heat map → month → day, plus bulk editing. */
 
-import { t, number, monthName, monthShort, weekdayNames, yearLabel, hijriMonthRange } from '../i18n.js';
+import {
+  t,
+  number,
+  dateLong,
+  monthName,
+  monthShort,
+  weekdayNames,
+  yearLabel,
+  hijriMonthRange,
+} from '../i18n.js';
 import {
   addDays,
   dayOfISO,
@@ -96,7 +105,13 @@ function renderMonth(app, model) {
       }).join('');
       return `
         <button class="cal-cell" data-s="${status}" data-today="${date === app.today ? 1 : 0}"
-          data-action="open-day" data-date="${date}">
+          data-action="open-day" data-date="${date}"
+          aria-label="${esc(
+            `${dateLong(date)} — ${t('calendar.daysDone', {
+              done: countDone(model, date),
+              total: countOwed(model, date),
+            })}`,
+          )}">
           <span>${esc(String(Number(date.slice(8, 10))))}</span>
           <span class="cal-cell__dots">${marks}</span>
         </button>`;
@@ -132,6 +147,20 @@ function renderMonth(app, model) {
       t('calendar.bulk'),
     )}</button>
   `;
+}
+
+
+/** How many of a day's prayers are done, and how many were owed. */
+function countDone(model, date) {
+  return Array.from({ length: 5 }, (_, index) => model.get(dayOfISO(date) * 5 + index)).filter(
+    (value) => value === 1,
+  ).length;
+}
+
+function countOwed(model, date) {
+  return Array.from({ length: 5 }, (_, index) => dayOfISO(date) * 5 + index).filter((index) =>
+    model.isOwed(index),
+  ).length;
 }
 
 export function render(app) {

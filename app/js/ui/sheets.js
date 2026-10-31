@@ -10,6 +10,7 @@ import { clock, esc } from './dom.js';
 import { icon, PRAYER_ARABIC } from './icons.js';
 import { createBackup, readBackup, isEncryptedBackup, hashPin, verifyPin, cryptoAvailable } from '../store.js';
 import { LINKS } from '../config.js';
+import { qiblaBearing } from '../core/qibla.js';
 import { searchCities } from '../../data/cities.js';
 
 /* ------------------------------------------------------------------ */
@@ -532,6 +533,70 @@ function snapshotsSheet(app) {
   });
 }
 
+/** The qibla dial: a bearing, plus a live needle when the phone has a compass. */
+function qiblaSheet(app) {
+  const location = app.model.profile.location;
+  const bearing = qiblaBearing(location.lat, location.lon);
+  const hasCompass = typeof window !== 'undefined' && 'DeviceOrientationEvent' in window;
+
+  return sheetShell({
+    title: esc(t('qibla.title')),
+    subtitle: esc(location.name || ''),
+    body: `
+      <div class="qibla">
+        <div class="qibla__dial">
+          <span class="qibla__n">N</span>
+          <div class="qibla__needle" id="qibla-needle" data-bearing="${bearing}"
+            style="transform:rotate(${bearing}deg)"><span></span></div>
+        </div>
+      </div>
+      <div class="stat" style="margin-top:.6rem">
+        <div class="stat__label">${esc(t('qibla.bearing'))}</div>
+        <div class="stat__value">${esc(`${Math.round(bearing)}°`)}</div>
+      </div>
+      <p class="field__hint">${esc(t('qibla.hint'))}</p>
+      ${
+        hasCompass
+          ? ''
+          : `<div class="notice">${icon('info')}<span>${esc(t('qibla.unavailable'))}</span></div>`
+      }
+    `,
+    foot: `<button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>`,
+  });
+}
+
+/** Follow the magnetometer while the dial is open; stop when it closes. */
+export function attachCompass() {
+  stopCompass();
+  const needle = document.getElementById('qibla-needle');
+  if (!needle || typeof window === 'undefined') return;
+
+  const bearing = Number(needle.dataset.bearing) || 0;
+  const update = (event) => {
+    const heading =
+      typeof event.webkitCompassHeading === 'number'
+        ? event.webkitCompassHeading
+        : typeof event.alpha === 'number'
+          ? 360 - event.alpha
+          : null;
+    if (heading === null) return;
+    needle.style.transform = `rotate(${bearing - heading}deg)`;
+  };
+
+  compassHandler = update;
+  window.addEventListener('deviceorientationabsolute', update, true);
+  window.addEventListener('deviceorientation', update, true);
+}
+
+let compassHandler = null;
+
+export function stopCompass() {
+  if (!compassHandler || typeof window === 'undefined') return;
+  window.removeEventListener('deviceorientationabsolute', compassHandler, true);
+  window.removeEventListener('deviceorientation', compassHandler, true);
+  compassHandler = null;
+}
+
 /* ------------------------------------------------------------------ */
 /* PIN                                                                 */
 /* ------------------------------------------------------------------ */
@@ -659,6 +724,8 @@ export function renderSheet(app) {
       return syncSheet(app);
     case 'snapshots':
       return snapshotsSheet(app);
+    case 'qibla':
+      return qiblaSheet(app);
     case 'support':
       return supportSheet();
     default:
@@ -710,6 +777,8 @@ function applyPrayerSelection(app, { proposeDefer }) {
 }
 
 export const handlers = {
+  'qibla-attach': () => attachCompass(),
+
   'toggle-sheet-check': (app, el) => {
     const id = el.dataset.id;
     const sheet = app.sheet;

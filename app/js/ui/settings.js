@@ -13,6 +13,7 @@ import { hasNativeBridge } from '../native.js';
 import { generateCode, normalizeCode } from '../sync/code.js';
 import { makeClient } from '../sync/client.js';
 import { forgetRemote, syncOnce } from '../sync/sync.js';
+import { attachCompass } from './sheets.js';
 
 function syncCard(app) {
   const sync = app.store?.getSync?.() || {};
@@ -181,10 +182,20 @@ export function render(app) {
         [
           ['dark', t('settings.themeDark')],
           ['light', t('settings.themeLight')],
+          ['sepia', t('settings.themeSepia')],
+          ['night', t('settings.themeNight')],
           ['auto', t('settings.themeAuto')],
         ],
         p.theme,
         'set-theme',
+      )}
+      ${segmented(
+        [
+          ['auto', t('settings.numeralsAuto')],
+          ['arabic', t('settings.numeralsArabic')],
+        ],
+        p.numerals || 'auto',
+        'set-numerals',
       )}
       <div>
         <div class="field__label">${esc(t('settings.textSize'))}</div>
@@ -206,6 +217,12 @@ export function render(app) {
   const prayer = card(
     t('settings.prayer'),
     `<div class="list">
+      ${row({
+        label: t('qibla.title'),
+        value: '',
+        action: 'open-qibla',
+        iconName: 'pin',
+      })}
       ${row({
         label: t('settings.location'),
         value: `${p.location.name}${p.location.country ? ` · ${p.location.country}` : ''}`,
@@ -498,6 +515,19 @@ export function render(app) {
           </button>
         </div>
 
+        <div class="field">
+          <span class="field__label">${esc(t('reminders.sound'))}</span>
+          ${segmented(
+            [
+              ['chime', t('reminders.soundChime')],
+              ['bell', t('reminders.soundBell')],
+              ['none', t('reminders.soundNone')],
+            ],
+            n.sound || 'chime',
+            'rem-sound',
+          )}
+        </div>
+
         <button class="btn btn--ghost btn--sm" data-action="rem-test">${icon('bell')} ${esc(
           t('reminders.test'),
         )}</button>
@@ -635,6 +665,17 @@ export const handlers = {
     app.applyVisualPreferences();
     app.render();
   },
+  'set-numerals': (app, el) => {
+    app.commit((model) => model.updateProfile({ numerals: el.dataset.value }), { silent: true });
+    app.applyVisualPreferences();
+    app.render({ preserveScroll: true });
+  },
+
+  'open-qibla': (app) => {
+    app.openSheet('qibla', {});
+    requestAnimationFrame(() => attachCompass());
+  },
+
   'set-theme': (app, el) => {
     app.commit((model) => model.updateProfile({ theme: el.dataset.value }), { silent: true });
     app.applyVisualPreferences();
@@ -680,6 +721,15 @@ export const handlers = {
   'open-support': (app) => app.openSheet('support', {}),
 
   'open-snapshots': (app) => app.openSheet('snapshots', {}),
+
+  'rem-sound': (app, el) => {
+    const config = normalizeReminders(app.model.profile.notifications);
+    app.commit(
+      (model) => model.updateProfile({ notifications: { ...config, sound: el.dataset.value } }),
+      { silent: true },
+    );
+    app.applyVisualPreferences();
+  },
 
   'snapshot-restore': (app, el) => {
     const model = app.store.restoreSnapshot(el.dataset.at);

@@ -52,11 +52,20 @@ export function primeAudio() {
   }
 }
 
+let soundId = 'chime';
+
+/** 'chime' | 'bell' | 'none' — set from the profile when preferences change. */
+export function setSound(id) {
+  soundId = ['chime', 'bell', 'none'].includes(id) ? id : 'chime';
+}
+
 function chime() {
+  if (soundId === 'none') return;
+  const tones = soundId === 'bell' ? [523.25, 392] : [880, 1174.66];
   if (!audio) return;
   try {
     const start = audio.currentTime;
-    [880, 1174.66].forEach((frequency, index) => {
+    tones.forEach((frequency, index) => {
       const oscillator = audio.createOscillator();
       const gain = audio.createGain();
       const at = start + index * 0.22;

@@ -1,6 +1,6 @@
 /* Qada service worker — offline shell, no network dependency at runtime. */
 
-const VERSION = 'qada-v20';
+const VERSION = 'qada-v21';
 const SHELL = [
   './',
   './index.html',
@@ -26,6 +26,7 @@ const SHELL = [
   './js/core/engine.js',
   './js/core/reminders.js',
   './js/core/rle.js',
+  './js/core/qibla.js',
   './js/ui/icons.js',
   './js/ui/dom.js',
   './js/ui/today.js',

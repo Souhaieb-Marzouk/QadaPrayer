@@ -24,7 +24,7 @@ import * as sheets from './ui/sheets.js';
 import * as lock from './ui/lock.js';
 import * as printScreen from './ui/print.js';
 import { renderLock } from './ui/lock.js';
-import { resetShown, scheduleReminders, snoozeFrom } from './notify.js';
+import { resetShown, scheduleReminders, setSound, snoozeFrom } from './notify.js';
 import { applyUpdate, checkForUpdate, initUpdater } from './updater.js';
 import { buildSnapshot, publishSnapshot } from './native.js';
 import { mergeModels } from './merge.js';
@@ -289,6 +289,8 @@ export function applyVisualPreferences() {
   const profile = app.model?.profile;
   const theme = profile?.theme || app.store.meta?.theme || 'dark';
   const scale = profile?.textScale || app.store.meta?.textScale || 1;
+  i18n.setArabicDigits(profile?.numerals === 'arabic');
+  setSound(profile?.notifications?.sound || 'chime');
   const root = document.documentElement;
   const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true;
   const effective = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme;
@@ -480,6 +482,7 @@ export function openSheet(type, props = {}) {
 }
 
 export function closeSheet() {
+  sheets.stopCompass?.();
   app.sheet = null;
   render({ preserveScroll: true });
 }
@@ -729,7 +732,31 @@ function onDocumentInput(event) {
 }
 
 function onKeyDown(event) {
-  if (event.key === 'Escape' && app.sheet) closeSheet();
+  if (event.key === 'Escape' && app.sheet) {
+    closeSheet();
+    return;
+  }
+
+  // Keep Tab inside the open sheet: it is a modal, so leaving it is a trap.
+  if (event.key !== 'Tab' || !app.sheet) return;
+  const sheet = document.querySelector('.sheet');
+  if (!sheet) return;
+
+  const focusable = [...sheet.querySelectorAll(
+    'button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
+  )].filter((node) => node.offsetParent !== null);
+  if (!focusable.length) return;
+
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+
+  if (event.shiftKey && (document.activeElement === first || !sheet.contains(document.activeElement))) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
 }
 
 /* ------------------------------------------------------------------ */

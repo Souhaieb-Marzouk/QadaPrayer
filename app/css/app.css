@@ -2241,3 +2241,95 @@ html {
 .row-actions .btn {
   flex: 1;
 }
+
+/* Two extra palettes: warm sepia, and a colder midnight. */
+[data-theme='sepia'] {
+  --bg: #17110b;
+  --bg-glow-1: rgba(120, 74, 32, 0.3);
+  --bg-glow-2: rgba(212, 162, 76, 0.18);
+  --surface: rgba(46, 34, 22, 0.74);
+  --surface-strong: #241a11;
+  --surface-2: rgba(255, 240, 214, 0.05);
+  --line: rgba(212, 162, 76, 0.22);
+  --line-soft: rgba(255, 240, 214, 0.09);
+  --text: #f2e5d2;
+  --text-dim: #d9c6ac;
+  --muted: #a89madd;
+  --muted: #a8977f;
+  --muted-2: #8c7c67;
+  --ring-track: rgba(255, 240, 214, 0.1);
+  --scrim: rgba(20, 14, 9, 0.62);
+}
+
+[data-theme='night'] {
+  --bg: #05070f;
+  --bg-glow-1: rgba(40, 70, 160, 0.26);
+  --bg-glow-2: rgba(120, 90, 200, 0.16);
+  --surface: rgba(16, 20, 38, 0.76);
+  --surface-strong: #0b0f1e;
+  --surface-2: rgba(255, 255, 255, 0.05);
+  --line: rgba(140, 160, 255, 0.2);
+  --line-soft: rgba(255, 255, 255, 0.08);
+  --text: #e7ecff;
+  --text-dim: #c3cbe8;
+  --muted: #8d99bd;
+  --muted-2: #6f7a9c;
+  --ring-track: rgba(255, 255, 255, 0.1);
+  --scrim: rgba(4, 6, 14, 0.66);
+}
+
+/* Qibla dial */
+.qibla {
+  display: flex;
+  justify-content: center;
+  margin: 0.4rem 0 0.2rem;
+}
+
+.qibla__dial {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: radial-gradient(circle at 50% 40%, rgba(212, 162, 76, 0.12), transparent 70%);
+  display: grid;
+  place-items: center;
+}
+
+.qibla__n {
+  position: absolute;
+  top: 6px;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.qibla__needle {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: start center;
+  transition: transform 0.12s linear;
+}
+
+.qibla__needle span {
+  display: block;
+  width: 2px;
+  height: 45%;
+  margin-top: 12%;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--gold-soft), transparent);
+  box-shadow: 0 0 18px rgba(240, 205, 138, 0.55);
+}
+
+.qibla__needle span::before {
+  content: '';
+  position: absolute;
+  top: 6%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: var(--gold-soft);
+}

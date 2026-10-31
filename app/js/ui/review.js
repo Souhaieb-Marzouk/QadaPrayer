@@ -155,13 +155,90 @@ export function render(app) {
       </div>
     </div>
 
+    <button class="btn btn--primary btn--block" style="margin-top:.8rem" data-action="share-card">
+      ${esc(t('review.share'))}
+    </button>
+
     <button class="btn btn--ghost btn--block" style="margin-top:.8rem" data-action="review-back">
       ${icon('chevronLeft')} ${esc(t('review.back'))}
     </button>
   `;
 }
 
+/** Draw a small, private progress card and hand it to the share sheet. */
+async function shareCard(app) {
+  try {
+    const model = app.model;
+    const projection = model.projection();
+    const streaks = model.streaks(app.today);
+    const week = model.rangeSummary(addDays(app.today, -6), app.today);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1350;
+    const ctx = canvas.getContext('2d');
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#0b2a26');
+    gradient.addColorStop(1, '#06100f');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#f0cd8a';
+    ctx.font = '600 46px Georgia, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('QadaPrayer', canvas.width / 2, 150);
+
+    ctx.fillStyle = '#e9f3ef';
+    ctx.font = '700 150px Georgia, serif';
+    ctx.fillText(String(projection.remaining), canvas.width / 2, 500);
+
+    ctx.fillStyle = '#c3d6d1';
+    ctx.font = '400 40px Georgia, serif';
+    ctx.fillText('%', canvas.width / 2, 560);
+
+    ctx.fillStyle = '#7fd1c0';
+    ctx.font = '600 44px Georgia, serif';
+    ctx.fillText(`${streaks.current}`, canvas.width / 2, 760);
+    ctx.fillStyle = '#8fa8a2';
+    ctx.font = '400 30px Georgia, serif';
+    ctx.fillText('streak', canvas.width / 2, 805);
+
+    ctx.fillStyle = '#e9f3ef';
+    ctx.font = '400 34px Georgia, serif';
+    ctx.fillText(`${week.complete}/${week.days}`, canvas.width / 2, 950);
+    ctx.fillStyle = '#8fa8a2';
+    ctx.font = '400 28px Georgia, serif';
+    ctx.fillText('this week', canvas.width / 2, 992);
+
+    ctx.fillStyle = '#5c716c';
+    ctx.font = '400 26px Georgia, serif';
+    ctx.fillText(dateMedium(app.today), canvas.width / 2, 1220);
+
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (!blob) throw new Error('no-blob');
+
+    const file = new File([blob], 'qadaprayer.png', { type: 'image/png' });
+    if (navigator.canShare?.({ files: [file] })) {
+      await navigator.share({ files: [file], title: 'QadaPrayer' });
+    } else {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'qadaprayer.png';
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    app.showToast(t('review.shareDone'));
+  } catch {
+    app.showToast(t('review.shareFailed'));
+  }
+}
+
 export const handlers = {
+  'share-card': (app) => shareCard(app),
+
   'review-back': (app) => {
     app.route = 'stats';
     if (location.hash !== '#/stats') history.replaceState(null, '', '#/stats');
