@@ -474,7 +474,10 @@ export const handlers = {
     app.render();
   },
   'onb-gps': (app) => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      app.showToast(t('location.unsupported'));
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (position) => {
         app.onb.draft.location = {

@@ -227,6 +227,9 @@ export function renderDaySheet(app, sheet) {
     <button class="btn btn--primary" data-action="day-mark-all" data-date="${date}">${esc(
       t('calendar.markAllDay'),
     )}</button>
+    <button class="btn btn--ghost" data-action="day-mark-exempt" data-date="${date}">${esc(
+      t('calendar.markExempt'),
+    )}</button>
     <button class="btn" data-action="day-step" data-delta="1" aria-label="${esc(
       t('today.nextDay'),
     )}">${icon('chevronRight')}</button>
@@ -910,7 +913,9 @@ export const handlers = {
     app.sheet = null;
 
     if (mode === 'tomorrow') {
-      app.commit((model) => model.pausePrayer(sheet.date, sheet.prayer), {
+      // The user asked for "tomorrow": every make-up still open today moves, not
+      // only the ones under this prayer.
+      app.commit((model) => model.pauseDay(sheet.date), {
         message: t('sheet.deferTomorrow'),
       });
       return;
@@ -942,6 +947,14 @@ export const handlers = {
     app.commit((model) => model.setMark(date, prayer, nextValue));
   },
 
+  'day-mark-exempt': (app, el) => {
+    const date = el.dataset.date;
+    app.commit((model) => model.markRange(date, date, MARK_EXEMPT), {
+      message: t('calendar.markExempt'),
+    });
+    app.closeSheet();
+  },
+
   'day-mark-all': (app, el) => {
     const date = el.dataset.date;
     app.commit((model) => model.markRange(date, date, MARK_DONE), {
@@ -957,11 +970,14 @@ export const handlers = {
       sheet.from = app.model.profile.pubertyDate;
       sheet.to = addDays(app.today, -1);
     } else if (preset === 'year') {
-      const year = app.today.slice(0, 4);
+      const year = String(app.cal.year || app.today.slice(0, 4));
       sheet.from = `${year}-01-01`;
-      sheet.to = app.today < `${year}-12-31` ? addDays(app.today, -1) : `${year}-12-31`;
+      sheet.to = `${year}-12-31`;
     } else {
-      const prefix = app.today.slice(0, 7);
+      const year = String(app.cal.year || app.today.slice(0, 4));
+      const month = app.cal.month;
+      const index = month === null || month === undefined ? Number(app.today.slice(5, 7)) - 1 : month;
+      const prefix = `${year}-${String(index + 1).padStart(2, '0')}`;
       sheet.from = `${prefix}-01`;
       sheet.to = addDays(app.today, -1);
     }
@@ -998,7 +1014,10 @@ export const handlers = {
   },
 
   'city-gps': (app) => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      app.showToast(t('location.unsupported'));
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';

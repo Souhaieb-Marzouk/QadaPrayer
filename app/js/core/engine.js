@@ -486,6 +486,13 @@ export class Qada {
     return [];
   }
 
+  /** Move every make-up still owed today to the next day. */
+  pauseDay(dateISO) {
+    this.data.pauses[dateISO] = (1 << SLOTS_PER_DAY) - 1;
+    this.log({ kind: 'defer', mode: 'tomorrow', dateISO, prayer: null });
+    this.touch();
+  }
+
   /** Move everything planned under one prayer of `dateISO` to the next day. */
   pausePrayer(dateISO, prayer) {
     const index = PRAYER_INDEX[prayer];

@@ -163,6 +163,21 @@ function countOwed(model, date) {
   ).length;
 }
 
+
+/** The dates the calendar is currently showing: a month, a year, or this month. */
+function visibleRange(app) {
+  const month = app.cal.month;
+  const year = Number(app.cal.year) || Number(app.today.slice(0, 4));
+
+  if (month !== null && month !== undefined) {
+    const first = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+    const last = new Date(Date.UTC(year, month + 1, 0)).toISOString().slice(0, 10);
+    return { from: first, to: last };
+  }
+
+  return { from: `${year}-01-01`, to: `${year}-12-31` };
+}
+
 export function render(app) {
   const model = app.model;
   const header = `
@@ -200,10 +215,15 @@ export const handlers = {
     app.openSheet('day', { date: el.dataset.date });
   },
   'open-bulk': (app) => {
+    // Start from what the user is looking at: the month, the year, or — with
+    // nothing selected — the month we are in.
     const model = app.model;
+    const { from, to } = visibleRange(app);
+    const earliest = model.profile.pubertyDate || addDays(app.today, -365);
+
     app.openSheet('bulk', {
-      from: model.profile.pubertyDate || addDays(app.today, -365),
-      to: addDays(app.today, -1),
+      from: from < earliest ? earliest : from,
+      to: to,
       mode: 'done',
     });
   },
