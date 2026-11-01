@@ -358,9 +358,7 @@ function citySheet(app) {
           query,
         )}" placeholder="${esc(t('onboarding.searchCity'))}" autocomplete="off">
       </div>
-      <button class="btn btn--ghost btn--block" data-action="city-gps">${icon(
-        'pin',
-      )} ${esc(t('onboarding.useGps'))}</button>
+      
       <div class="city-list">
         ${results
           .map(

@@ -1,6 +1,6 @@
 /* Qada service worker — offline shell, no network dependency at runtime. */
 
-const VERSION = 'qada-v29';
+const VERSION = 'qada-v30';
 const SHELL = [
   './',
   './index.html',

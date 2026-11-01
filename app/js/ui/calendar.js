@@ -169,9 +169,9 @@ function visibleRange(app) {
   const month = app.cal.month;
   const year = Number(app.cal.year) || Number(app.today.slice(0, 4));
 
-  if (month !== null && month !== undefined) {
-    const first = `${year}-${String(month + 1).padStart(2, '0')}-01`;
-    const last = new Date(Date.UTC(year, month + 1, 0)).toISOString().slice(0, 10);
+  if (Number.isFinite(month) && month >= 1) {
+    const first = `${year}-${String(month).padStart(2, '0')}-01`;
+    const last = new Date(Date.UTC(year, month, 0)).toISOString().slice(0, 10);
     return { from: first, to: last };
   }
 
