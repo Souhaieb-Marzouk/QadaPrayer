@@ -206,14 +206,17 @@ export function render(app) {
         p.theme,
         'set-theme',
       )}
-      ${segmented(
-        [
-          ['auto', t('settings.numeralsAuto')],
-          ['arabic', t('settings.numeralsArabic')],
-        ],
-        p.numerals || 'auto',
-        'set-numerals',
-      )}
+      <div class="field">
+        <span class="field__label">${esc(t('settings.numerals'))}</span>
+        ${segmented(
+          [
+            ['auto', t('settings.numeralsAuto')],
+            ['arabic', t('settings.numeralsArabic')],
+          ],
+          p.numerals || 'auto',
+          'set-numerals',
+        )}
+      </div>
       <div>
         <div class="field__label">${esc(t('settings.textSize'))}</div>
         ${segmented(

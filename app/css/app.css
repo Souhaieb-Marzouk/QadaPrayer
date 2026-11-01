@@ -2387,3 +2387,35 @@ html {
   font-weight: 700;
   color: var(--gold-soft);
 }
+
+/* WebKit (Safari, every iPhone browser) needs the prefixed backdrop filter;
+   without it the bar is see-through and the page shows through. The background
+   is nearly opaque anyway, so nothing looks different where blur works. */
+.nav,
+.topbar {
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+.nav {
+  background: linear-gradient(180deg, rgba(6, 16, 15, 0.92), rgba(6, 16, 15, 0.98));
+}
+
+.topbar {
+  background: rgba(6, 16, 15, 0.94);
+}
+
+[data-theme='light'] .nav,
+[data-theme='light'] .topbar {
+  background: rgba(247, 243, 234, 0.96);
+}
+
+[data-theme='sepia'] .nav,
+[data-theme='sepia'] .topbar {
+  background: rgba(23, 17, 11, 0.95);
+}
+
+[data-theme='night'] .nav,
+[data-theme='night'] .topbar {
+  background: rgba(5, 7, 15, 0.95);
+}
