@@ -120,6 +120,10 @@ function stepWelcome() {
     <div class="onb-point">${icon('shield')}<span>${esc(t('onboarding.welcomePoint1'))}</span></div>
     <div class="onb-point">${icon('globe')}<span>${esc(t('onboarding.welcomePoint2'))}</span></div>
     <div class="onb-point">${icon('download')}<span>${esc(t('onboarding.welcomePoint3'))}</span></div>
+    <button class="btn btn--ghost btn--block" style="margin-top:1.1rem" data-action="onb-sync-open">
+      ${icon('upload')} ${esc(t('onboarding.syncOpen'))}
+    </button>
+    <p class="field__hint" style="text-align:center">${esc(t('onboarding.syncOpenHint'))}</p>
   `;
 }
 
@@ -307,8 +311,8 @@ export function render(app) {
   const state = draft(app);
   const step = state.step;
 
-  // The very first screen: bring the history from another phone, or start fresh.
-  if (step === 0 && !state.asked) {
+  // Reachable from the welcome page, not the first thing you see.
+  if (step === 0 && state.showSync) {
     return `
       <div class="onb" dir="${state.draft.language === 'ar' ? 'rtl' : 'ltr'}">
         <div class="onb__dots">${dots(0)}</div>
@@ -352,7 +356,20 @@ function go(app, step) {
 }
 
 export const handlers = {
+  'onb-sync-open': (app) => {
+    app.onb.showSync = true;
+    app.onb.syncStatus = '';
+    app.render();
+  },
+
+  'onb-sync-back': (app) => {
+    app.onb.showSync = false;
+    app.onb.syncStatus = '';
+    app.render();
+  },
+
   'onb-sync-skip': (app) => {
+    app.onb.showSync = false;
     app.onb.asked = true;
     app.render();
   },

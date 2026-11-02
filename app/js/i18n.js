@@ -75,6 +75,8 @@ const DICTIONARIES = {
     'onboarding.welcomePoint3': 'Your data stays on your phone, with an encrypted backup you control.',
     'onboarding.start': 'Get started',
     'onboarding.syncTitle': 'Do you already use QadaPrayer?',
+    'onboarding.syncOpen': 'I already use QadaPrayer — restore my data',
+    'onboarding.syncOpenHint': 'Been tracking on another phone? Bring the ledger here in one step.',
     'onboarding.syncBody':
       'If another phone already has your history, bring it here: paste the sync code and everything arrives, set up and ready.',
     'onboarding.syncRestore': 'Restore with this code',
@@ -550,6 +552,8 @@ const DICTIONARIES = {
     'onboarding.welcomePoint3': 'Vos données restent sur votre téléphone, avec une sauvegarde chiffrée.',
     'onboarding.start': 'Commencer',
     'onboarding.syncTitle': 'Vous utilisez déjà QadaPrayer ?',
+    'onboarding.syncOpen': 'J\u2019utilise déjà QadaPrayer — restaurer mes données',
+    'onboarding.syncOpenHint': 'Vous suivez déjà sur un autre t\u00e9l\u00e9phone ? Ramenez votre registre en une \u00e9tape.',
     'onboarding.syncBody':
       'Si un autre téléphone a déjà votre historique, amenez-le ici : collez le code de synchro et tout arrive, déjà configuré.',
     'onboarding.syncRestore': 'Restaurer avec ce code',
@@ -1025,6 +1029,8 @@ const DICTIONARIES = {
     'onboarding.welcomePoint3': 'بياناتك تبقى في هاتفك، مع نسخة احتياطية مشفّرة تملكها أنت.',
     'onboarding.start': 'ابدأ',
     'onboarding.syncTitle': 'هل تستعمل «قضاء» من قبل؟',
+    'onboarding.syncOpen': 'أستعمل QadaPrayer من قبل — استعد بياناتي',
+    'onboarding.syncOpenHint': 'تتابع على هاتف آخر؟ انقل سجلك في خطوة.',
     'onboarding.syncBody':
       'إن كان هاتف آخر يحمل سجلك، انقله إلى هنا: الصق رمز المزامنة فيصل كل شيء جاهزًا.',
     'onboarding.syncRestore': 'استعادة بهذا الرمز',
