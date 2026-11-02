@@ -2419,3 +2419,19 @@ html {
 [data-theme='night'] .topbar {
   background: rgba(5, 7, 15, 0.95);
 }
+
+/* City list: the pin icon was rendering at its default size. */
+.city-item svg,
+.city-list svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: none;
+  color: var(--gold-soft);
+}
+
+.city-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: start;
+}

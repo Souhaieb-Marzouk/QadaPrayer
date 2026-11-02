@@ -39,3 +39,6 @@ release.local.json
 
 # Wrangler local state (account cache, KV preview data)
 infra/.wrangler/
+
+# Visual Studio cache, never part of the project
+.vs/

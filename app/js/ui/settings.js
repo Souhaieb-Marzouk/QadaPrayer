@@ -64,7 +64,7 @@ function syncCard(app) {
         <button class="btn btn--ghost btn--sm btn--block" data-action="sync-copy">${esc(
           t('sync.copy'),
         )}</button>
-        <button class="btn btn--ghost btn--sm btn--block" data-action="open-sync">${esc(
+        <button class="btn btn--ghost btn--sm btn--block" data-action="sync-forget">${esc(
           t('sync.deleteRemote'),
         )}</button>
       </div>`
@@ -447,7 +447,7 @@ export function render(app) {
             ? `<button class="btn btn--primary btn--block" data-action="install-app">${icon(
                 'download',
               )} ${esc(t('settings.install'))}</button>`
-            : `<div class="notice">${icon('info')}<span>${esc(t('onboarding.useGps'))}</span></div>`
+            : `<div class="notice">${icon('info')}<span>${esc(t('settings.installHint'))}</span></div>`
       }
     </div>`,
   );

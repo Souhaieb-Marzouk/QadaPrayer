@@ -104,7 +104,8 @@ export async function checkForApkUpdate(app, { force = false, fetchImpl } = {}) 
 
     return {
       ...latest,
-      available: current ? compareVersions(latest.version, current) > 0 : false,
+      available:
+        Boolean(latest.apkUrl) && current ? compareVersions(latest.version, current) > 0 : false,
     };
   } catch (error) {
     app.store?.writeMeta({ apkCheckedAt: new Date().toISOString() });
