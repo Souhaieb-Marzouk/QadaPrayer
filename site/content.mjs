@@ -5,6 +5,13 @@
  * from this file, so the three versions can never drift apart.
  */
 
+/**
+ * Cloudflare Web Analytics: cookieless, no IP storage, no fingerprint.
+ * Paste the token from the Cloudflare dashboard here to switch it on; while it
+ * is empty the beacon is not emitted at all.
+ */
+export const ANALYTICS = { cloudflareToken: 'e9a914f1bcf14ab1b5c5a205ddb91a90' };
+
 export const DONATE = {
   kofi: 'https://ko-fi.com/cyberpulseacademy',
   paypal: 'https://www.paypal.com/donate/?hosted_button_id=KNUSPQTVR9WCU',

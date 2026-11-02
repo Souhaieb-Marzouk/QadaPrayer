@@ -7,7 +7,7 @@
  */
 
 import { writeFileSync } from 'node:fs';
-import { CONTENT, DONATE, LANGS } from '../site/content.mjs';
+import { ANALYTICS, CONTENT, DONATE, LANGS } from '../site/content.mjs';
 
 const esc = (value) =>
   String(value)
@@ -40,6 +40,12 @@ function head(lang, c) {
     <meta property="og:locale" content="${lang.code}" />
     ${alternates}
     <link rel="stylesheet" href="./site.css" />
+${
+  ANALYTICS.cloudflareToken
+    ? `    <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon='{"token": "${ANALYTICS.cloudflareToken}"}'></script>\n`
+    : ''
+}
   </head>`;
 }
 
@@ -89,6 +95,7 @@ function hero(lang, c) {
             <a class="btn btn--primary" href="#install">${esc(c.hero.ctaPrimary)}</a>
             <a class="btn btn--ghost" href="./app/?demo=1">${esc(c.hero.ctaSecondary)}</a>
           </div>
+          <p class="stats-line" id="stats-line" hidden></p>
           <ul class="hero__facts">
             ${facts}
           </ul>
@@ -351,7 +358,8 @@ function page(lang) {
     '    </main>',
     '',
     footer(c, lang),
-    '  </body>',
+    '    <script src="./site-stats.js" defer></script>',
+'  </body>',
     '</html>',
     '',
   ].join('\n');

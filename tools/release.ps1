@@ -125,6 +125,7 @@ try {
   Step 'Landing pages'
   node tools/build-site.mjs | Out-Null
   if ($LASTEXITCODE -ne 0) { Fail 'tools/build-site.mjs failed' }
+  node tools/stats.mjs | Out-Null
   node tools/build-pages.mjs | Out-Null
   if ($LASTEXITCODE -ne 0) { Fail 'tools/build-pages.mjs failed' }
   Ok 'index, guide and privacy pages, three languages'
