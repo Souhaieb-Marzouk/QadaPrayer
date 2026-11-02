@@ -61,6 +61,9 @@ function nav(lang, c) {
         <a href="#screens">${esc(c.nav.screens)}</a>
         <a href="#how">${esc(c.nav.how)}</a>
         <a href="#install">${esc(c.nav.install)}</a>
+        <a href="./${lang.code === 'en' ? 'guide.html' : `guide-${lang.code}.html`}">${esc(
+          lang.code === 'fr' ? 'Guide' : lang.code === 'ar' ? 'الدليل' : 'Guide',
+        )}</a>
         <a href="#support">${esc(c.nav.support)}</a>
       </nav>
       <div class="nav__end">

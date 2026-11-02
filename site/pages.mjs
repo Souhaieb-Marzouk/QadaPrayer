@@ -52,6 +52,21 @@ export const PAGES = {
       {
         t: '10. Worth knowing',
         b: 'Appearance: dark, light, sepia, midnight, and Arabic digits. Qibla: a compass that turns with the phone. Widget: today at a glance. About: the app checks once a day for a new version and can install it.',
+      },      {
+        t: '11. Backups, in detail',
+        b: 'Settings → Backup → Download writes an encrypted file to your Downloads folder (on iPhone it opens the share sheet). Keep it in your own cloud. To restore, choose the file and pick Merge — the union of what you had and what is in the file — or Replace. Merge never loses a mark; Replace is for starting over.',
+      },
+      {
+        t: '12. More than one person',
+        b: 'Settings → People. Each person has their own ledger, their own settings and their own sync code, so two people on one phone never share a count. Add a person, set them up once, then switch with a tap.',
+      },
+      {
+        t: '13. The widget and updates',
+        b: 'Long-press the home screen → Widgets → QadaPrayer for today at a glance. In Settings → About the app checks once a day for a new release and offers Download and install; Android asks you to confirm, and your data is kept.',
+      },
+      {
+        t: '14. If something looks wrong',
+        b: 'A mark you did not expect: open that day in the calendar and untick it — tomorrow always follows the ledger, never the other way round. The count does not move: check that the pace is not zero in Settings → Pace. Nothing loads: pull to refresh once; the app is offline-first, so the data is still there.',
       },
     ],
     privacyTitle: 'Privacy',
@@ -116,6 +131,21 @@ export const PAGES = {
       {
         t: '10. Bon à savoir',
         b: 'Apparence : sombre, clair, sépia, minuit, et chiffres arabes. Qibla : une boussole qui suit le téléphone. Widget : aujourd’hui en un coup d’œil. À propos : l’app vérifie une fois par jour les mises à jour et peut l’installer.',
+      },      {
+        t: '11. La sauvegarde en détail',
+        b: 'Réglages → Sauvegarde → Télécharger écrit un fichier chiffré dans vos Téléchargements (sur iPhone, la feuille de partage s’ouvre). Gardez-le dans votre propre cloud. Pour restaurer : choisissez le fichier puis Fusionner — l’union de ce que vous aviez et du fichier — ou Remplacer. Fusionner ne perd jamais une prière.',
+      },
+      {
+        t: '12. Plusieurs personnes',
+        b: 'Réglages → Personnes. Chacun a son registre, ses réglages et son code de synchro : deux personnes sur un même téléphone ne partagent jamais un compte. Ajoutez une personne, configurez-la une fois, puis passez de l’une à l’autre en un appui.',
+      },
+      {
+        t: '13. Le widget et les mises à jour',
+        b: 'Appui long sur l’écran d’accueil → Widgets → QadaPrayer pour voir la journée en un coup d’œil. Dans Réglages → À propos, l’app vérifie une fois par jour les nouvelles versions et propose Télécharger et installer ; Android demande confirmation, vos données sont conservées.',
+      },
+      {
+        t: '14. Si quelque chose semble faux',
+        b: 'Une marque inattendue : ouvrez ce jour dans le calendrier et décochez-la — demain suit toujours le registre, jamais l’inverse. Le compteur ne bouge pas : vérifiez que le rythme n’est pas à zéro (Réglages → Rythme). Rien ne s’affiche : rechargez une fois ; l’app fonctionne hors ligne, vos données sont là.',
       },
     ],
     privacyTitle: 'Confidentialité',
@@ -180,6 +210,21 @@ export const PAGES = {
       {
         t: '١٠. جدير بالمعرفة',
         b: 'المظهر: داكن، فاتح، بني، ليلي، وأرقام عربية. القبلة: بوصلة تدور مع الهاتف. الودجت: اليوم في لمحة. حول: يتحقق التطبيق من التحديثات مرة يوميًا ويمكنه تثبيتها.',
+      },      {
+        t: '١١. النسخ الاحتياطي بالتفصيل',
+        b: 'الإعدادات ← النسخ الاحتياطي ← تنزيل: يُكتب ملف مشفّر في مجلد التنزيلات (وعلى آيفون يفتح قائمة المشاركة). احفظه في سحابتك. للاستعادة: اختر الملف ثم «دمج» — وهو اتحاد ما لديك وما في الملف — أو «استبدال». الدمج لا يُفقد صلاة.',
+      },
+      {
+        t: '١٢. أكثر من شخص',
+        b: 'الإعدادات ← الأشخاص. لكل شخص سجله وإعداداته ورمز مزامنته، فلا يتشارك شخصان عددًا واحدًا. أضف شخصًا، أعدّه مرة، ثم بدّل بلمسة.',
+      },
+      {
+        t: '١٣. الودجت والتحديثات',
+        b: 'اضغط مطولًا على الشاشة الرئيسية ← الودجتات ← QadaPrayer لترى يومك في لمحة. وفي الإعدادات ← حول، يتحقق التطبيق مرة يوميًا من الإصدارات ويعرض «تنزيل وتثبيت»؛ وأندرويد يطلب التأكيد وتبقى بياناتك.',
+      },
+      {
+        t: '١٤. إذا بدا شيء خاطئًا',
+        b: 'علامة غير متوقعة: افتح ذلك اليوم في التقويم وأزل التحديد — فالغد يتبع السجل دائمًا. العدد لا يتحرك: تأكد أن الوتيرة ليست صفرًا. لا شيء يظهر: أعد التحميل مرة؛ فالتطبيق يعمل بلا إنترنت.',
       },
     ],
     privacyTitle: 'الخصوصية',
