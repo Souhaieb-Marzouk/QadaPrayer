@@ -312,7 +312,7 @@ export function render(app) {
   const step = state.step;
 
   // Reachable from the welcome page, not the first thing you see.
-  if (step === 0 && state.showSync) {
+  if (step === 1 && state.showSync) {
     return `
       <div class="onb" dir="${state.draft.language === 'ar' ? 'rtl' : 'ltr'}">
         <div class="onb__dots">${dots(0)}</div>
@@ -322,8 +322,10 @@ export function render(app) {
   }
 
   const bodies = [
-    () => stepWelcome(),
+    // Language first: the welcome page is written in a language, and someone who
+    // does not read English must be able to change it before reading anything.
     () => stepLanguage(state),
+    () => stepWelcome(),
     () => stepGender(state),
     () => stepPuberty(state),
     () => stepHistory(state),
