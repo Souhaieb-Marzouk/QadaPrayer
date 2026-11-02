@@ -861,3 +861,75 @@ code {
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Phones: the header carries a brand, a language switch, a tip button and a
+   download button — too much for 390px. Drop the tip (it is on the page twice
+   already), tighten everything, and let the footer wrap. */
+@media (max-width: 720px) {
+  .nav {
+    gap: 0.4rem;
+    padding: 0.6rem 0.8rem;
+    flex-wrap: nowrap;
+    align-items: center;
+  }
+
+  .nav__brand {
+    flex: none;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+  }
+
+  .nav__brand img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .nav__end {
+    margin-inline-start: auto;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .nav__end .btn--tip {
+    display: none;
+  }
+
+  .nav .btn--sm {
+    padding: 0.34rem 0.6rem;
+    font-size: 0.72rem;
+    min-height: 1.95rem;
+    white-space: nowrap;
+  }
+
+  .lang {
+    padding: 0.1rem;
+  }
+
+  .lang a {
+    padding: 0.22rem 0.34rem;
+    font-size: 0.68rem;
+  }
+
+  .footer {
+    padding: 1.4rem 1rem calc(1.4rem + env(safe-area-inset-bottom));
+    gap: 0.5rem;
+    text-align: center;
+  }
+
+  .footer__links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem 0.9rem;
+    font-size: 0.8rem;
+    line-height: 1.6;
+  }
+
+  .footer__donate {
+    margin-top: 0.6rem;
+  }
+
+  .footer__note {
+    max-width: 30ch;
+    margin-inline: auto;
+  }
+}
