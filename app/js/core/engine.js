@@ -524,7 +524,7 @@ export class Qada {
     let count = 0;
     for (let i = from; i <= to; i += 1) {
       // An excused day (haydh) is never overwritten by a bulk "done".
-      if (options.skipExempt && value === MARK_DONE && this.valueAt(i) === MARK_EXEMPT) continue;
+      if (options.skipExempt && value === MARK_DONE && this.get(i) === MARK_EXEMPT) continue;
       this.ledger[i] = value;
       count += 1;
     }
