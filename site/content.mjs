@@ -10,7 +10,7 @@
  * Paste the token from the Cloudflare dashboard here to switch it on; while it
  * is empty the beacon is not emitted at all.
  */
-export const ANALYTICS = { cloudflareToken: 'e9a914f1bcf14ab1b5c5a205ddb91a90' };
+export const ANALYTICS = { cloudflareToken: '' };
 
 export const DONATE = {
   kofi: 'https://ko-fi.com/cyberpulseacademy',

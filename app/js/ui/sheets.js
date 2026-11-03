@@ -227,9 +227,13 @@ export function renderDaySheet(app, sheet) {
     <button class="btn btn--primary" data-action="day-mark-all" data-date="${date}">${esc(
       t('calendar.markAllDay'),
     )}</button>
-    <button class="btn btn--ghost" data-action="day-mark-exempt" data-date="${date}">${esc(
-      t('calendar.markExempt'),
-    )}</button>
+    ${
+      app.model.profile.gender === 'female'
+        ? `<button class="btn btn--ghost" data-action="day-mark-exempt" data-date="${date}">${esc(
+            t('calendar.markExcused'),
+          )}</button>`
+        : ''
+    }
     <button class="btn" data-action="day-step" data-delta="1" aria-label="${esc(
       t('today.nextDay'),
     )}">${icon('chevronRight')}</button>
@@ -945,6 +949,22 @@ export const handlers = {
     app.commit((model) => model.setMark(date, prayer, nextValue));
   },
 
+  'today-excuse': (app) => {
+    app.openSheet('confirm', {
+      title: t('today.excuse'),
+      body: t('today.excuseBody'),
+      confirmLabel: t('today.excuse'),
+      action: 'do-today-excuse',
+    });
+  },
+
+  'do-today-excuse': (app) => {
+    app.commit((model) => model.markRange(app.today, app.today, MARK_EXEMPT, { includeToday: true }), {
+      message: t('today.excuse'),
+    });
+    app.closeSheet();
+  },
+
   'day-mark-exempt': (app, el) => {
     const date = el.dataset.date;
     app.commit((model) => model.markRange(date, date, MARK_EXEMPT), {
@@ -993,7 +1013,9 @@ export const handlers = {
     let count = 0;
     app.commit(
       (model) => {
-        count = model.markRange(sheet.from, sheet.to, value);
+        count = model.markRange(sheet.from, sheet.to, value, {
+          skipExempt: value === MARK_DONE,
+        });
       },
       { message: t('calendar.preview', { count: number(count) }) },
     );

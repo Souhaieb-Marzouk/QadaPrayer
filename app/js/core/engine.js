@@ -506,11 +506,11 @@ export class Qada {
    * Mark every owed slot in an inclusive date range.
    * Dates are clamped to the owed window; future dates are refused.
    */
-  markRange(fromDate, toDate, value = MARK_DONE) {
+  markRange(fromDate, toDate, value = MARK_DONE, options = {}) {
     const start = this.startIndex;
     if (start === null) return 0;
     const yesterday = addDays(this.today, -1);
-    const cappedTo = toDate < yesterday ? toDate : yesterday;
+    const cappedTo = options.includeToday || toDate < yesterday ? toDate : yesterday;
     if (cappedTo < fromDate) return 0;
     const from = Math.max(start, dayOfISO(fromDate) * SLOTS_PER_DAY);
     const to = Math.min(this.endOfToday, this.endOfDay(cappedTo));

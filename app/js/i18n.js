@@ -145,6 +145,10 @@ const DICTIONARIES = {
     'calendar.dayDetail': 'Day detail',
     'calendar.markAllDay': 'Mark the whole day as prayed',
     'calendar.markExempt': 'Not owed (exempt)',
+    'calendar.markExcused': 'Excused — hayd or illness',
+    'today.excuse': 'I am excused today',
+    'today.excuseBody':
+      'Today is excused: the five prayers are not owed, and the calendar, the streak and the progress follow. You can change it any time by opening the day.',
     'location.unsupported': 'This phone cannot share its location — search for your city instead.',
     'calendar.daysDone': '{done}/{total} prayed',
     'calendar.empty': 'No obligations on this day.',

@@ -180,6 +180,14 @@ export function render(app) {
     }
 
     ${
+      app.model.profile.gender === 'female'
+        ? `<button class="btn btn--ghost btn--block" data-action="today-excuse">${icon(
+            'shield',
+          )} ${esc(t('today.excuse'))}</button>`
+        : ''
+    }
+
+    ${
       projection.remaining === 0
         ? `<div class="notice">${icon('moonCheck')}<span>${esc(t('today.allDone'))}</span></div>`
         : ''
