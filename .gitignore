@@ -42,3 +42,8 @@ infra/.wrangler/
 
 # Visual Studio cache (machine-local, never committed)
 .vs/
+
+# Local tooling and scratch space
+_pylibs/
+_tmp/
+media/*.mp4.bak

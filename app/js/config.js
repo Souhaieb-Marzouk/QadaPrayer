@@ -5,7 +5,7 @@
  * nothing else in the codebase needs to change.
  */
 
-export const VERSION = '1.2.10';
+export const VERSION = '1.3.0';
 
 export const LINKS = {
   koFi: 'https://ko-fi.com/cyberpulseacademy',

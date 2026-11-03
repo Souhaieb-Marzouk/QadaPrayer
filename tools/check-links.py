@@ -74,6 +74,9 @@ for name in (
     "privacy.html",
     "privacy-ar.html",
     "privacy-fr.html",
+    "videos.html",
+    "videos-ar.html",
+    "videos-fr.html",
 ):
     check_html(os.path.join(ROOT, name))
 check_html(os.path.join(ROOT, "app", "index.html"))

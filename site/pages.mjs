@@ -84,6 +84,7 @@ export const PAGES = {
     appLabel: 'Open the app',
     back: 'Back to the website',
     guideLink: 'User guide',
+    videosLink: 'Watch the six walkthrough parts',
   },
 
   fr: {
