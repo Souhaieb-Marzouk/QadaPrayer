@@ -44,6 +44,8 @@ const DICTIONARIES = {
     'calendar.shortMissed': 'Missed',
     'calendar.shortExcused': 'Excused',
     'calendar.badRange': 'Choose a start and an end date first.',
+    'calendar.nothingToChange':
+      'Nothing to change: those days are in the future, already marked, or excused.',
     'today.allDone': 'Everything owed is done.',
     'today.emptyQueue': 'No make-ups assigned here.',
     'today.late': 'past its window',
@@ -534,6 +536,8 @@ const DICTIONARIES = {
     'calendar.shortMissed': 'Manquées',
     'calendar.shortExcused': 'Excusée',
     'calendar.badRange': 'Choisissez une date de début et de fin.',
+    'calendar.nothingToChange':
+      'Rien \u00e0 changer : ces jours sont dans le futur, d\u00e9j\u00e0 marqu\u00e9s ou excus\u00e9s.',
     'today.allDone': 'Tout ce qui était dû est fait.',
     'today.emptyQueue': 'Aucun rattrapage ici.',
     'today.late': 'hors délai',
@@ -1024,6 +1028,8 @@ const DICTIONARIES = {
     'calendar.shortMissed': 'فائتة',
     'calendar.shortExcused': 'معذورة',
     'calendar.badRange': 'اختر تاريخ البداية والنهاية.',
+    'calendar.nothingToChange':
+      '\u0644\u0627 \u0634\u064a\u0621 \u0644\u062a\u063a\u064a\u064a\u0631\u0647: \u0647\u0630\u0647 \u0627\u0644\u0623\u064a\u0627\u0645 \u0641\u064a \u0627\u0644\u0645\u0633\u062a\u0642\u0628\u0644\u060c \u0623\u0648 \u0645\u0633\u062c\u0651\u0644\u0629 \u0645\u0646 \u0642\u0628\u0644\u060c \u0623\u0648 \u0645\u0639\u0630\u0648\u0631\u0629.',
     'today.allDone': 'تمّ أداء كل ما عليك.',
     'today.emptyQueue': 'لا قضاء مُخصَّص هنا.',
     'today.late': 'خرج وقتها',

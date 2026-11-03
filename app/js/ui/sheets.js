@@ -217,14 +217,7 @@ export function renderDaySheet(app, sheet) {
   const body = `
     <div class="field__hint">${esc(t(`calendar.${summary === 'before' ? 'beforePuberty' : summary === 'future' ? 'future' : 'empty'}`))}</div>
     ${rows}
-  `;
 
-  // Three short actions, side by side: long labels were pushing the last button
-  // and the close arrow out of a phone's width.
-  const foot = `
-    <button class="btn btn--icon" data-action="day-step" data-delta="-1" aria-label="${esc(
-      t('today.previousDay'),
-    )}">${icon('chevronLeft')}</button>
     <div class="day-actions">
       <button class="btn btn--primary btn--sm" data-action="day-mark-all" data-date="${date}">${esc(
         t('calendar.shortDone'),
@@ -240,15 +233,19 @@ export function renderDaySheet(app, sheet) {
           : ''
       }
     </div>
+  `;
+
+  // Arrows and close only: the three marks have their own row above.
+  const foot = `
+    <button class="btn btn--icon" data-action="day-step" data-delta="-1" aria-label="${esc(
+      t('today.previousDay'),
+    )}">${icon('chevronLeft')}</button>
     <button class="btn btn--icon" data-action="day-step" data-delta="1" aria-label="${esc(
       t('today.nextDay'),
     )}">${icon('chevronRight')}</button>
     <button class="btn btn--icon" data-action="close-sheet" aria-label="${esc(
       t('common.close'),
     )}">${icon('close')}</button>
-    <button class="btn" data-action="day-step" data-delta="1" aria-label="${esc(
-      t('today.nextDay'),
-    )}">${icon('chevronRight')}</button>
   `;
 
   return sheetShell({
@@ -1066,14 +1063,23 @@ export const handlers = {
       app.showToast(t('calendar.badRange'));
       return;
     }
-    app.commit(
-      (model) => {
-        count = model.markRange(sheet.from, sheet.to, value, {
-          skipExempt: value === MARK_DONE,
-        });
-      },
-      { message: t('calendar.preview', { count: number(count) }) },
-    );
+    try {
+      app.commit(
+        (model) => {
+          count = model.markRange(sheet.from, sheet.to, value, {
+            skipExempt: value === MARK_DONE,
+          });
+        },
+        { silent: true },
+      );
+    } catch (error) {
+      app.showToast(error && error.message ? error.message : t('error.generic'));
+      return;
+    }
+
+    // A range that lies in the future (markRange stops at yesterday) or is
+    // already in that state changes nothing — say so instead of going quiet.
+    app.showToast(count ? t('calendar.preview', { count: number(count) }) : t('calendar.nothingToChange'));
     app.closeSheet();
   },
 

@@ -2514,17 +2514,21 @@ html {
 
 /* The three day actions, and the arrows, on one row. */
 .day-actions {
+  grid-column: 1 / -1;
+  flex: 1 1 100%;
+  order: -1;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.4rem;
-  flex: 1;
-  min-width: 0;
+  gap: 0.45rem;
+  width: 100%;
+  margin-top: 0.9rem;
 }
 
 .day-actions .btn {
-  padding-inline: 0.4rem;
-  font-size: 0.8rem;
-  min-height: 2.35rem;
+  padding-inline: 0.3rem;
+  font-size: 0.86rem;
+  min-height: 2.9rem;
+  width: 100%;
 }
 
 .btn--icon {
