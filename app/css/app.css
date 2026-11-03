@@ -2477,3 +2477,67 @@ html {
 .credits__link:hover {
   text-decoration: underline;
 }
+
+/* An excused day: the box is filled (the prayer is settled, not pending) but in
+   its own colour, and the badge is not the "prayed" one. */
+.prayer[data-state='exempt'] .prayer__check {
+  background: linear-gradient(150deg, var(--jade, #2f8f7a), var(--jade-deep, #1f5f52));
+  border-color: transparent;
+  color: #04120f;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.prayer[data-state='exempt'] .prayer__check svg {
+  opacity: 1;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.prayer.prayer[data-state='exempt'] .prayer__right span {
+  background: rgba(240, 205, 138, 0.14);
+  border: 1px solid rgba(240, 205, 138, 0.34);
+  color: var(--gold-soft, #f0cd8a);
+}
+
+[data-theme='light'] .prayer.prayer[data-state='exempt'] .prayer__right span,
+[data-theme='sepia'] .prayer.prayer[data-state='exempt'] .prayer__right span {
+  background: rgba(122, 84, 24, 0.12);
+  border-color: rgba(122, 84, 24, 0.3);
+  color: #6b4a12;
+}
+
+/* An excused day is not editable: the row is not a button any more. */
+.prayer__head--locked {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* The three day actions, and the arrows, on one row. */
+.day-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.day-actions .btn {
+  padding-inline: 0.4rem;
+  font-size: 0.8rem;
+  min-height: 2.35rem;
+}
+
+.btn--icon {
+  padding-inline: 0.55rem;
+  min-width: 2.35rem;
+}
+
+/* An excused day in the calendar looks like an excused prayer in Today. */
+.day[data-state='exempt'],
+.cal-day[data-state='exempt'],
+.day--excused {
+  background: linear-gradient(150deg, rgba(47, 143, 122, 0.9), rgba(31, 95, 82, 0.95));
+  border-color: transparent;
+  color: #04120f;
+  box-shadow: inset 0 0 0 1px rgba(240, 205, 138, 0.35);
+}

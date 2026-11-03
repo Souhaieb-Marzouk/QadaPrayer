@@ -219,24 +219,33 @@ export function renderDaySheet(app, sheet) {
     ${rows}
   `;
 
+  // Three short actions, side by side: long labels were pushing the last button
+  // and the close arrow out of a phone's width.
   const foot = `
-    <button class="btn" data-action="day-step" data-delta="-1" aria-label="${esc(
+    <button class="btn btn--icon" data-action="day-step" data-delta="-1" aria-label="${esc(
       t('today.previousDay'),
     )}">${icon('chevronLeft')}</button>
-    <button class="btn" data-action="close-sheet">${esc(t('common.close'))}</button>
-    <button class="btn btn--primary" data-action="day-mark-all" data-date="${date}">${esc(
-      t('calendar.markAllDay'),
-    )}</button>
-    <button class="btn btn--ghost" data-action="day-mark-missed" data-date="${date}">${esc(
-      t('calendar.markMissed'),
-    )}</button>
-    ${
-      app.model.profile.gender === 'female'
-        ? `<button class="btn btn--ghost" data-action="day-mark-exempt" data-date="${date}">${esc(
-            t('calendar.markExcused'),
-          )}</button>`
-        : ''
-    }
+    <div class="day-actions">
+      <button class="btn btn--primary btn--sm" data-action="day-mark-all" data-date="${date}">${esc(
+        t('calendar.shortDone'),
+      )}</button>
+      <button class="btn btn--ghost btn--sm" data-action="day-mark-missed" data-date="${date}">${esc(
+        t('calendar.shortMissed'),
+      )}</button>
+      ${
+        app.model.profile.gender === 'female'
+          ? `<button class="btn btn--ghost btn--sm" data-action="day-mark-exempt" data-date="${date}">${esc(
+              t('calendar.shortExcused'),
+            )}</button>`
+          : ''
+      }
+    </div>
+    <button class="btn btn--icon" data-action="day-step" data-delta="1" aria-label="${esc(
+      t('today.nextDay'),
+    )}">${icon('chevronRight')}</button>
+    <button class="btn btn--icon" data-action="close-sheet" aria-label="${esc(
+      t('common.close'),
+    )}">${icon('close')}</button>
     <button class="btn" data-action="day-step" data-delta="1" aria-label="${esc(
       t('today.nextDay'),
     )}">${icon('chevronRight')}</button>
@@ -328,7 +337,7 @@ function bulkSheet(app) {
     body,
     foot: `
       <button class="btn" data-action="close-sheet">${esc(t('common.cancel'))}</button>
-      <button class="btn btn--primary" data-action="bulk-apply" ${count ? '' : 'disabled'}>${esc(
+      <button class="btn btn--primary" data-action="bulk-apply" >${esc(
         t('calendar.apply'),
       )}</button>`,
   });
@@ -966,6 +975,26 @@ export const handlers = {
     });
   },
 
+  'today-resume': (app) => {
+    app.openSheet('confirm', {
+      title: t('today.resume'),
+      body: t('today.resumeBody'),
+      confirmLabel: t('today.resume'),
+      action: 'do-today-resume',
+    });
+  },
+
+  'do-today-resume': (app) => {
+    app.commit(
+      (model) => {
+        model.markRange(app.today, app.today, MARK_MISSED, { includeToday: true, skipExempt: false });
+        model.resumeDay(app.today);
+      },
+      { message: t('today.resume') },
+    );
+    app.closeSheet();
+  },
+
   'do-today-excuse': (app) => {
     app.commit(
       (model) => {
@@ -1032,6 +1061,11 @@ export const handlers = {
     const sheet = app.sheet;
     const value = sheet.mode === 'done' ? MARK_DONE : sheet.mode === 'exempt' ? MARK_EXEMPT : MARK_MISSED;
     let count = 0;
+
+    if (!isISO(sheet.from) || !isISO(sheet.to) || sheet.to < sheet.from) {
+      app.showToast(t('calendar.badRange'));
+      return;
+    }
     app.commit(
       (model) => {
         count = model.markRange(sheet.from, sheet.to, value, {

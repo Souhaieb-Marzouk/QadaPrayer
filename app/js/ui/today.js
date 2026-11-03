@@ -48,7 +48,11 @@ function renderPrayer(app, item) {
 
   return `
     <article class="prayer" data-state="${status}" data-prayer="${prayer}">
-      <button class="prayer__head" data-action="prayer-sheet" data-prayer="${prayer}">
+      ${
+        excused
+          ? '<div class="prayer__head prayer__head--locked">'
+          : `<button class="prayer__head" data-action="prayer-sheet" data-prayer="${prayer}">`
+      }
         <span class="prayer__check">${icon('check')}</span>
         <span class="prayer__body">
           <span class="prayer__name">
@@ -60,7 +64,7 @@ function renderPrayer(app, item) {
           </span>
         </span>
         <span class="prayer__right">${statusPill(status)}</span>
-      </button>
+      ${excused ? '</div>' : '</button>'}
       <div class="prayer__qada">
         ${
           excused
@@ -77,6 +81,7 @@ export function render(app) {
   const model = app.model;
   const projection = model.projection();
   const plan = model.plan(app.today);
+  const excusedToday = plan.items.length > 0 && plan.items.every((item) => item.mark === MARK_EXEMPT);
   const state = prayerStateAt(app.day, app.now);
 
   const todayDone = PRAYERS.filter(
@@ -184,11 +189,15 @@ export function render(app) {
     }
 
     ${
-      app.model.profile.gender === 'female'
-        ? `<button class="btn btn--ghost btn--block" data-action="today-excuse">${icon(
-            'shield',
-          )} ${esc(t('today.excuse'))}</button>`
-        : ''
+      app.model.profile.gender !== 'female'
+        ? ''
+        : excusedToday
+          ? `<button class="btn btn--ghost btn--block" data-action="today-resume">${icon(
+              'undo',
+            )} ${esc(t('today.resume'))}</button>`
+          : `<button class="btn btn--ghost btn--block" data-action="today-excuse">${icon(
+              'shield',
+            )} ${esc(t('today.excuse'))}</button>`
     }
 
     ${

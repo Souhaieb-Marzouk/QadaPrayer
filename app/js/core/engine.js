@@ -486,6 +486,12 @@ export class Qada {
     return [];
   }
 
+  /** Undo pauseDay: the day plans its make-ups again. */
+  resumeDay(dateISO) {
+    delete this.data.pauses[dateISO];
+    this.touch();
+  }
+
   /** Move every make-up still owed today to the next day. */
   pauseDay(dateISO) {
     this.data.pauses[dateISO] = (1 << SLOTS_PER_DAY) - 1;
