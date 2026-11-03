@@ -40,7 +40,9 @@ function renderQadaChips(indices) {
 
 function renderPrayer(app, item) {
   const { prayer } = item;
-  const status = statusOf(app, item.mark, prayer);
+  // An excused day is neither prayed nor missed: say so where the badge is.
+  const excused = item.mark === MARK_EXEMPT;
+  const status = excused ? 'exempt' : statusOf(app, item.mark, prayer);
   const window = app.day.windows[prayer];
   const time = `${clock(window.start)} – ${clock(window.end)}`;
 
@@ -61,9 +63,11 @@ function renderPrayer(app, item) {
       </button>
       <div class="prayer__qada">
         ${
-          item.qada.length
-            ? `<span class="qada-empty">${esc(t('today.makeups'))}:</span>${renderQadaChips(item.qada)}`
-            : `<span class="qada-empty">${esc(t('today.noMakeups'))}</span>`
+          excused
+            ? `<span class="qada-empty">${esc(t('today.excused'))}</span>`
+            : item.qada.length
+              ? `<span class="qada-empty">${esc(t('today.makeups'))}:</span>${renderQadaChips(item.qada)}`
+              : `<span class="qada-empty">${esc(t('today.noMakeups'))}</span>`
         }
       </div>
     </article>`;

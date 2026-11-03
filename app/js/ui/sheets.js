@@ -227,6 +227,9 @@ export function renderDaySheet(app, sheet) {
     <button class="btn btn--primary" data-action="day-mark-all" data-date="${date}">${esc(
       t('calendar.markAllDay'),
     )}</button>
+    <button class="btn btn--ghost" data-action="day-mark-missed" data-date="${date}">${esc(
+      t('calendar.markMissed'),
+    )}</button>
     ${
       app.model.profile.gender === 'female'
         ? `<button class="btn btn--ghost" data-action="day-mark-exempt" data-date="${date}">${esc(
@@ -340,8 +343,13 @@ function countChange(model, from, to, mode, today) {
   const toIndex = Math.min(model.backlogEnd(today), dayOfISO(to) * 5 + 4);
   if (toIndex < fromIndex) return 0;
   let count = 0;
+  const skipExempt = target === MARK_DONE;
   for (let i = fromIndex; i <= toIndex; i += 1) {
-    if (model.get(i) !== target) count += 1;
+    const current = model.get(i);
+    if (current === target) continue;
+    // days already excused are not part of "N prayers will change"
+    if (skipExempt && current === MARK_EXEMPT) continue;
+    count += 1;
   }
   return count;
 }
@@ -959,8 +967,21 @@ export const handlers = {
   },
 
   'do-today-excuse': (app) => {
-    app.commit((model) => model.markRange(app.today, app.today, MARK_EXEMPT, { includeToday: true }), {
-      message: t('today.excuse'),
+    app.commit(
+      (model) => {
+        model.markRange(app.today, app.today, MARK_EXEMPT, { includeToday: true });
+        // What she still owed today is not owed today: it moves to tomorrow.
+        model.pauseDay(app.today);
+      },
+      { message: t('today.excuse') },
+    );
+    app.closeSheet();
+  },
+
+  'day-mark-missed': (app, el) => {
+    const date = el.dataset.date;
+    app.commit((model) => model.markRange(date, date, MARK_MISSED), {
+      message: t('calendar.markMissed'),
     });
     app.closeSheet();
   },
