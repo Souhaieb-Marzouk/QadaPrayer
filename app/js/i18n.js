@@ -148,6 +148,10 @@ const DICTIONARIES = {
     'calendar.markExcused': 'Excused — Haydh',
     'today.excuse': 'I am excused today',
     'today.excused': 'Excused — not owed today',
+    'credits.made': 'Designed and developed by',
+    'credits.rights': 'All rights reserved.',
+    'credits.licence': 'Free software, GNU GPL v3',
+    'credits.built': 'Built for the one who is counting, quietly.',
     'today.excuseBody':
       'Today is excused: the five prayers are not owed, and the calendar, the streak and the progress follow. You can change it any time by opening the day.',
     'location.unsupported': 'This phone cannot share its location — search for your city instead.',
@@ -631,6 +635,10 @@ const DICTIONARIES = {
     'today.excuseBody':
       'Aujourd’hui est excusé : les cinq prières ne sont pas dues, et le calendrier, la série et la progression suivent. Vous pouvez changer cela à tout moment.',
     'today.excused': 'Excusée — non due aujourd’hui',
+    'credits.made': 'Con\u00e7u et d\u00e9velopp\u00e9 par',
+    'credits.rights': 'Tous droits r\u00e9serv\u00e9s.',
+    'credits.licence': 'Logiciel libre, GNU GPL v3',
+    'credits.built': 'Fait pour celui qui compte, sans bruit.',
     'calendar.markExempt': 'Non due (exemption)',
     'location.unsupported': 'Ce téléphone ne peut pas partager sa position — cherchez votre ville.',
     'calendar.daysDone': '{done}/{total} priées',
@@ -1112,6 +1120,10 @@ const DICTIONARIES = {
     'today.excuseBody':
       'اليوم معذور: لا تلزمك الصلوات الخمس، ويتبع ذلك التقويم والتتابع والتقدم.',
     'today.excused': 'معذورة — غير مطلوبة اليوم',
+    'credits.made': '\u062a\u0635\u0645\u064a\u0645 \u0648\u062a\u0637\u0648\u064a\u0631',
+    'credits.rights': '\u062c\u0645\u064a\u0639 \u0627\u0644\u062d\u0642\u0648\u0642 \u0645\u062d\u0641\u0648\u0638\u0629.',
+    'credits.licence': '\u0628\u0631\u0646\u0627\u0645\u062c \u062d\u0631\u060c GNU GPL v3',
+    'credits.built': '\u0645\u0635\u0646\u0648\u0639 \u0644\u0645\u0646 \u064a\u0639\u062f\u0651 \u0628\u0647\u062f\u0648\u0621.',
     'calendar.markExempt': 'غير مطلوب (عذر)',
     'location.unsupported': 'هذا الهاتف لا يمكنه مشاركة موقعه — ابحث عن مدينتك.',
     'calendar.daysDone': '{done}/{total} مُصلّاة',

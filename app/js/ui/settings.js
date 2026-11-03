@@ -629,6 +629,23 @@ export function render(app) {
     </div>`,
   );
 
+  const year = new Date().getFullYear();
+  const credits = `
+    <div class="credits">
+      <p class="credits__who">
+        ${esc(t('credits.made'))}
+        <strong>Souhaieb Marzouk</strong>
+      </p>
+      <p class="credits__line">
+        © ${year} QadaPrayer · ${esc(t('credits.rights'))}
+      </p>
+      <p class="credits__line">
+        ${esc(t('credits.licence'))} ·
+        <a class="credits__link" href="${esc('https://github.com/Souhaieb-Marzouk/QadaPrayer')}" rel="noreferrer noopener" target="_blank">GitHub</a>
+      </p>
+      <p class="credits__line credits__line--soft">${esc(t('credits.built'))}</p>
+    </div>`;
+
   return [
     language,
     appearance,
@@ -641,6 +658,7 @@ export function render(app) {
     data,
     install,
     about,
+    credits,
   ].join('');
 }
 

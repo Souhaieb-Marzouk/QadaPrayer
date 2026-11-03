@@ -2435,3 +2435,45 @@ html {
   gap: 0.5rem;
   text-align: start;
 }
+
+/* Credits, at the very bottom of Settings. */
+.credits {
+  margin: 1.8rem auto 0.4rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line-soft);
+  text-align: center;
+  display: grid;
+  gap: 0.3rem;
+  max-width: 26rem;
+}
+
+.credits__who {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-dim);
+}
+
+.credits__who strong {
+  color: var(--text);
+  font-weight: 650;
+}
+
+.credits__line {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.credits__line--soft {
+  opacity: 0.62;
+}
+
+.credits__link {
+  color: var(--gold-soft);
+  text-decoration: none;
+}
+
+.credits__link:hover {
+  text-decoration: underline;
+}
