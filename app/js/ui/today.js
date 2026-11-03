@@ -161,7 +161,7 @@ export function render(app) {
     </div>
 
     ${
-      paused
+      paused && !excusedToday
         ? `<div class="notice">${icon('clock')}<span>${esc(
             t('today.paused', { prayer: pausedPrayer }),
           )}</span></div>
